@@ -46,9 +46,9 @@ echo "
 --- a/makefile.linux-mingw 2014-04-02 11:32:16.471594423 +0300
 +++ b/makefile.linux-mingw 2014-04-02 11:32:59.631051835 +0300
 @@ -52,7 +52,7 @@
-	DEFS += -DUSE_IPV6=$(USE_IPV6)
+DEFS += -DUSE_IPV6=$(USE_IPV6)
 endif
--LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi -lz -lcrypt32 -lws2_32
+-LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
 +LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi -lz -lcrypt32 STAGING_HERE/lib/libevent.a STAGING_HERE/lib/libevent.dll.a -lws2_32
 # TODO: make the mingw builds smarter about dependencies, like the linux/osx builds are
 HEADERS = $(wildcard *.h) " | sed s2"STAGING_HERE"2"$(echo $STAGING)"2g | patch -l

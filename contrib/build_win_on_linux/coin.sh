@@ -10,12 +10,10 @@ cd $STAGING
 unzip -o $OUTDIR/qt-win32-4.8.3-gitian-r4.zip
 unzip -o $OUTDIR/boost-win32-1.54.0-gitian-r6.zip
 unzip -o $OUTDIR/bitcoin-deps-win32-gitian-r9.zip
-#cd ~/deps
+cd ~/deps
 rm -rf razor
-mkdir razor
-#git clone https://github.com/razor-coin/razor.git	# or just unpack a .tar archive
+git clone https://github.com/razor-coin/razor.git razor	# or just unpack a .tar archive
 cd ~/deps/razor
-cp -R ~/razor/* .
 export PATH=$STAGING/host/bin:$PATH
 ln -sf $STAGING $HOME/qt
 

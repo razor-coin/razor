@@ -51,7 +51,7 @@ static void cpath_ref_decref(crypt_path_reference_t *cpath_ref);
 /** A map from channel and circuit ID to circuit.  (Lookup performance is
  * very important here, since we need to do it every time a cell arrives.) */
 typedef struct chan_circid_circuit_map_t {
-  HT_ENTRY(chan_circid_circuit_map_t) node;
+  HT_ERZRY(chan_circid_circuit_map_t) node;
   channel_t *chan;
   circid_t circ_id;
   circuit_t *circuit;
@@ -465,27 +465,27 @@ circuit_purpose_to_controller_string(uint8_t purpose)
   static char buf[32];
   switch (purpose) {
     case CIRCUIT_PURPOSE_OR:
-    case CIRCUIT_PURPOSE_INTRO_POINT:
+    case CIRCUIT_PURPOSE_IRZRO_POINT:
     case CIRCUIT_PURPOSE_REND_POINT_WAITING:
     case CIRCUIT_PURPOSE_REND_ESTABLISHED:
       return "SERVER"; /* A controller should never see these, actually. */
 
     case CIRCUIT_PURPOSE_C_GENERAL:
       return "GENERAL";
-    case CIRCUIT_PURPOSE_C_INTRODUCING:
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACKED:
-      return "HS_CLIENT_INTRO";
+    case CIRCUIT_PURPOSE_C_IRZRODUCING:
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED:
+      return "HS_CLIENT_IRZRO";
 
     case CIRCUIT_PURPOSE_C_ESTABLISH_REND:
     case CIRCUIT_PURPOSE_C_REND_READY:
-    case CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED:
+    case CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED:
     case CIRCUIT_PURPOSE_C_REND_JOINED:
       return "HS_CLIENT_REND";
 
-    case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
-    case CIRCUIT_PURPOSE_S_INTRO:
-      return "HS_SERVICE_INTRO";
+    case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
+    case CIRCUIT_PURPOSE_S_IRZRO:
+      return "HS_SERVICE_IRZRO";
 
     case CIRCUIT_PURPOSE_S_CONNECT_REND:
     case CIRCUIT_PURPOSE_S_REND_JOINED:
@@ -495,8 +495,8 @@ circuit_purpose_to_controller_string(uint8_t purpose)
       return "TESTING";
     case CIRCUIT_PURPOSE_C_MEASURE_TIMEOUT:
       return "MEASURE_TIMEOUT";
-    case CIRCUIT_PURPOSE_CONTROLLER:
-      return "CONTROLLER";
+    case CIRCUIT_PURPOSE_CORZROLLER:
+      return "CORZROLLER";
     case CIRCUIT_PURPOSE_PATH_BIAS_TESTING:
       return "PATH_BIAS_TESTING";
 
@@ -525,36 +525,36 @@ circuit_purpose_to_controller_hs_state_string(uint8_t purpose)
     case CIRCUIT_PURPOSE_C_GENERAL:
     case CIRCUIT_PURPOSE_C_MEASURE_TIMEOUT:
     case CIRCUIT_PURPOSE_TESTING:
-    case CIRCUIT_PURPOSE_CONTROLLER:
+    case CIRCUIT_PURPOSE_CORZROLLER:
     case CIRCUIT_PURPOSE_PATH_BIAS_TESTING:
       return NULL;
 
-    case CIRCUIT_PURPOSE_INTRO_POINT:
+    case CIRCUIT_PURPOSE_IRZRO_POINT:
       return "OR_HSSI_ESTABLISHED";
     case CIRCUIT_PURPOSE_REND_POINT_WAITING:
       return "OR_HSCR_ESTABLISHED";
     case CIRCUIT_PURPOSE_REND_ESTABLISHED:
       return "OR_HS_R_JOINED";
 
-    case CIRCUIT_PURPOSE_C_INTRODUCING:
+    case CIRCUIT_PURPOSE_C_IRZRODUCING:
       return "HSCI_CONNECTING";
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
-      return "HSCI_INTRO_SENT";
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACKED:
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
+      return "HSCI_IRZRO_SENT";
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED:
       return "HSCI_DONE";
 
     case CIRCUIT_PURPOSE_C_ESTABLISH_REND:
       return "HSCR_CONNECTING";
     case CIRCUIT_PURPOSE_C_REND_READY:
       return "HSCR_ESTABLISHED_IDLE";
-    case CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED:
+    case CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED:
       return "HSCR_ESTABLISHED_WAITING";
     case CIRCUIT_PURPOSE_C_REND_JOINED:
       return "HSCR_JOINED";
 
-    case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
+    case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
       return "HSSI_CONNECTING";
-    case CIRCUIT_PURPOSE_S_INTRO:
+    case CIRCUIT_PURPOSE_S_IRZRO:
       return "HSSI_ESTABLISHED";
 
     case CIRCUIT_PURPOSE_S_CONNECT_REND:
@@ -574,7 +574,7 @@ circuit_purpose_to_string(uint8_t purpose)
     {
     case CIRCUIT_PURPOSE_OR:
       return "Circuit at relay";
-    case CIRCUIT_PURPOSE_INTRO_POINT:
+    case CIRCUIT_PURPOSE_IRZRO_POINT:
       return "Acting as intro point";
     case CIRCUIT_PURPOSE_REND_POINT_WAITING:
       return "Acting as rendevous (pending)";
@@ -582,26 +582,26 @@ circuit_purpose_to_string(uint8_t purpose)
       return "Acting as rendevous (established)";
     case CIRCUIT_PURPOSE_C_GENERAL:
       return "General-purpose client";
-    case CIRCUIT_PURPOSE_C_INTRODUCING:
+    case CIRCUIT_PURPOSE_C_IRZRODUCING:
       return "Hidden service client: Connecting to intro point";
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
       return "Hidden service client: Waiting for ack from intro point";
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACKED:
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED:
       return "Hidden service client: Received ack from intro point";
     case CIRCUIT_PURPOSE_C_ESTABLISH_REND:
       return "Hidden service client: Establishing rendezvous point";
     case CIRCUIT_PURPOSE_C_REND_READY:
       return "Hidden service client: Pending rendezvous point";
-    case CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED:
+    case CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED:
       return "Hidden service client: Pending rendezvous point (ack received)";
     case CIRCUIT_PURPOSE_C_REND_JOINED:
       return "Hidden service client: Active rendezvous point";
     case CIRCUIT_PURPOSE_C_MEASURE_TIMEOUT:
       return "Measuring circuit timeout";
 
-    case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
+    case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
       return "Hidden service: Establishing introduction point";
-    case CIRCUIT_PURPOSE_S_INTRO:
+    case CIRCUIT_PURPOSE_S_IRZRO:
       return "Hidden service: Introduction point";
     case CIRCUIT_PURPOSE_S_CONNECT_REND:
       return "Hidden service: Connecting to rendezvous point";
@@ -611,7 +611,7 @@ circuit_purpose_to_string(uint8_t purpose)
     case CIRCUIT_PURPOSE_TESTING:
       return "Testing circuit";
 
-    case CIRCUIT_PURPOSE_CONTROLLER:
+    case CIRCUIT_PURPOSE_CORZROLLER:
       return "Circuit made by controller";
 
     case CIRCUIT_PURPOSE_PATH_BIAS_TESTING:
@@ -1265,7 +1265,7 @@ or_circuit_t *
 circuit_get_intro_point(const char *digest)
 {
   return circuit_get_by_rend_token_and_purpose(
-                                     CIRCUIT_PURPOSE_INTRO_POINT, digest,
+                                     CIRCUIT_PURPOSE_IRZRO_POINT, digest,
                                      DIGEST_LEN);
 }
 
@@ -1425,9 +1425,9 @@ circuit_mark_all_dirty_circs_as_unusable(void)
  *   - If circ isn't open yet: call circuit_build_failed() if we're
  *     the origin, and in either case call circuit_rep_hist_note_result()
  *     to note stats.
- *   - If purpose is C_INTRODUCE_ACK_WAIT, report the intro point
+ *   - If purpose is C_IRZRODUCE_ACK_WAIT, report the intro point
  *     failure we just had to the hidden service client module.
- *   - If purpose is C_INTRODUCING and <b>reason</b> isn't TIMEOUT,
+ *   - If purpose is C_IRZRODUCING and <b>reason</b> isn't TIMEOUT,
  *     report to the hidden service client module that the intro point
  *     we just tried may be unreachable.
  *   - Send appropriate destroys and edge_destroys for conns and
@@ -1502,7 +1502,7 @@ circuit_mark_for_close_(circuit_t *circ, int reason, int line,
      (circ->state == CIRCUIT_STATE_OPEN)?CIRC_EVENT_CLOSED:CIRC_EVENT_FAILED,
      orig_reason);
   }
-  if (circ->purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT) {
+  if (circ->purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT) {
     origin_circuit_t *ocirc = TO_ORIGIN_CIRCUIT(circ);
     int timed_out = (reason == END_CIRC_REASON_TIMEOUT);
     tor_assert(circ->state == CIRCUIT_STATE_OPEN);
@@ -1516,9 +1516,9 @@ circuit_mark_for_close_(circuit_t *circ, int reason, int line,
     rend_client_report_intro_point_failure(ocirc->build_state->chosen_exit,
                                            ocirc->rend_data,
                                            timed_out ?
-                                           INTRO_POINT_FAILURE_TIMEOUT :
-                                           INTRO_POINT_FAILURE_GENERIC);
-  } else if (circ->purpose == CIRCUIT_PURPOSE_C_INTRODUCING &&
+                                           IRZRO_POINT_FAILURE_TIMEOUT :
+                                           IRZRO_POINT_FAILURE_GENERIC);
+  } else if (circ->purpose == CIRCUIT_PURPOSE_C_IRZRODUCING &&
              reason != END_CIRC_REASON_TIMEOUT) {
     origin_circuit_t *ocirc = TO_ORIGIN_CIRCUIT(circ);
     if (ocirc->build_state->chosen_exit && ocirc->rend_data) {
@@ -1529,7 +1529,7 @@ circuit_mark_for_close_(circuit_t *circ, int reason, int line,
            safe_str_client(build_state_get_exit_nickname(ocirc->build_state)));
       rend_client_report_intro_point_failure(ocirc->build_state->chosen_exit,
                                              ocirc->rend_data,
-                                             INTRO_POINT_FAILURE_UNREACHABLE);
+                                             IRZRO_POINT_FAILURE_UNREACHABLE);
     }
   }
   if (circ->n_chan) {

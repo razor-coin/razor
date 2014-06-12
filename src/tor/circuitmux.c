@@ -165,7 +165,7 @@ struct circuit_muxinfo_s {
  */
 
 struct chanid_circid_muxinfo_t {
-  HT_ENTRY(chanid_circid_muxinfo_t) node;
+  HT_ERZRY(chanid_circid_muxinfo_t) node;
   uint64_t chan_id;
   circid_t circ_id;
   circuit_muxinfo_t muxinfo;

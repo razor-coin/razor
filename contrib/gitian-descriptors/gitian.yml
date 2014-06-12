@@ -1,5 +1,5 @@
 ---
-name: "neutrinocoin"
+name: "razor"
 suites:
 - "lucid"
 architectures:
@@ -20,8 +20,8 @@ packages:
 - "libpng12-dev"
 reference_datetime: "2011-01-30 00:00:00"
 remotes:
-- "url": "https://github.com/neutrinocoin-project/neutrinocoin.git"
-  "dir": "neutrinocoin"
+- "url": "https://github.com/razor-project/razor.git"
+  "dir": "razor"
 files:
 - "miniupnpc-1.6.tar.gz"
 - "qrencode-3.2.0.tar.bz2"
@@ -40,16 +40,16 @@ script: |
   make $MAKEOPTS install
   cd ..
   #
-  cd neutrinocoin
+  cd razor
   mkdir -p $OUTDIR/src
   git archive HEAD | tar -x -C $OUTDIR/src
   cp $OUTDIR/src/doc/README.md $OUTDIR
   cp $OUTDIR/src/COPYING $OUTDIR
   cd src
-  make -f makefile.unix STATIC=1 OPENSSL_INCLUDE_PATH="$INSTDIR/include" OPENSSL_LIB_PATH="$INSTDIR/lib" $MAKEOPTS neutrinocoind USE_UPNP=0 DEBUGFLAGS= USE_SSE2=1
+  make -f makefile.unix STATIC=1 OPENSSL_INCLUDE_PATH="$INSTDIR/include" OPENSSL_LIB_PATH="$INSTDIR/lib" $MAKEOPTS razord USE_UPNP=0 DEBUGFLAGS= USE_SSE2=1
   mkdir -p $OUTDIR/bin/$GBUILD_BITS
-  install -s neutrinocoind $OUTDIR/bin/$GBUILD_BITS
+  install -s razord $OUTDIR/bin/$GBUILD_BITS
   cd ..
   qmake INCLUDEPATH="$INSTDIR/include" LIBS="-L$INSTDIR/lib" RELEASE=1 USE_QRCODE=1 USE_SSE2=1
   make $MAKEOPTS
-  install neutrinocoin-qt $OUTDIR/bin/$GBUILD_BITS
+  install razor-qt $OUTDIR/bin/$GBUILD_BITS

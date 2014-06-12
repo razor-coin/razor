@@ -2983,7 +2983,7 @@ router_purpose_to_string(uint8_t p)
     {
     case ROUTER_PURPOSE_GENERAL: return "general";
     case ROUTER_PURPOSE_BRIDGE: return "bridge";
-    case ROUTER_PURPOSE_CONTROLLER: return "controller";
+    case ROUTER_PURPOSE_CORZROLLER: return "controller";
     default:
       tor_assert(0);
     }
@@ -2999,7 +2999,7 @@ router_purpose_from_string(const char *s)
   else if (!strcmp(s, "bridge"))
     return ROUTER_PURPOSE_BRIDGE;
   else if (!strcmp(s, "controller"))
-    return ROUTER_PURPOSE_CONTROLLER;
+    return ROUTER_PURPOSE_CORZROLLER;
   else
     return ROUTER_PURPOSE_UNKNOWN;
 }

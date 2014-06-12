@@ -15,7 +15,7 @@
 #include "rendmid.h"
 #include "rephist.h"
 
-/** Respond to an ESTABLISH_INTRO cell by checking the signed data and
+/** Respond to an ESTABLISH_IRZRO cell by checking the signed data and
  * setting the circuit's purpose and service pk digest.
  */
 int
@@ -32,12 +32,12 @@ rend_mid_establish_intro(or_circuit_t *circ, const uint8_t *request,
   int reason = END_CIRC_REASON_INTERNAL;
 
   log_info(LD_REND,
-           "Received an ESTABLISH_INTRO request on circuit %u",
+           "Received an ESTABLISH_IRZRO request on circuit %u",
            (unsigned) circ->p_circ_id);
 
   if (circ->base_.purpose != CIRCUIT_PURPOSE_OR || circ->base_.n_chan) {
     log_fn(LOG_PROTOCOL_WARN, LD_PROTOCOL,
-         "Rejecting ESTABLISH_INTRO on non-OR or non-edge circuit.");
+         "Rejecting ESTABLISH_IRZRO on non-OR or non-edge circuit.");
     reason = END_CIRC_REASON_TORPROTOCOL;
     goto err;
   }
@@ -56,9 +56,9 @@ rend_mid_establish_intro(or_circuit_t *circ, const uint8_t *request,
     goto err;
   }
 
-  /* Next 20 bytes: Hash of rend_circ_nonce | "INTRODUCE" */
+  /* Next 20 bytes: Hash of rend_circ_nonce | "IRZRODUCE" */
   memcpy(buf, circ->rend_circ_nonce, DIGEST_LEN);
-  memcpy(buf+DIGEST_LEN, "INTRODUCE", 9);
+  memcpy(buf+DIGEST_LEN, "IRZRODUCE", 9);
   if (crypto_digest(expected_digest, buf, DIGEST_LEN+9) < 0) {
     log_warn(LD_BUG, "Internal error computing digest.");
     goto err;
@@ -75,7 +75,7 @@ rend_mid_establish_intro(or_circuit_t *circ, const uint8_t *request,
                                        (char*)(request+2+DIGEST_LEN+asn1len),
                                        request_len-(2+DIGEST_LEN+asn1len))<0) {
     log_warn(LD_PROTOCOL,
-             "Incorrect signature on ESTABLISH_INTRO cell; rejecting.");
+             "Incorrect signature on ESTABLISH_IRZRO cell; rejecting.");
     reason = END_CIRC_REASON_TORPROTOCOL;
     goto err;
   }
@@ -103,14 +103,14 @@ rend_mid_establish_intro(or_circuit_t *circ, const uint8_t *request,
 
   /* Acknowledge the request. */
   if (relay_send_command_from_edge(0, TO_CIRCUIT(circ),
-                                   RELAY_COMMAND_INTRO_ESTABLISHED,
+                                   RELAY_COMMAND_IRZRO_ESTABLISHED,
                                    "", 0, NULL)<0) {
-    log_info(LD_GENERAL, "Couldn't send INTRO_ESTABLISHED cell.");
+    log_info(LD_GENERAL, "Couldn't send IRZRO_ESTABLISHED cell.");
     goto err;
   }
 
   /* Now, set up this circuit. */
-  circuit_change_purpose(TO_CIRCUIT(circ), CIRCUIT_PURPOSE_INTRO_POINT);
+  circuit_change_purpose(TO_CIRCUIT(circ), CIRCUIT_PURPOSE_IRZRO_POINT);
   memcpy(circ->rend_token, pk_digest, DIGEST_LEN);
 
   log_info(LD_REND,
@@ -119,7 +119,7 @@ rend_mid_establish_intro(or_circuit_t *circ, const uint8_t *request,
 
   return 0;
  truncated:
-  log_warn(LD_PROTOCOL, "Rejecting truncated ESTABLISH_INTRO cell.");
+  log_warn(LD_PROTOCOL, "Rejecting truncated ESTABLISH_IRZRO cell.");
   reason = END_CIRC_REASON_TORPROTOCOL;
  err:
   if (pk) crypto_pk_free(pk);
@@ -127,9 +127,9 @@ rend_mid_establish_intro(or_circuit_t *circ, const uint8_t *request,
   return -1;
 }
 
-/** Process an INTRODUCE1 cell by finding the corresponding introduction
- * circuit, and relaying the body of the INTRODUCE1 cell inside an
- * INTRODUCE2 cell.
+/** Process an IRZRODUCE1 cell by finding the corresponding introduction
+ * circuit, and relaying the body of the IRZRODUCE1 cell inside an
+ * IRZRODUCE2 cell.
  */
 int
 rend_mid_introduce(or_circuit_t *circ, const uint8_t *request,
@@ -139,12 +139,12 @@ rend_mid_introduce(or_circuit_t *circ, const uint8_t *request,
   char serviceid[REND_SERVICE_ID_LEN_BASE32+1];
   char nak_body[1];
 
-  log_info(LD_REND, "Received an INTRODUCE1 request on circuit %u",
+  log_info(LD_REND, "Received an IRZRODUCE1 request on circuit %u",
            (unsigned)circ->p_circ_id);
 
   if (circ->base_.purpose != CIRCUIT_PURPOSE_OR || circ->base_.n_chan) {
     log_warn(LD_PROTOCOL,
-             "Rejecting INTRODUCE1 on non-OR or non-edge circuit %u.",
+             "Rejecting IRZRODUCE1 on non-OR or non-edge circuit %u.",
              (unsigned)circ->p_circ_id);
     goto err;
   }
@@ -155,7 +155,7 @@ rend_mid_introduce(or_circuit_t *circ, const uint8_t *request,
    */
   if (request_len < (DIGEST_LEN+(MAX_NICKNAME_LEN+1)+REND_COOKIE_LEN+
                      DH_KEY_LEN+CIPHER_KEY_LEN+PKCS1_OAEP_PADDING_OVERHEAD)) {
-    log_warn(LD_PROTOCOL, "Impossibly short INTRODUCE1 cell on circuit %u; "
+    log_warn(LD_PROTOCOL, "Impossibly short IRZRODUCE1 cell on circuit %u; "
              "responding with nack.",
              (unsigned)circ->p_circ_id);
     goto err;
@@ -168,7 +168,7 @@ rend_mid_introduce(or_circuit_t *circ, const uint8_t *request,
   intro_circ = circuit_get_intro_point((char*)request);
   if (!intro_circ) {
     log_info(LD_REND,
-             "No intro circ found for INTRODUCE1 cell (%s) from circuit %u; "
+             "No intro circ found for IRZRODUCE1 cell (%s) from circuit %u; "
              "responding with nack.",
              safe_str(serviceid), (unsigned)circ->p_circ_id);
     goto err;
@@ -182,17 +182,17 @@ rend_mid_introduce(or_circuit_t *circ, const uint8_t *request,
 
   /* Great.  Now we just relay the cell down the circuit. */
   if (relay_send_command_from_edge(0, TO_CIRCUIT(intro_circ),
-                                   RELAY_COMMAND_INTRODUCE2,
+                                   RELAY_COMMAND_IRZRODUCE2,
                                    (char*)request, request_len, NULL)) {
     log_warn(LD_GENERAL,
-             "Unable to send INTRODUCE2 cell to Tor client.");
+             "Unable to send IRZRODUCE2 cell to Tor client.");
     goto err;
   }
   /* And sent an ack down Alice's circuit.  Empty body means succeeded. */
   if (relay_send_command_from_edge(0,TO_CIRCUIT(circ),
-                                   RELAY_COMMAND_INTRODUCE_ACK,
+                                   RELAY_COMMAND_IRZRODUCE_ACK,
                                    NULL,0,NULL)) {
-    log_warn(LD_GENERAL, "Unable to send INTRODUCE_ACK cell to Tor client.");
+    log_warn(LD_GENERAL, "Unable to send IRZRODUCE_ACK cell to Tor client.");
     circuit_mark_for_close(TO_CIRCUIT(circ), END_CIRC_REASON_INTERNAL);
     return -1;
   }
@@ -202,7 +202,7 @@ rend_mid_introduce(or_circuit_t *circ, const uint8_t *request,
   /* Send the client an NACK */
   nak_body[0] = 1;
   if (relay_send_command_from_edge(0,TO_CIRCUIT(circ),
-                                   RELAY_COMMAND_INTRODUCE_ACK,
+                                   RELAY_COMMAND_IRZRODUCE_ACK,
                                    nak_body, 1, NULL)) {
     log_warn(LD_GENERAL, "Unable to send NAK to Tor client.");
     /* Is this right? */

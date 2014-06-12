@@ -1,7 +1,7 @@
 src/*.exe
-src/neutrinocoin
-src/neutrinocoind
-src/test_neutrinocoin
+src/razor
+src/razord
+src/test_razor
 .*.swp
 *.*~*
 *.bak
@@ -9,17 +9,17 @@ src/test_neutrinocoin
 *.orig
 *.o
 *.patch
-.neutrinocoin
+.razor
 
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
-neutrinocoin-qt
-Neutrinocoin-Qt.app
+razor-qt
+Razor-Qt.app
 
 # Unit-tests
 Makefile.test
-neutrinocoin-qt_test
+razor-qt_test
 
 # Resources cpp
 qrc_*.cpp

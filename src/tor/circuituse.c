@@ -61,13 +61,13 @@ circuit_is_acceptable(const origin_circuit_t *origin_circ,
   if (purpose == CIRCUIT_PURPOSE_C_REND_JOINED && !must_be_open) {
     if (circ->purpose != CIRCUIT_PURPOSE_C_ESTABLISH_REND &&
         circ->purpose != CIRCUIT_PURPOSE_C_REND_READY &&
-        circ->purpose != CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED &&
+        circ->purpose != CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED &&
         circ->purpose != CIRCUIT_PURPOSE_C_REND_JOINED)
       return 0;
-  } else if (purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT &&
+  } else if (purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT &&
              !must_be_open) {
-    if (circ->purpose != CIRCUIT_PURPOSE_C_INTRODUCING &&
-        circ->purpose != CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT)
+    if (circ->purpose != CIRCUIT_PURPOSE_C_IRZRODUCING &&
+        circ->purpose != CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT)
       return 0;
   } else {
     if (purpose != circ->purpose)
@@ -150,7 +150,7 @@ circuit_is_acceptable(const origin_circuit_t *origin_circ,
       return 0;
     }
   } else { /* not general */
-    const edge_connection_t *edge_conn = ENTRY_TO_EDGE_CONN(conn);
+    const edge_connection_t *edge_conn = ERZRY_TO_EDGE_CONN(conn);
     if ((edge_conn->rend_data && !origin_circ->rend_data) ||
         (!edge_conn->rend_data && origin_circ->rend_data) ||
         (edge_conn->rend_data && origin_circ->rend_data &&
@@ -179,7 +179,7 @@ circuit_is_better(const origin_circuit_t *oa, const origin_circuit_t *ob,
 {
   const circuit_t *a = TO_CIRCUIT(oa);
   const circuit_t *b = TO_CIRCUIT(ob);
-  const uint8_t purpose = ENTRY_TO_CONN(conn)->purpose;
+  const uint8_t purpose = ERZRY_TO_CONN(conn)->purpose;
   int a_bits, b_bits;
 
   /* If one of the circuits was allowed to live due to relaxing its timeout,
@@ -210,7 +210,7 @@ circuit_is_better(const origin_circuit_t *oa, const origin_circuit_t *ob,
           return 1;
       }
       break;
-    case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
+    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
       /* the closer it is to ack_wait the better it is */
       if (a->purpose > b->purpose)
         return 1;
@@ -255,12 +255,12 @@ circuit_is_better(const origin_circuit_t *oa, const origin_circuit_t *ob,
  * If must_be_open, ignore circs not in CIRCUIT_STATE_OPEN.
  *
  * circ_purpose specifies what sort of circuit we must have.
- * It can be C_GENERAL, C_INTRODUCE_ACK_WAIT, or C_REND_JOINED.
+ * It can be C_GENERAL, C_IRZRODUCE_ACK_WAIT, or C_REND_JOINED.
  *
  * If it's REND_JOINED and must_be_open==0, then return the closest
  * rendezvous-purposed circuit that you can find.
  *
- * If it's INTRODUCE_ACK_WAIT and must_be_open==0, then return the
+ * If it's IRZRODUCE_ACK_WAIT and must_be_open==0, then return the
  * closest introduce-purposed circuit that you can find.
  */
 static origin_circuit_t *
@@ -276,7 +276,7 @@ circuit_get_best(const entry_connection_t *conn,
   tor_assert(conn);
 
   tor_assert(purpose == CIRCUIT_PURPOSE_C_GENERAL ||
-             purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT ||
+             purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT ||
              purpose == CIRCUIT_PURPOSE_C_REND_JOINED);
 
   tor_gettimeofday(&now);
@@ -289,7 +289,7 @@ circuit_get_best(const entry_connection_t *conn,
 
     /* Log an info message if we're going to launch a new intro circ in
      * parallel */
-    if (purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT &&
+    if (purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT &&
         !must_be_open && origin_circ->hs_circ_has_timed_out) {
         intro_going_on_but_too_old = 1;
         continue;
@@ -436,7 +436,7 @@ circuit_expire_building(void)
    * Four hops:
    *   RTTs = 4a + 3b + 2c + d
    *   RTTs = 10h
-   * Client INTRODUCE1+ACK: // XXX: correct?
+   * Client IRZRODUCE1+ACK: // XXX: correct?
    *   RTTs = 5a + 4b + 3c + 2d
    *   RTTs = 14h
    * Server intro:
@@ -497,10 +497,10 @@ circuit_expire_building(void)
       cutoff = begindir_cutoff;
     else if (victim->purpose == CIRCUIT_PURPOSE_C_MEASURE_TIMEOUT)
       cutoff = close_cutoff;
-    else if (victim->purpose == CIRCUIT_PURPOSE_C_INTRODUCING ||
-             victim->purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT)
+    else if (victim->purpose == CIRCUIT_PURPOSE_C_IRZRODUCING ||
+             victim->purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT)
       cutoff = c_intro_cutoff;
-    else if (victim->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_INTRO)
+    else if (victim->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO)
       cutoff = s_intro_cutoff;
     else if (victim->purpose == CIRCUIT_PURPOSE_C_ESTABLISH_REND)
       cutoff = stream_cutoff;
@@ -571,8 +571,8 @@ circuit_expire_building(void)
 
 #if 0
     /* some debug logs, to help track bugs */
-    if (victim->purpose >= CIRCUIT_PURPOSE_C_INTRODUCING &&
-        victim->purpose <= CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED) {
+    if (victim->purpose >= CIRCUIT_PURPOSE_C_IRZRODUCING &&
+        victim->purpose <= CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED) {
       if (!victim->timestamp_dirty)
         log_fn(LOG_DEBUG,"Considering %sopen purpose %d to %s (circid %d)."
                "(clean).",
@@ -596,7 +596,7 @@ circuit_expire_building(void)
         default: /* most open circuits can be left alone. */
           continue; /* yes, continue inside a switch refers to the nearest
                      * enclosing loop. C is smart. */
-        case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
+        case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
           break; /* too old, need to die */
         case CIRCUIT_PURPOSE_C_REND_READY:
           /* it's a rend_ready circ -- has it already picked a query? */
@@ -612,7 +612,7 @@ circuit_expire_building(void)
            * time to complete the test, but not forever */
           TO_ORIGIN_CIRCUIT(victim)->path_state = PATH_STATE_USE_FAILED;
           break;
-        case CIRCUIT_PURPOSE_C_INTRODUCING:
+        case CIRCUIT_PURPOSE_C_IRZRODUCING:
           /* We keep old introducing circuits around for
            * a while in parallel, and they can end up "opened".
            * We decide below if we're going to mark them timed
@@ -620,8 +620,8 @@ circuit_expire_building(void)
            */
           break;
         case CIRCUIT_PURPOSE_C_ESTABLISH_REND:
-        case CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED:
-        case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
+        case CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED:
+        case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
           /* rend and intro circs become dirty each time they
            * make an introduction attempt. so timestamp_dirty
            * will reflect the time since the last attempt.
@@ -702,19 +702,19 @@ circuit_expire_building(void)
       switch (victim->purpose) {
       case CIRCUIT_PURPOSE_C_REND_READY:
         /* We only want to spare a rend circ if it has been specified in
-         * an INTRODUCE1 cell sent to a hidden service.  A circ's
+         * an IRZRODUCE1 cell sent to a hidden service.  A circ's
          * pending_final_cpath field is non-NULL iff it is a rend circ
-         * and we have tried to send an INTRODUCE1 cell specifying it.
+         * and we have tried to send an IRZRODUCE1 cell specifying it.
          * Thus, if the pending_final_cpath field *is* NULL, then we
          * want to not spare it. */
         if (TO_ORIGIN_CIRCUIT(victim)->build_state->pending_final_cpath ==
             NULL)
           break;
         /* fallthrough! */
-      case CIRCUIT_PURPOSE_C_INTRODUCING:
+      case CIRCUIT_PURPOSE_C_IRZRODUCING:
         /* connection_ap_handshake_attach_circuit() will relaunch for us */
-      case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
-      case CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED:
+      case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
+      case CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED:
         /* If we have reached this line, we want to spare the circ for now. */
         log_info(LD_CIRC,"Marking circ %u (state %d:%s, purpose %d) "
                  "as timed-out HS circ",
@@ -1007,7 +1007,7 @@ circuit_detach_stream(circuit_t *circ, edge_connection_t *conn)
   tor_assert(conn);
 
   if (conn->base_.type == CONN_TYPE_AP) {
-    entry_connection_t *entry_conn = EDGE_TO_ENTRY_CONN(conn);
+    entry_connection_t *entry_conn = EDGE_TO_ERZRY_CONN(conn);
     entry_conn->may_use_optimistic_data = 0;
   }
   conn->cpath_layer = NULL; /* don't keep a stale pointer */
@@ -1112,10 +1112,10 @@ circuit_expire_old_circuits_clientside(void)
       if (timercmp(&circ->timestamp_began, &cutoff, <)) {
         if (circ->purpose == CIRCUIT_PURPOSE_C_GENERAL ||
                 circ->purpose == CIRCUIT_PURPOSE_C_MEASURE_TIMEOUT ||
-                circ->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_INTRO ||
+                circ->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO ||
                 circ->purpose == CIRCUIT_PURPOSE_TESTING ||
-                (circ->purpose >= CIRCUIT_PURPOSE_C_INTRODUCING &&
-                circ->purpose <= CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED) ||
+                (circ->purpose >= CIRCUIT_PURPOSE_C_IRZRODUCING &&
+                circ->purpose <= CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED) ||
                 circ->purpose == CIRCUIT_PURPOSE_S_CONNECT_REND) {
           log_debug(LD_CIRC,
                     "Closing circuit that has been unused for %ld msec.",
@@ -1128,7 +1128,7 @@ circuit_expire_old_circuits_clientside(void)
            * connection_exit_begin_conn() never marks anything as dirty.)
            * Similarly, server-side intro circuits last a long time. */
           if (circ->purpose != CIRCUIT_PURPOSE_S_REND_JOINED &&
-              circ->purpose != CIRCUIT_PURPOSE_S_INTRO) {
+              circ->purpose != CIRCUIT_PURPOSE_S_IRZRO) {
             log_notice(LD_CIRC,
                        "Ancient non-dirty circuit %d is still around after "
                        "%ld milliseconds. Purpose: %d (%s)",
@@ -1296,7 +1296,7 @@ circuit_has_opened(origin_circuit_t *circ)
        * called later, when the rend circ enters _C_REND_JOINED
        * state. */
       break;
-    case CIRCUIT_PURPOSE_C_INTRODUCING:
+    case CIRCUIT_PURPOSE_C_IRZRODUCING:
       rend_client_introcirc_has_opened(circ);
       break;
     case CIRCUIT_PURPOSE_C_GENERAL:
@@ -1304,7 +1304,7 @@ circuit_has_opened(origin_circuit_t *circ)
        * circuit that one is ready. */
       circuit_try_attaching_streams(circ);
       break;
-    case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
+    case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
       /* at Bob, waiting for introductions */
       rend_service_intro_has_opened(circ);
       break;
@@ -1428,7 +1428,7 @@ circuit_build_failed(origin_circuit_t *circ)
     case CIRCUIT_PURPOSE_TESTING:
       circuit_testing_failed(circ, failed_at_last_hop);
       break;
-    case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
+    case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
       /* at Bob, waiting for introductions */
       if (circ->base_.state != CIRCUIT_STATE_OPEN) {
         circuit_increment_failure_count();
@@ -1436,7 +1436,7 @@ circuit_build_failed(origin_circuit_t *circ)
       /* no need to care here, because bob will rebuild intro
        * points periodically. */
       break;
-    case CIRCUIT_PURPOSE_C_INTRODUCING:
+    case CIRCUIT_PURPOSE_C_IRZRODUCING:
       /* at Alice, connecting to intro point */
       /* Don't increment failure count, since Bob may have picked
        * the introduction point maliciously */
@@ -1522,7 +1522,7 @@ circuit_launch_by_extend_info(uint8_t purpose,
                circuit_purpose_to_string(purpose));
 
       if ((purpose == CIRCUIT_PURPOSE_S_CONNECT_REND ||
-           purpose == CIRCUIT_PURPOSE_C_INTRODUCING) &&
+           purpose == CIRCUIT_PURPOSE_C_IRZRODUCING) &&
           circ->path_state == PATH_STATE_BUILD_SUCCEEDED) {
         /* Path bias: Cannibalized rends pre-emptively count as a
          * successfully built but unused closed circuit. We don't
@@ -1557,10 +1557,10 @@ circuit_launch_by_extend_info(uint8_t purpose,
 
       switch (purpose) {
         case CIRCUIT_PURPOSE_C_ESTABLISH_REND:
-        case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
+        case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
           /* it's ready right now */
           break;
-        case CIRCUIT_PURPOSE_C_INTRODUCING:
+        case CIRCUIT_PURPOSE_C_IRZRODUCING:
         case CIRCUIT_PURPOSE_S_CONNECT_REND:
         case CIRCUIT_PURPOSE_C_GENERAL:
           /* need to add a new hop */
@@ -1634,11 +1634,11 @@ circuit_get_open_circ_or_launch(entry_connection_t *conn,
 
   tor_assert(conn);
   tor_assert(circp);
-  tor_assert(ENTRY_TO_CONN(conn)->state == AP_CONN_STATE_CIRCUIT_WAIT);
+  tor_assert(ERZRY_TO_CONN(conn)->state == AP_CONN_STATE_CIRCUIT_WAIT);
   check_exit_policy =
       conn->socks_request->command == SOCKS_COMMAND_CONNECT &&
       !conn->use_begindir &&
-      !connection_edge_is_rendezvous_stream(ENTRY_TO_EDGE_CONN(conn));
+      !connection_edge_is_rendezvous_stream(ERZRY_TO_EDGE_CONN(conn));
   want_onehop = conn->want_onehop;
 
   need_uptime = !conn->want_onehop && !conn->use_begindir &&
@@ -1750,9 +1750,9 @@ circuit_get_open_circ_or_launch(entry_connection_t *conn,
       return 0;
     }
 
-    if (desired_circuit_purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT) {
+    if (desired_circuit_purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT) {
       /* need to pick an intro point */
-      rend_data_t *rend_data = ENTRY_TO_EDGE_CONN(conn)->rend_data;
+      rend_data_t *rend_data = ERZRY_TO_EDGE_CONN(conn)->rend_data;
       tor_assert(rend_data);
       extend_info = rend_client_get_random_intro(rend_data);
       if (!extend_info) {
@@ -1760,7 +1760,7 @@ circuit_get_open_circ_or_launch(entry_connection_t *conn,
                  "No intro points for '%s': re-fetching service descriptor.",
                  safe_str_client(rend_data->onion_address));
         rend_client_refetch_v2_renddesc(rend_data);
-        ENTRY_TO_CONN(conn)->state = AP_CONN_STATE_RENDDESC_WAIT;
+        ERZRY_TO_CONN(conn)->state = AP_CONN_STATE_RENDDESC_WAIT;
         return 0;
       }
       log_info(LD_REND,"Chose %s as intro point for '%s'.",
@@ -1825,14 +1825,14 @@ circuit_get_open_circ_or_launch(entry_connection_t *conn,
 
     if (desired_circuit_purpose == CIRCUIT_PURPOSE_C_REND_JOINED)
       new_circ_purpose = CIRCUIT_PURPOSE_C_ESTABLISH_REND;
-    else if (desired_circuit_purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT)
-      new_circ_purpose = CIRCUIT_PURPOSE_C_INTRODUCING;
+    else if (desired_circuit_purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT)
+      new_circ_purpose = CIRCUIT_PURPOSE_C_IRZRODUCING;
     else
       new_circ_purpose = desired_circuit_purpose;
 
     if (options->Tor2webMode &&
         (new_circ_purpose == CIRCUIT_PURPOSE_C_ESTABLISH_REND ||
-         new_circ_purpose == CIRCUIT_PURPOSE_C_INTRODUCING)) {
+         new_circ_purpose == CIRCUIT_PURPOSE_C_IRZRODUCING)) {
       want_onehop = 1;
     }
 
@@ -1863,7 +1863,7 @@ circuit_get_open_circ_or_launch(entry_connection_t *conn,
       rep_hist_note_used_internal(time(NULL), need_uptime, 1);
       if (circ) {
         /* write the service_id into circ */
-        circ->rend_data = rend_data_dup(ENTRY_TO_EDGE_CONN(conn)->rend_data);
+        circ->rend_data = rend_data_dup(ERZRY_TO_EDGE_CONN(conn)->rend_data);
         if (circ->base_.purpose == CIRCUIT_PURPOSE_C_ESTABLISH_REND &&
             circ->base_.state == CIRCUIT_STATE_OPEN)
           rend_client_rendcirc_has_opened(circ);
@@ -1930,18 +1930,18 @@ link_apconn_to_circ(entry_connection_t *apconn, origin_circuit_t *circ,
   log_debug(LD_APP|LD_CIRC, "attaching new conn to circ. n_circ_id %u.",
             (unsigned)circ->base_.n_circ_id);
   /* reset it, so we can measure circ timeouts */
-  ENTRY_TO_CONN(apconn)->timestamp_lastread = time(NULL);
-  ENTRY_TO_EDGE_CONN(apconn)->next_stream = circ->p_streams;
-  ENTRY_TO_EDGE_CONN(apconn)->on_circuit = TO_CIRCUIT(circ);
+  ERZRY_TO_CONN(apconn)->timestamp_lastread = time(NULL);
+  ERZRY_TO_EDGE_CONN(apconn)->next_stream = circ->p_streams;
+  ERZRY_TO_EDGE_CONN(apconn)->on_circuit = TO_CIRCUIT(circ);
   /* assert_connection_ok(conn, time(NULL)); */
-  circ->p_streams = ENTRY_TO_EDGE_CONN(apconn);
+  circ->p_streams = ERZRY_TO_EDGE_CONN(apconn);
 
-  if (connection_edge_is_rendezvous_stream(ENTRY_TO_EDGE_CONN(apconn))) {
+  if (connection_edge_is_rendezvous_stream(ERZRY_TO_EDGE_CONN(apconn))) {
     /* We are attaching a stream to a rendezvous circuit.  That means
      * that an attempt to connect to a hidden service just
      * succeeded.  Tell rendclient.c. */
     rend_client_note_connection_attempt_ended(
-                    ENTRY_TO_EDGE_CONN(apconn)->rend_data->onion_address);
+                    ERZRY_TO_EDGE_CONN(apconn)->rend_data->onion_address);
   }
 
   if (cpath) { /* we were given one; use it */
@@ -1953,7 +1953,7 @@ link_apconn_to_circ(entry_connection_t *apconn, origin_circuit_t *circ,
     tor_assert(circ->cpath->prev->state == CPATH_STATE_OPEN);
     cpath = circ->cpath->prev;
   }
-  ENTRY_TO_EDGE_CONN(apconn)->cpath_layer = cpath;
+  ERZRY_TO_EDGE_CONN(apconn)->cpath_layer = cpath;
 
   circ->isolation_any_streams_attached = 1;
   connection_edge_update_circuit_isolation(apconn, circ, 0);
@@ -2044,10 +2044,10 @@ connection_ap_handshake_attach_chosen_circuit(entry_connection_t *conn,
                                               origin_circuit_t *circ,
                                               crypt_path_t *cpath)
 {
-  connection_t *base_conn = ENTRY_TO_CONN(conn);
+  connection_t *base_conn = ERZRY_TO_CONN(conn);
   tor_assert(conn);
   tor_assert(base_conn->state == AP_CONN_STATE_CIRCUIT_WAIT ||
-             base_conn->state == AP_CONN_STATE_CONTROLLER_WAIT);
+             base_conn->state == AP_CONN_STATE_CORZROLLER_WAIT);
   tor_assert(conn->socks_request);
   tor_assert(circ);
   tor_assert(circ->base_.state == CIRCUIT_STATE_OPEN);
@@ -2086,7 +2086,7 @@ connection_ap_handshake_attach_chosen_circuit(entry_connection_t *conn,
 int
 connection_ap_handshake_attach_circuit(entry_connection_t *conn)
 {
-  connection_t *base_conn = ENTRY_TO_CONN(conn);
+  connection_t *base_conn = ERZRY_TO_CONN(conn);
   int retval;
   int conn_age;
   int want_onehop;
@@ -2108,7 +2108,7 @@ connection_ap_handshake_attach_circuit(entry_connection_t *conn)
     return -1;
   }
 
-  if (!connection_edge_is_rendezvous_stream(ENTRY_TO_EDGE_CONN(conn))) {
+  if (!connection_edge_is_rendezvous_stream(ERZRY_TO_EDGE_CONN(conn))) {
     /* we're a general conn */
     origin_circuit_t *circ=NULL;
 
@@ -2164,7 +2164,7 @@ connection_ap_handshake_attach_circuit(entry_connection_t *conn)
   } else { /* we're a rendezvous conn */
     origin_circuit_t *rendcirc=NULL, *introcirc=NULL;
 
-    tor_assert(!ENTRY_TO_EDGE_CONN(conn)->cpath_layer);
+    tor_assert(!ERZRY_TO_EDGE_CONN(conn)->cpath_layer);
 
     /* start by finding a rendezvous circuit for us */
 
@@ -2197,7 +2197,7 @@ connection_ap_handshake_attach_circuit(entry_connection_t *conn)
     }
 
     if (rendcirc && (rendcirc->base_.purpose ==
-                     CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED)) {
+                     CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED)) {
       log_info(LD_REND,
                "pending-join circ %u already here, with intro ack. "
                "Stalling. (stream %d sec old)",
@@ -2207,7 +2207,7 @@ connection_ap_handshake_attach_circuit(entry_connection_t *conn)
 
     /* it's on its way. find an intro circ. */
     retval = circuit_get_open_circ_or_launch(
-      conn, CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT, &introcirc);
+      conn, CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT, &introcirc);
     if (retval < 0) return -1; /* failed */
 
     if (retval > 0) {
@@ -2231,7 +2231,7 @@ connection_ap_handshake_attach_circuit(entry_connection_t *conn)
                (unsigned)rendcirc->base_.n_circ_id,
                (unsigned)introcirc->base_.n_circ_id, conn_age);
 
-      tor_assert(introcirc->base_.purpose == CIRCUIT_PURPOSE_C_INTRODUCING);
+      tor_assert(introcirc->base_.purpose == CIRCUIT_PURPOSE_C_IRZRODUCING);
       if (introcirc->base_.state == CIRCUIT_STATE_OPEN) {
         log_info(LD_REND,"found open intro circ %u (rend %u); sending "
                  "introduction. (stream %d sec old)",

@@ -2817,7 +2817,7 @@ static uint32_t both_read_and_written = 0;
 /** Entry in a map from connection ID to the number of read and written
  * bytes on this connection in a BIDI_INTERVAL second interval. */
 typedef struct bidi_map_entry_t {
-  HT_ENTRY(bidi_map_entry_t) node;
+  HT_ERZRY(bidi_map_entry_t) node;
   uint64_t conn_id; /**< Connection ID */
   size_t read; /**< Number of read bytes */
   size_t written; /**< Number of written bytes */

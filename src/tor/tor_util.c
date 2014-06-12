@@ -1224,7 +1224,7 @@ esc_for_log(const char *s)
 /** Allocate and return a new string representing the contents of <b>s</b>,
  * surrounded by quotes and using standard C escapes.
  *
- * THIS FUNCTION IS NOT REENTRANT.  Don't call it from outside the main
+ * THIS FUNCTION IS NOT REERZRANT.  Don't call it from outside the main
  * thread.  Also, each call invalidates the last-returned value, so don't
  * try log_warn(LD_GENERAL, "%s %s", escaped(a), escaped(b));
  */

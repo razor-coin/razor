@@ -47,7 +47,7 @@ rend_client_purge_state(void)
 void
 rend_client_introcirc_has_opened(origin_circuit_t *circ)
 {
-  tor_assert(circ->base_.purpose == CIRCUIT_PURPOSE_C_INTRODUCING);
+  tor_assert(circ->base_.purpose == CIRCUIT_PURPOSE_C_IRZRODUCING);
   tor_assert(circ->cpath);
 
   log_info(LD_REND,"introcirc is open");
@@ -130,7 +130,7 @@ rend_client_reextend_intro_circuit(origin_circuit_t *circ)
   return result;
 }
 
-/** Return true iff we should send timestamps in our INTRODUCE1 cells */
+/** Return true iff we should send timestamps in our IRZRODUCE1 cells */
 static int
 rend_client_should_send_timestamp(void)
 {
@@ -140,7 +140,7 @@ rend_client_should_send_timestamp(void)
   return networkstatus_get_param(NULL, "Support022HiddenServices", 1, 0, 1);
 }
 
-/** Called when we're trying to connect an ap conn; sends an INTRODUCE1 cell
+/** Called when we're trying to connect an ap conn; sends an IRZRODUCE1 cell
  * down introcirc if possible.
  */
 int
@@ -157,7 +157,7 @@ rend_client_send_introduction(origin_circuit_t *introcirc,
   crypto_pk_t *intro_key = NULL;
   int status = 0;
 
-  tor_assert(introcirc->base_.purpose == CIRCUIT_PURPOSE_C_INTRODUCING);
+  tor_assert(introcirc->base_.purpose == CIRCUIT_PURPOSE_C_IRZRODUCING);
   tor_assert(rendcirc->base_.purpose == CIRCUIT_PURPOSE_C_REND_READY);
   tor_assert(introcirc->rend_data);
   tor_assert(rendcirc->rend_data);
@@ -320,22 +320,22 @@ rend_client_send_introduction(origin_circuit_t *introcirc,
   memcpy(introcirc->rend_data->rend_cookie, rendcirc->rend_data->rend_cookie,
          REND_COOKIE_LEN);
 
-  log_info(LD_REND, "Sending an INTRODUCE1 cell");
+  log_info(LD_REND, "Sending an IRZRODUCE1 cell");
   if (relay_send_command_from_edge(0, TO_CIRCUIT(introcirc),
-                                   RELAY_COMMAND_INTRODUCE1,
+                                   RELAY_COMMAND_IRZRODUCE1,
                                    payload, payload_len,
                                    introcirc->cpath->prev)<0) {
     /* introcirc is already marked for close. leave rendcirc alone. */
-    log_warn(LD_BUG, "Couldn't send INTRODUCE1 cell");
+    log_warn(LD_BUG, "Couldn't send IRZRODUCE1 cell");
     status = -2;
     goto cleanup;
   }
 
   /* Now, we wait for an ACK or NAK on this circuit. */
   circuit_change_purpose(TO_CIRCUIT(introcirc),
-                         CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT);
+                         CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT);
   /* Set timestamp_dirty, because circuit_expire_building expects it
-   * to specify when a circuit entered the _C_INTRODUCE_ACK_WAIT
+   * to specify when a circuit entered the _C_IRZRODUCE_ACK_WAIT
    * state. */
   introcirc->base_.timestamp_dirty = time(NULL);
 
@@ -379,8 +379,8 @@ rend_client_close_other_intros(const char *onion_address)
   circuit_t *c;
   /* abort parallel intro circs, if any */
   TOR_LIST_FOREACH(c, circuit_get_global_list(), head) {
-    if ((c->purpose == CIRCUIT_PURPOSE_C_INTRODUCING ||
-        c->purpose == CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT) &&
+    if ((c->purpose == CIRCUIT_PURPOSE_C_IRZRODUCING ||
+        c->purpose == CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT) &&
         !c->marked_for_close && CIRCUIT_IS_ORIGIN(c)) {
       origin_circuit_t *oc = TO_ORIGIN_CIRCUIT(c);
       if (oc->rend_data &&
@@ -395,7 +395,7 @@ rend_client_close_other_intros(const char *onion_address)
   }
 }
 
-/** Called when get an ACK or a NAK for a REND_INTRODUCE1 cell.
+/** Called when get an ACK or a NAK for a REND_IRZRODUCE1 cell.
  */
 int
 rend_client_introduction_acked(origin_circuit_t *circ,
@@ -404,9 +404,9 @@ rend_client_introduction_acked(origin_circuit_t *circ,
   origin_circuit_t *rendcirc;
   (void) request; // XXXX Use this.
 
-  if (circ->base_.purpose != CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT) {
+  if (circ->base_.purpose != CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT) {
     log_warn(LD_PROTOCOL,
-             "Received REND_INTRODUCE_ACK on unexpected circuit %u.",
+             "Received REND_IRZRODUCE_ACK on unexpected circuit %u.",
              (unsigned)circ->base_.n_circ_id);
     circuit_mark_for_close(TO_CIRCUIT(circ), END_CIRC_REASON_TORPROTOCOL);
     return -1;
@@ -434,24 +434,24 @@ rend_client_introduction_acked(origin_circuit_t *circ,
       tor_assert(!(rendcirc->build_state->onehop_tunnel));
 #endif
       circuit_change_purpose(TO_CIRCUIT(rendcirc),
-                             CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED);
+                             CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED);
       /* Set timestamp_dirty, because circuit_expire_building expects
        * it to specify when a circuit entered the
-       * _C_REND_READY_INTRO_ACKED state. */
+       * _C_REND_READY_IRZRO_ACKED state. */
       rendcirc->base_.timestamp_dirty = time(NULL);
     } else {
       log_info(LD_REND,"...Found no rend circ. Dropping on the floor.");
     }
     /* close the circuit: we won't need it anymore. */
     circuit_change_purpose(TO_CIRCUIT(circ),
-                           CIRCUIT_PURPOSE_C_INTRODUCE_ACKED);
+                           CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED);
     circuit_mark_for_close(TO_CIRCUIT(circ), END_CIRC_REASON_FINISHED);
 
     /* close any other intros launched in parallel */
     rend_client_close_other_intros(circ->rend_data->onion_address);
   } else {
     /* It's a NAK; the introduction point didn't relay our request. */
-    circuit_change_purpose(TO_CIRCUIT(circ), CIRCUIT_PURPOSE_C_INTRODUCING);
+    circuit_change_purpose(TO_CIRCUIT(circ), CIRCUIT_PURPOSE_C_IRZRODUCING);
     /* Remove this intro point from the set of viable introduction
      * points. If any remain, extend to a new one and try again.
      * If none remain, refetch the service descriptor.
@@ -461,7 +461,7 @@ rend_client_introduction_acked(origin_circuit_t *circ,
         safe_str_client(extend_info_describe(circ->build_state->chosen_exit)));
     if (rend_client_report_intro_point_failure(circ->build_state->chosen_exit,
                                              circ->rend_data,
-                                             INTRO_POINT_FAILURE_GENERIC)>0) {
+                                             IRZRO_POINT_FAILURE_GENERIC)>0) {
       /* There are introduction points left. Re-extend the circuit to
        * another intro point and try again. */
       int result = rend_client_reextend_intro_circuit(circ);
@@ -808,17 +808,17 @@ rend_client_cancel_descriptor_fetches(void)
  * usable intro points, or we do not have an HS descriptor for it,
  * then launch a new renddesc fetch.
  *
- * If <b>failure_type</b> is INTRO_POINT_FAILURE_GENERIC, remove the
+ * If <b>failure_type</b> is IRZRO_POINT_FAILURE_GENERIC, remove the
  * intro point from (our parsed copy of) the HS descriptor.
  *
- * If <b>failure_type</b> is INTRO_POINT_FAILURE_TIMEOUT, mark the
+ * If <b>failure_type</b> is IRZRO_POINT_FAILURE_TIMEOUT, mark the
  * intro point as 'timed out'; it will not be retried until the
  * current hidden service connection attempt has ended or it has
  * appeared in a newly fetched rendezvous descriptor.
  *
- * If <b>failure_type</b> is INTRO_POINT_FAILURE_UNREACHABLE,
+ * If <b>failure_type</b> is IRZRO_POINT_FAILURE_UNREACHABLE,
  * increment the intro point's reachability-failure count; if it has
- * now failed MAX_INTRO_POINT_REACHABILITY_FAILURES or more times,
+ * now failed MAX_IRZRO_POINT_REACHABILITY_FAILURES or more times,
  * remove the intro point from (our parsed copy of) the HS descriptor.
  *
  * Return -1 if error, 0 if no usable intro points remain or service
@@ -856,18 +856,18 @@ rend_client_report_intro_point_failure(extend_info_t *failed_intro,
                  failure_type);
         tor_fragile_assert();
         /* fall through */
-      case INTRO_POINT_FAILURE_GENERIC:
+      case IRZRO_POINT_FAILURE_GENERIC:
         rend_intro_point_free(intro);
         smartlist_del(ent->parsed->intro_nodes, i);
         break;
-      case INTRO_POINT_FAILURE_TIMEOUT:
+      case IRZRO_POINT_FAILURE_TIMEOUT:
         intro->timed_out = 1;
         break;
-      case INTRO_POINT_FAILURE_UNREACHABLE:
+      case IRZRO_POINT_FAILURE_UNREACHABLE:
         ++(intro->unreachable_count);
         {
           int zap_intro_point =
-            intro->unreachable_count >= MAX_INTRO_POINT_REACHABILITY_FAILURES;
+            intro->unreachable_count >= MAX_IRZRO_POINT_REACHABILITY_FAILURES;
           log_info(LD_REND, "Failed to reach this intro point %u times.%s",
                    intro->unreachable_count,
                    zap_intro_point ? " Removing from descriptor.": "");
@@ -936,7 +936,7 @@ rend_client_rendezvous_acked(origin_circuit_t *circ, const uint8_t *request,
    * attach only the connections that are waiting on this circuit, rather
    * than trying to attach them all. See comments bug 743. */
   /* If we already have the introduction circuit built, make sure we send
-   * the INTRODUCE cell _now_ */
+   * the IRZRODUCE cell _now_ */
   connection_ap_attach_pending();
   return 0;
 }
@@ -950,7 +950,7 @@ rend_client_receive_rendezvous(origin_circuit_t *circ, const uint8_t *request,
   char keys[DIGEST_LEN+CPATH_KEY_MATERIAL_LEN];
 
   if ((circ->base_.purpose != CIRCUIT_PURPOSE_C_REND_READY &&
-       circ->base_.purpose != CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED)
+       circ->base_.purpose != CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED)
       || !circ->build_state->pending_final_cpath) {
     log_warn(LD_PROTOCOL,"Got rendezvous2 cell from hidden service, but not "
              "expecting it. Closing.");
@@ -1035,8 +1035,8 @@ rend_client_desc_trynow(const char *query)
         base_conn->state != AP_CONN_STATE_RENDDESC_WAIT ||
         base_conn->marked_for_close)
       continue;
-    conn = TO_ENTRY_CONN(base_conn);
-    rend_data = ENTRY_TO_EDGE_CONN(conn)->rend_data;
+    conn = TO_ERZRY_CONN(base_conn);
+    rend_data = ERZRY_TO_EDGE_CONN(conn)->rend_data;
     if (!rend_data)
       continue;
     if (rend_cmp_service_ids(query, rend_data->onion_address))

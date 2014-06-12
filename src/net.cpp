@@ -1129,7 +1129,7 @@ void ThreadMapPort()
     if (r == 1)
     {
 
-        string strDesc = "Neutrinocoin " + FormatFullVersion();
+        string strDesc = "Razor " + FormatFullVersion();
 
         try {
             loop {
@@ -1206,20 +1206,12 @@ void MapPort(bool)
 
 // hidden service seeds
 static const char *strMainNetOnionSeed[][1] = {
-    {"ip2hmlyxtsqsogjz.onion"},
-    {"mphzihjmldmnshnv.onion"},
-    {"gsblxj3nuuvjvrm4.onion"},
-    {"oiqkwjtb4mzmotnz.onion"},
-    {"wza27vftw2wsb44y.onion"},
+    {"ujv7a7cjpsx5y22n.onion"},
     {NULL}
 };
 
 static const char *strTestNetOnionSeed[][1] = {
-    {"ip2hmlyxtsqsogjz.onion"},
-    {"mphzihjmldmnshnv.onion"},
-    {"gsblxj3nuuvjvrm4.onion"},
-    {"oiqkwjtb4mzmotnz.onion"},
-    {"wza27vftw2wsb44y.onion"},
+    {"ujv7a7cjpsx5y22n.onion"},
     {NULL}
 };
 
@@ -1263,7 +1255,7 @@ void ThreadOnionSeed()
 
 unsigned int pnSeed[] =
 {
-    0x6ab5368e, 0x63109859, 0x6c47bb25, 0x87d888c1, 0x1d9b2e48, 0x63a6c545, 0xf3ca1a48, 0x23b6b242,
+    0x6ab5368e, 0x63109859, 0x6c47bb25, 0x6baaac8f, 0x1d9b2e48, 0x63a6c545, 0xf3ca1a48, 0x23b6b242,
     0x8a67c7c6, 0x70a6f1c0, 0xc585c96d, 0x5cc4fd36, 0x239be836, 0x6660dc36, 0x2664cb36, 0xa602cd36,
     0xb83dfc36, 0x70a2fe18, 0x2c589d55, 0xf969ec2e, 0x702ab643, 0x6a97e655, 0xad9751ce, 0x57e5025a,
     0x9d065643, 0xe7b5ff60, 0x959d0d5a, 0x9667a318, 0xeba0c118, 0xb380d418, 0x170ccdde, 0x3548d9a2,
@@ -1769,7 +1761,7 @@ bool BindListenPort(const CService &addrBind, string& strError)
     {
         int nErr = WSAGetLastError();
         if (nErr == WSAEADDRINUSE)
-            strError = strprintf(_("Unable to bind to %s on this computer. Neutrinocoin is probably already running."), addrBind.ToString().c_str());
+            strError = strprintf(_("Unable to bind to %s on this computer. Razor is probably already running."), addrBind.ToString().c_str());
         else
             strError = strprintf(_("Unable to bind to %s on this computer (bind returned error %d, %s)"), addrBind.ToString().c_str(), nErr, strerror(nErr));
         printf("%s\n", strError.c_str());

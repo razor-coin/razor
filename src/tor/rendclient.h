@@ -23,9 +23,9 @@ void rend_client_refetch_v2_renddesc(const rend_data_t *rend_query);
 void rend_client_cancel_descriptor_fetches(void);
 void rend_client_purge_last_hid_serv_requests(void);
 
-#define INTRO_POINT_FAILURE_GENERIC 0
-#define INTRO_POINT_FAILURE_TIMEOUT 1
-#define INTRO_POINT_FAILURE_UNREACHABLE 2
+#define IRZRO_POINT_FAILURE_GENERIC 0
+#define IRZRO_POINT_FAILURE_TIMEOUT 1
+#define IRZRO_POINT_FAILURE_UNREACHABLE 2
 
 int rend_client_report_intro_point_failure(extend_info_t *failed_intro,
                                            const rend_data_t *rend_query,

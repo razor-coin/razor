@@ -47,7 +47,7 @@
 #include "transports.h"
 #include "ext_orport.h"
 #include "torgzip.h"
-#include "neutrinocoin.h"
+#include "razor.h"
 #ifdef _WIN32
 #include <shlobj.h>
 #endif
@@ -2781,13 +2781,13 @@ options_validate(or_options_t *old_options, or_options_t *options,
   if (options->AllowInvalidNodes) {
     SMARTLIST_FOREACH_BEGIN(options->AllowInvalidNodes, const char *, cp) {
         if (!strcasecmp(cp, "entry"))
-          options->AllowInvalid_ |= ALLOW_INVALID_ENTRY;
+          options->AllowInvalid_ |= ALLOW_INVALID_ERZRY;
         else if (!strcasecmp(cp, "exit"))
           options->AllowInvalid_ |= ALLOW_INVALID_EXIT;
         else if (!strcasecmp(cp, "middle"))
           options->AllowInvalid_ |= ALLOW_INVALID_MIDDLE;
         else if (!strcasecmp(cp, "introduction"))
-          options->AllowInvalid_ |= ALLOW_INVALID_INTRODUCTION;
+          options->AllowInvalid_ |= ALLOW_INVALID_IRZRODUCTION;
         else if (!strcasecmp(cp, "rendezvous"))
           options->AllowInvalid_ |= ALLOW_INVALID_RENDEZVOUS;
         else {
@@ -5328,7 +5328,7 @@ warn_nonlocal_controller_ports(smartlist_t *ports, unsigned forbid)
 {
   int warned = 0;
   SMARTLIST_FOREACH_BEGIN(ports, port_cfg_t *, port) {
-    if (port->type != CONN_TYPE_CONTROL_LISTENER)
+    if (port->type != CONN_TYPE_CORZROL_LISTENER)
       continue;
     if (port->is_unix_addr)
       continue;
@@ -5418,7 +5418,7 @@ parse_port_config(smartlist_t *out,
 {
   smartlist_t *elts;
   int retval = -1;
-  const unsigned is_control = (listener_type == CONN_TYPE_CONTROL_LISTENER);
+  const unsigned is_control = (listener_type == CONN_TYPE_CORZROL_LISTENER);
   const unsigned is_ext_orport = (listener_type == CONN_TYPE_EXT_OR_LISTENER);
   const unsigned allow_no_options = flags & CL_PORT_NO_OPTIONS;
   const unsigned use_server_options = flags & CL_PORT_SERVER_OPTIONS;
@@ -5896,7 +5896,7 @@ parse_ports(or_options_t *options, int validate_only,
     if (parse_port_config(ports,
                           options->ControlPort_lines,
                           options->ControlListenAddress,
-                          "Control", CONN_TYPE_CONTROL_LISTENER,
+                          "Control", CONN_TYPE_CORZROL_LISTENER,
                           "127.0.0.1", 0,
                           control_port_flags) < 0) {
       *msg = tor_strdup("Invalid ControlPort/ControlListenAddress "
@@ -5905,7 +5905,7 @@ parse_ports(or_options_t *options, int validate_only,
     }
     if (parse_unix_socket_config(ports,
                                  options->ControlSocket,
-                                 CONN_TYPE_CONTROL_LISTENER) < 0) {
+                                 CONN_TYPE_CORZROL_LISTENER) < 0) {
       *msg = tor_strdup("Invalid ControlSocket configuration");
       goto err;
     }
@@ -5957,7 +5957,7 @@ parse_ports(or_options_t *options, int validate_only,
   options->NATDPort_set =
     !! count_real_listeners(ports, CONN_TYPE_AP_NATD_LISTENER);
   options->ControlPort_set =
-    !! count_real_listeners(ports, CONN_TYPE_CONTROL_LISTENER);
+    !! count_real_listeners(ports, CONN_TYPE_CORZROL_LISTENER);
   options->DirPort_set =
     !! count_real_listeners(ports, CONN_TYPE_DIR_LISTENER);
   options->DNSPort_set =
@@ -6165,10 +6165,10 @@ normalize_data_directory(or_options_t *options)
     return 0; /* all set */
 #ifdef _WIN32
   p = tor_malloc(MAX_PATH);
-  strlcpy(p,neutrinocoin_tor_data_directory(),MAX_PATH);
+  strlcpy(p,razor_tor_data_directory(),MAX_PATH);
 #else
   p = tor_malloc(PATH_MAX);
-  strlcpy(p,neutrinocoin_tor_data_directory(),PATH_MAX);
+  strlcpy(p,razor_tor_data_directory(),PATH_MAX);
 #endif
   options->DataDirectory = p;
   return 0;

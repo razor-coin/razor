@@ -388,7 +388,7 @@ tor_tls_err_to_string(int err)
     case TOR_TLS_ERROR_NO_ROUTE: return "host unreachable";
     case TOR_TLS_ERROR_TIMEOUT: return "connection timed out";
     case TOR_TLS_CLOSE: return "closed";
-    case TOR_TLS_WANTREAD: return "want to read";
+    case TOR_TLS_WARZREAD: return "want to read";
     case TOR_TLS_WANTWRITE: return "want to write";
     default: return "(unknown error code)";
   }
@@ -399,7 +399,7 @@ tor_tls_err_to_string(int err)
 
 /** Given a TLS object and the result of an SSL_* call, use
  * SSL_get_error to determine whether an error has occurred, and if so
- * which one.  Return one of TOR_TLS_{DONE|WANTREAD|WANTWRITE|ERROR}.
+ * which one.  Return one of TOR_TLS_{DONE|WARZREAD|WANTWRITE|ERROR}.
  * If extra&CATCH_SYSCALL is true, return TOR_TLS_SYSCALL_ instead of
  * reporting syscall errors.  If extra&CATCH_ZERO is true, return
  * TOR_TLS_ZERORETURN_ instead of reporting zero-return errors.
@@ -417,7 +417,7 @@ tor_tls_get_error(tor_tls_t *tls, int r, int extra,
     case SSL_ERROR_NONE:
       return TOR_TLS_DONE;
     case SSL_ERROR_WANT_READ:
-      return TOR_TLS_WANTREAD;
+      return TOR_TLS_WARZREAD;
     case SSL_ERROR_WANT_WRITE:
       return TOR_TLS_WANTWRITE;
     case SSL_ERROR_SYSCALL:
@@ -1990,7 +1990,7 @@ tor_tls_free(tor_tls_t *tls)
 /** Underlying function for TLS reading.  Reads up to <b>len</b>
  * characters from <b>tls</b> into <b>cp</b>.  On success, returns the
  * number of characters read.  On failure, returns TOR_TLS_ERROR,
- * TOR_TLS_CLOSE, TOR_TLS_WANTREAD, or TOR_TLS_WANTWRITE.
+ * TOR_TLS_CLOSE, TOR_TLS_WARZREAD, or TOR_TLS_WANTWRITE.
  */
 int
 tor_tls_read(tor_tls_t *tls, char *cp, size_t len)
@@ -2035,7 +2035,7 @@ static uint64_t total_bytes_written_by_tls = 0;
 /** Underlying function for TLS writing.  Write up to <b>n</b>
  * characters from <b>cp</b> onto <b>tls</b>.  On success, returns the
  * number of characters written.  On failure, returns TOR_TLS_ERROR,
- * TOR_TLS_WANTREAD, or TOR_TLS_WANTWRITE.
+ * TOR_TLS_WARZREAD, or TOR_TLS_WANTWRITE.
  */
 int
 tor_tls_write(tor_tls_t *tls, const char *cp, size_t n)
@@ -2061,14 +2061,14 @@ tor_tls_write(tor_tls_t *tls, const char *cp, size_t n)
     total_bytes_written_over_tls += r;
     return r;
   }
-  if (err == TOR_TLS_WANTWRITE || err == TOR_TLS_WANTREAD) {
+  if (err == TOR_TLS_WANTWRITE || err == TOR_TLS_WARZREAD) {
     tls->wantwrite_n = n;
   }
   return err;
 }
 
 /** Perform initial handshake on <b>tls</b>.  When finished, returns
- * TOR_TLS_DONE.  On failure, returns TOR_TLS_ERROR, TOR_TLS_WANTREAD,
+ * TOR_TLS_DONE.  On failure, returns TOR_TLS_ERROR, TOR_TLS_WARZREAD,
  * or TOR_TLS_WANTWRITE.
  */
 int
@@ -2185,7 +2185,7 @@ tor_tls_start_renegotiating(tor_tls_t *tls)
 #endif
 
 /** Client only: Renegotiate a TLS session.  When finished, returns
- * TOR_TLS_DONE.  On failure, returns TOR_TLS_ERROR, TOR_TLS_WANTREAD, or
+ * TOR_TLS_DONE.  On failure, returns TOR_TLS_ERROR, TOR_TLS_WARZREAD, or
  * TOR_TLS_WANTWRITE.
  */
 int
@@ -2214,7 +2214,7 @@ tor_tls_renegotiate(tor_tls_t *tls)
 }
 
 /** Shut down an open tls connection <b>tls</b>.  When finished, returns
- * TOR_TLS_DONE.  On failure, returns TOR_TLS_ERROR, TOR_TLS_WANTREAD,
+ * TOR_TLS_DONE.  On failure, returns TOR_TLS_ERROR, TOR_TLS_WARZREAD,
  * or TOR_TLS_WANTWRITE.
  */
 int

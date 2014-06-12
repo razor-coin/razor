@@ -1455,7 +1455,7 @@ connection_tls_continue_handshake(or_connection_t *conn)
       connection_start_writing(TO_CONN(conn));
       log_debug(LD_OR,"wanted write");
       return 0;
-    case TOR_TLS_WANTREAD: /* handshaking conns are *always* reading */
+    case TOR_TLS_WARZREAD: /* handshaking conns are *always* reading */
       log_debug(LD_OR,"wanted read");
       return 0;
     case TOR_TLS_CLOSE:

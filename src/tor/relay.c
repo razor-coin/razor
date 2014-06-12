@@ -535,16 +535,16 @@ relay_command_to_string(uint8_t command)
     case RELAY_COMMAND_RESOLVE: return "RESOLVE";
     case RELAY_COMMAND_RESOLVED: return "RESOLVED";
     case RELAY_COMMAND_BEGIN_DIR: return "BEGIN_DIR";
-    case RELAY_COMMAND_ESTABLISH_INTRO: return "ESTABLISH_INTRO";
+    case RELAY_COMMAND_ESTABLISH_IRZRO: return "ESTABLISH_IRZRO";
     case RELAY_COMMAND_ESTABLISH_RENDEZVOUS: return "ESTABLISH_RENDEZVOUS";
-    case RELAY_COMMAND_INTRODUCE1: return "INTRODUCE1";
-    case RELAY_COMMAND_INTRODUCE2: return "INTRODUCE2";
+    case RELAY_COMMAND_IRZRODUCE1: return "IRZRODUCE1";
+    case RELAY_COMMAND_IRZRODUCE2: return "IRZRODUCE2";
     case RELAY_COMMAND_RENDEZVOUS1: return "RENDEZVOUS1";
     case RELAY_COMMAND_RENDEZVOUS2: return "RENDEZVOUS2";
-    case RELAY_COMMAND_INTRO_ESTABLISHED: return "INTRO_ESTABLISHED";
+    case RELAY_COMMAND_IRZRO_ESTABLISHED: return "IRZRO_ESTABLISHED";
     case RELAY_COMMAND_RENDEZVOUS_ESTABLISHED:
       return "RENDEZVOUS_ESTABLISHED";
-    case RELAY_COMMAND_INTRODUCE_ACK: return "INTRODUCE_ACK";
+    case RELAY_COMMAND_IRZRODUCE_ACK: return "IRZRODUCE_ACK";
     default: return "(unrecognized)";
   }
 }
@@ -684,7 +684,7 @@ connection_edge_send_command(edge_connection_t *fromconn,
   if (!circ) {
     if (fromconn->base_.type == CONN_TYPE_AP) {
       log_info(LD_APP,"no circ. Closing conn.");
-      connection_mark_unattached_ap(EDGE_TO_ENTRY_CONN(fromconn),
+      connection_mark_unattached_ap(EDGE_TO_ERZRY_CONN(fromconn),
                                     END_STREAM_REASON_INTERNAL);
     } else {
       log_info(LD_EXIT,"no circ. Closing conn.");
@@ -730,7 +730,7 @@ connection_ap_process_end_not_open(
   node_t *exitrouter;
   int reason = *(cell->payload+RELAY_HEADER_SIZE);
   int control_reason;
-  edge_connection_t *edge_conn = ENTRY_TO_EDGE_CONN(conn);
+  edge_connection_t *edge_conn = ERZRY_TO_EDGE_CONN(conn);
   (void) layer_hint; /* unused */
 
   if (rh->length > 0) {
@@ -906,7 +906,7 @@ connection_ap_process_end_not_open(
        stream_end_reason_to_string(rh->length > 0 ? reason : -1));
   circuit_log_path(LOG_INFO,LD_APP,circ);
   /* need to test because of detach_retriable */
-  if (!ENTRY_TO_CONN(conn)->marked_for_close)
+  if (!ERZRY_TO_CONN(conn)->marked_for_close)
     connection_mark_unattached_ap(conn, control_reason);
   return 0;
 }
@@ -1023,7 +1023,7 @@ connection_edge_process_relay_cell_not_open(
     if (CIRCUIT_IS_ORIGIN(circ) && conn->base_.type == CONN_TYPE_AP) {
       return connection_ap_process_end_not_open(rh, cell,
                                                 TO_ORIGIN_CIRCUIT(circ),
-                                                EDGE_TO_ENTRY_CONN(conn),
+                                                EDGE_TO_ERZRY_CONN(conn),
                                                 layer_hint);
     } else {
       /* we just got an 'end', don't need to send one */
@@ -1039,7 +1039,7 @@ connection_edge_process_relay_cell_not_open(
       rh->command == RELAY_COMMAND_CONNECTED) {
     tor_addr_t addr;
     int ttl;
-    entry_connection_t *entry_conn = EDGE_TO_ENTRY_CONN(conn);
+    entry_connection_t *entry_conn = EDGE_TO_ERZRY_CONN(conn);
     tor_assert(CIRCUIT_IS_ORIGIN(circ));
     if (conn->base_.state != AP_CONN_STATE_CONNECT_WAIT) {
       log_fn(LOG_PROTOCOL_WARN, LD_APP,
@@ -1134,7 +1134,7 @@ connection_edge_process_relay_cell_not_open(
     int ttl;
     int answer_len;
     uint8_t answer_type;
-    entry_connection_t *entry_conn = EDGE_TO_ENTRY_CONN(conn);
+    entry_connection_t *entry_conn = EDGE_TO_ERZRY_CONN(conn);
     if (conn->base_.state != AP_CONN_STATE_RESOLVE_WAIT) {
       log_fn(LOG_PROTOCOL_WARN, LD_APP, "Got a 'resolved' cell while "
              "not in state resolve_wait. Dropping.");
@@ -1369,7 +1369,7 @@ connection_edge_process_relay_cell(cell_t *cell, circuit_t *circ,
                stream_end_reason_to_string(reason),
                conn->stream_id);
       if (conn->base_.type == CONN_TYPE_AP) {
-        entry_connection_t *entry_conn = EDGE_TO_ENTRY_CONN(conn);
+        entry_connection_t *entry_conn = EDGE_TO_ERZRY_CONN(conn);
         if (entry_conn->socks_request &&
             !entry_conn->socks_request->has_finished)
           log_warn(LD_BUG,
@@ -1574,14 +1574,14 @@ connection_edge_process_relay_cell(cell_t *cell, circuit_t *circ,
       log_info(domain,
                "'resolved' received, no conn attached anymore. Ignoring.");
       return 0;
-    case RELAY_COMMAND_ESTABLISH_INTRO:
+    case RELAY_COMMAND_ESTABLISH_IRZRO:
     case RELAY_COMMAND_ESTABLISH_RENDEZVOUS:
-    case RELAY_COMMAND_INTRODUCE1:
-    case RELAY_COMMAND_INTRODUCE2:
-    case RELAY_COMMAND_INTRODUCE_ACK:
+    case RELAY_COMMAND_IRZRODUCE1:
+    case RELAY_COMMAND_IRZRODUCE2:
+    case RELAY_COMMAND_IRZRODUCE_ACK:
     case RELAY_COMMAND_RENDEZVOUS1:
     case RELAY_COMMAND_RENDEZVOUS2:
-    case RELAY_COMMAND_INTRO_ESTABLISHED:
+    case RELAY_COMMAND_IRZRO_ESTABLISHED:
     case RELAY_COMMAND_RENDEZVOUS_ESTABLISHED:
       rend_process_relay_cell(circ, layer_hint,
                               rh.command, rh.length,
@@ -1628,7 +1628,7 @@ connection_edge_package_raw_inbuf(edge_connection_t *conn, int package_partial,
   const unsigned domain = conn->base_.type == CONN_TYPE_AP ? LD_APP : LD_EXIT;
   int sending_from_optimistic = 0;
   entry_connection_t *entry_conn =
-    conn->base_.type == CONN_TYPE_AP ? EDGE_TO_ENTRY_CONN(conn) : NULL;
+    conn->base_.type == CONN_TYPE_AP ? EDGE_TO_ERZRY_CONN(conn) : NULL;
   const int sending_optimistically =
     entry_conn &&
     conn->base_.type == CONN_TYPE_AP &&

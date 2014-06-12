@@ -3,7 +3,7 @@
 <plist version="0.9">
 <dict>
 	<key>CFBundleIconFile</key>
-	<string>neutrinocoin.icns</string>
+	<string>razor.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
@@ -15,19 +15,19 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
-	<string>Neutrinocoin-Qt</string>
+	<string>Razor-Qt</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.neutrinocoin.Neutrinocoin-Qt</string>
+	<string>org.razor.Razor-Qt</string>
         <key>CFBundleURLTypes</key>
         <array>
           <dict>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
-            <string>org.neutrinocoin.NeutrinocoinPayment</string>
+            <string>org.razor.RazorPayment</string>
             <key>CFBundleURLSchemes</key>
             <array>
-              <string>neutrinocoin</string>
+              <string>razor</string>
             </array>
           </dict>
         </array>

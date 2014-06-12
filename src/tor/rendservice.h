@@ -18,10 +18,10 @@ typedef struct rend_intro_cell_s rend_intro_cell_t;
 
 #ifdef RENDSERVICE_PRIVATE
 
-/* This can be used for both INTRODUCE1 and INTRODUCE2 */
+/* This can be used for both IRZRODUCE1 and IRZRODUCE2 */
 
 struct rend_intro_cell_s {
-  /* Is this an INTRODUCE1 or INTRODUCE2? (set to 1 or 2) */
+  /* Is this an IRZRODUCE1 or IRZRODUCE2? (set to 1 or 2) */
   uint8_t type;
   /* Public key digest */
   uint8_t pk[DIGEST_LEN];

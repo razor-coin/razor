@@ -424,7 +424,7 @@ connection_ext_or_auth_process_inbuf(or_connection_t *or_conn)
 /** Extended ORPort commands (Bridge-to-Transport) */
 #define EXT_OR_CMD_BT_OKAY 0x1000
 #define EXT_OR_CMD_BT_DENY 0x1001
-#define EXT_OR_CMD_BT_CONTROL 0x1002
+#define EXT_OR_CMD_BT_CORZROL 0x1002
 
 /** Process a USERADDR command from the Extended
  *  ORPort. <b>payload</b> is a payload of size <b>len</b>.

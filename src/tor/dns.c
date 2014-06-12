@@ -144,7 +144,7 @@ typedef struct pending_connection_t {
  * list from oldest to newest.
  */
 typedef struct cached_resolve_t {
-  HT_ENTRY(cached_resolve_t) node;
+  HT_ERZRY(cached_resolve_t) node;
   uint32_t magic;  /**< Must be CACHED_RESOLVE_MAGIC */
   char address[MAX_ADDRESSLEN]; /**< The hostname to be resolved. */
 
@@ -372,8 +372,8 @@ dns_get_expiry_ttl(uint32_t ttl)
 {
   if (ttl < MIN_DNS_TTL)
     return MIN_DNS_TTL;
-  else if (ttl > MAX_DNS_ENTRY_AGE)
-    return MAX_DNS_ENTRY_AGE;
+  else if (ttl > MAX_DNS_ERZRY_AGE)
+    return MAX_DNS_ERZRY_AGE;
   else
     return ttl;
 }

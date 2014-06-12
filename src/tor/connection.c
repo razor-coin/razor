@@ -104,7 +104,7 @@ static smartlist_t *outgoing_addrs = NULL;
     case CONN_TYPE_EXT_OR_LISTENER: \
     case CONN_TYPE_AP_LISTENER: \
     case CONN_TYPE_DIR_LISTENER: \
-    case CONN_TYPE_CONTROL_LISTENER: \
+    case CONN_TYPE_CORZROL_LISTENER: \
     case CONN_TYPE_AP_TRANS_LISTENER: \
     case CONN_TYPE_AP_NATD_LISTENER: \
     case CONN_TYPE_AP_DNS_LISTENER
@@ -131,8 +131,8 @@ conn_type_to_string(int type)
     case CONN_TYPE_DIR_LISTENER: return "Directory listener";
     case CONN_TYPE_DIR: return "Directory";
     case CONN_TYPE_CPUWORKER: return "CPU worker";
-    case CONN_TYPE_CONTROL_LISTENER: return "Control listener";
-    case CONN_TYPE_CONTROL: return "Control";
+    case CONN_TYPE_CORZROL_LISTENER: return "Control listener";
+    case CONN_TYPE_CORZROL: return "Control";
     case CONN_TYPE_EXT_OR: return "Extended OR";
     case CONN_TYPE_EXT_OR_LISTENER: return "Extended OR listener";
     default:
@@ -196,7 +196,7 @@ conn_state_to_string(int type, int state)
         case AP_CONN_STATE_SOCKS_WAIT: return "waiting for socks info";
         case AP_CONN_STATE_NATD_WAIT: return "waiting for natd dest info";
         case AP_CONN_STATE_RENDDESC_WAIT: return "waiting for rendezvous desc";
-        case AP_CONN_STATE_CONTROLLER_WAIT: return "waiting for controller";
+        case AP_CONN_STATE_CORZROLLER_WAIT: return "waiting for controller";
         case AP_CONN_STATE_CIRCUIT_WAIT: return "waiting for circuit";
         case AP_CONN_STATE_CONNECT_WAIT: return "waiting for connect response";
         case AP_CONN_STATE_RESOLVE_WAIT: return "waiting for resolve response";
@@ -219,10 +219,10 @@ conn_state_to_string(int type, int state)
         case CPUWORKER_STATE_BUSY_ONION: return "busy with onion";
       }
       break;
-    case CONN_TYPE_CONTROL:
+    case CONN_TYPE_CORZROL:
       switch (state) {
-        case CONTROL_CONN_STATE_OPEN: return "open (protocol v1)";
-        case CONTROL_CONN_STATE_NEEDAUTH:
+        case CORZROL_CONN_STATE_OPEN: return "open (protocol v1)";
+        case CORZROL_CONN_STATE_NEEDAUTH:
           return "waiting for authentication (protocol v1)";
       }
       break;
@@ -245,7 +245,7 @@ connection_type_uses_bufferevent(connection_t *conn)
     case CONN_TYPE_AP:
     case CONN_TYPE_EXIT:
     case CONN_TYPE_DIR:
-    case CONN_TYPE_CONTROL:
+    case CONN_TYPE_CORZROL:
     case CONN_TYPE_OR:
     case CONN_TYPE_EXT_OR:
     case CONN_TYPE_CPUWORKER:
@@ -303,7 +303,7 @@ entry_connection_new(int type, int socket_family)
 {
   entry_connection_t *entry_conn = tor_malloc_zero(sizeof(entry_connection_t));
   tor_assert(type == CONN_TYPE_AP);
-  connection_init(time(NULL), ENTRY_TO_CONN(entry_conn), type, socket_family);
+  connection_init(time(NULL), ERZRY_TO_CONN(entry_conn), type, socket_family);
   entry_conn->socks_request = socks_request_new();
   /* If this is coming from a listener, we'll set it up based on the listener
    * in a little while.  Otherwise, we're doing this as a linked connection
@@ -334,7 +334,7 @@ control_connection_new(int socket_family)
   control_connection_t *control_conn =
     tor_malloc_zero(sizeof(control_connection_t));
   connection_init(time(NULL),
-                  TO_CONN(control_conn), CONN_TYPE_CONTROL, socket_family);
+                  TO_CONN(control_conn), CONN_TYPE_CORZROL, socket_family);
   return control_conn;
 }
 
@@ -364,12 +364,12 @@ connection_new(int type, int socket_family)
       return TO_CONN(edge_connection_new(type, socket_family));
 
     case CONN_TYPE_AP:
-      return ENTRY_TO_CONN(entry_connection_new(type, socket_family));
+      return ERZRY_TO_CONN(entry_connection_new(type, socket_family));
 
     case CONN_TYPE_DIR:
       return TO_CONN(dir_connection_new(socket_family));
 
-    case CONN_TYPE_CONTROL:
+    case CONN_TYPE_CORZROL:
       return TO_CONN(control_connection_new(socket_family));
 
     CASE_ANY_LISTENER_TYPE:
@@ -407,13 +407,13 @@ connection_init(time_t now, connection_t *conn, int type, int socket_family)
       conn->magic = EDGE_CONNECTION_MAGIC;
       break;
     case CONN_TYPE_AP:
-      conn->magic = ENTRY_CONNECTION_MAGIC;
+      conn->magic = ERZRY_CONNECTION_MAGIC;
       break;
     case CONN_TYPE_DIR:
       conn->magic = DIR_CONNECTION_MAGIC;
       break;
-    case CONN_TYPE_CONTROL:
-      conn->magic = CONTROL_CONNECTION_MAGIC;
+    case CONN_TYPE_CORZROL:
+      conn->magic = CORZROL_CONNECTION_MAGIC;
       break;
     CASE_ANY_LISTENER_TYPE:
       conn->magic = LISTENER_CONNECTION_MAGIC;
@@ -475,8 +475,8 @@ connection_free_(connection_t *conn)
       memlen = sizeof(or_connection_t);
       break;
     case CONN_TYPE_AP:
-      tor_assert(conn->magic == ENTRY_CONNECTION_MAGIC);
-      mem = TO_ENTRY_CONN(conn);
+      tor_assert(conn->magic == ERZRY_CONNECTION_MAGIC);
+      mem = TO_ERZRY_CONN(conn);
       memlen = sizeof(entry_connection_t);
       break;
     case CONN_TYPE_EXIT:
@@ -489,9 +489,9 @@ connection_free_(connection_t *conn)
       mem = TO_DIR_CONN(conn);
       memlen = sizeof(dir_connection_t);
       break;
-    case CONN_TYPE_CONTROL:
-      tor_assert(conn->magic == CONTROL_CONNECTION_MAGIC);
-      mem = TO_CONTROL_CONN(conn);
+    case CONN_TYPE_CORZROL:
+      tor_assert(conn->magic == CORZROL_CONNECTION_MAGIC);
+      mem = TO_CORZROL_CONN(conn);
       memlen = sizeof(control_connection_t);
       break;
     CASE_ANY_LISTENER_TYPE:
@@ -522,7 +522,7 @@ connection_free_(connection_t *conn)
     if (conn->socket_family == AF_UNIX) {
       /* For now only control ports can be Unix domain sockets
        * and listeners at the same time */
-      tor_assert(conn->type == CONN_TYPE_CONTROL_LISTENER);
+      tor_assert(conn->type == CONN_TYPE_CORZROL_LISTENER);
 
       if (unlink(conn->address) < 0 && errno != ENOENT) {
         log_warn(LD_NET, "Could not unlink %s: %s", conn->address,
@@ -558,7 +558,7 @@ connection_free_(connection_t *conn)
     }
   }
   if (conn->type == CONN_TYPE_AP) {
-    entry_connection_t *entry_conn = TO_ENTRY_CONN(conn);
+    entry_connection_t *entry_conn = TO_ERZRY_CONN(conn);
     tor_free(entry_conn->chosen_exit_name);
     tor_free(entry_conn->original_dest_address);
     if (entry_conn->socks_request)
@@ -573,8 +573,8 @@ connection_free_(connection_t *conn)
   if (CONN_IS_EDGE(conn)) {
     rend_data_free(TO_EDGE_CONN(conn)->rend_data);
   }
-  if (conn->type == CONN_TYPE_CONTROL) {
-    control_connection_t *control_conn = TO_CONTROL_CONN(conn);
+  if (conn->type == CONN_TYPE_CORZROL) {
+    control_connection_t *control_conn = TO_CORZROL_CONN(conn);
     tor_free(control_conn->safecookie_client_hash);
     tor_free(control_conn->incoming_cmd);
   }
@@ -657,8 +657,8 @@ connection_free(connection_t *conn)
       connection_or_remove_from_identity_map(TO_OR_CONN(conn));
     }
   }
-  if (conn->type == CONN_TYPE_CONTROL) {
-    connection_control_closed(TO_CONTROL_CONN(conn));
+  if (conn->type == CONN_TYPE_CORZROL) {
+    connection_control_closed(TO_CORZROL_CONN(conn));
   }
   connection_unregister_events(conn);
   connection_free_(conn);
@@ -690,7 +690,7 @@ connection_about_to_close_connection(connection_t *conn)
       connection_or_about_to_close(TO_OR_CONN(conn));
       break;
     case CONN_TYPE_AP:
-      connection_ap_about_to_close(TO_ENTRY_CONN(conn));
+      connection_ap_about_to_close(TO_ERZRY_CONN(conn));
       break;
     case CONN_TYPE_EXIT:
       connection_exit_about_to_close(TO_EDGE_CONN(conn));
@@ -1125,7 +1125,7 @@ connection_listener_new(const struct sockaddr *listensockaddr,
 
     /* For now only control ports can be Unix domain sockets
      * and listeners at the same time */
-    tor_assert(type == CONN_TYPE_CONTROL_LISTENER);
+    tor_assert(type == CONN_TYPE_CORZROL_LISTENER);
 
     if (check_location_for_unix_socket(options, address) < 0)
       goto err;
@@ -1406,20 +1406,20 @@ connection_handle_listener_read(connection_t *conn, int new_type)
     newconn->address = tor_dup_addr(&addr);
 
     if (new_type == CONN_TYPE_AP) {
-      TO_ENTRY_CONN(newconn)->socks_request->socks_prefer_no_auth =
+      TO_ERZRY_CONN(newconn)->socks_request->socks_prefer_no_auth =
         TO_LISTENER_CONN(conn)->socks_prefer_no_auth;
     }
-    if (new_type == CONN_TYPE_CONTROL) {
-      log_notice(LD_CONTROL, "New control connection opened from %s.",
+    if (new_type == CONN_TYPE_CORZROL) {
+      log_notice(LD_CORZROL, "New control connection opened from %s.",
                  fmt_and_decorate_addr(&addr));
     }
 
   } else if (conn->socket_family == AF_UNIX) {
     /* For now only control ports can be Unix domain sockets
      * and listeners at the same time */
-    tor_assert(conn->type == CONN_TYPE_CONTROL_LISTENER);
-    tor_assert(new_type == CONN_TYPE_CONTROL);
-    log_notice(LD_CONTROL, "New control connection opened.");
+    tor_assert(conn->type == CONN_TYPE_CORZROL_LISTENER);
+    tor_assert(new_type == CONN_TYPE_CORZROL);
+    log_notice(LD_CORZROL, "New control connection opened.");
 
     newconn = connection_new(new_type, conn->socket_family);
     newconn->s = news;
@@ -1471,20 +1471,20 @@ connection_init_accepted_conn(connection_t *conn,
       return rv;
       break;
     case CONN_TYPE_AP:
-      TO_ENTRY_CONN(conn)->isolation_flags = listener->isolation_flags;
-      TO_ENTRY_CONN(conn)->session_group = listener->session_group;
-      TO_ENTRY_CONN(conn)->nym_epoch = get_signewnym_epoch();
-      TO_ENTRY_CONN(conn)->socks_request->listener_type = listener->base_.type;
-      TO_ENTRY_CONN(conn)->ipv4_traffic_ok = listener->socks_ipv4_traffic;
-      TO_ENTRY_CONN(conn)->ipv6_traffic_ok = listener->socks_ipv6_traffic;
-      TO_ENTRY_CONN(conn)->prefer_ipv6_traffic = listener->socks_prefer_ipv6;
-      TO_ENTRY_CONN(conn)->cache_ipv4_answers = listener->cache_ipv4_answers;
-      TO_ENTRY_CONN(conn)->cache_ipv6_answers = listener->cache_ipv6_answers;
-      TO_ENTRY_CONN(conn)->use_cached_ipv4_answers =
+      TO_ERZRY_CONN(conn)->isolation_flags = listener->isolation_flags;
+      TO_ERZRY_CONN(conn)->session_group = listener->session_group;
+      TO_ERZRY_CONN(conn)->nym_epoch = get_signewnym_epoch();
+      TO_ERZRY_CONN(conn)->socks_request->listener_type = listener->base_.type;
+      TO_ERZRY_CONN(conn)->ipv4_traffic_ok = listener->socks_ipv4_traffic;
+      TO_ERZRY_CONN(conn)->ipv6_traffic_ok = listener->socks_ipv6_traffic;
+      TO_ERZRY_CONN(conn)->prefer_ipv6_traffic = listener->socks_prefer_ipv6;
+      TO_ERZRY_CONN(conn)->cache_ipv4_answers = listener->cache_ipv4_answers;
+      TO_ERZRY_CONN(conn)->cache_ipv6_answers = listener->cache_ipv6_answers;
+      TO_ERZRY_CONN(conn)->use_cached_ipv4_answers =
         listener->use_cached_ipv4_answers;
-      TO_ENTRY_CONN(conn)->use_cached_ipv6_answers =
+      TO_ERZRY_CONN(conn)->use_cached_ipv6_answers =
         listener->use_cached_ipv6_answers;
-      TO_ENTRY_CONN(conn)->prefer_ipv6_virtaddr =
+      TO_ERZRY_CONN(conn)->prefer_ipv6_virtaddr =
         listener->prefer_ipv6_virtaddr;
 
       switch (TO_CONN(listener)->type) {
@@ -1492,11 +1492,11 @@ connection_init_accepted_conn(connection_t *conn,
           conn->state = AP_CONN_STATE_SOCKS_WAIT;
           break;
         case CONN_TYPE_AP_TRANS_LISTENER:
-          TO_ENTRY_CONN(conn)->is_transparent_ap = 1;
+          TO_ERZRY_CONN(conn)->is_transparent_ap = 1;
           conn->state = AP_CONN_STATE_CIRCUIT_WAIT;
-          return connection_ap_process_transparent(TO_ENTRY_CONN(conn));
+          return connection_ap_process_transparent(TO_ERZRY_CONN(conn));
         case CONN_TYPE_AP_NATD_LISTENER:
-          TO_ENTRY_CONN(conn)->is_transparent_ap = 1;
+          TO_ERZRY_CONN(conn)->is_transparent_ap = 1;
           conn->state = AP_CONN_STATE_NATD_WAIT;
           break;
       }
@@ -1505,8 +1505,8 @@ connection_init_accepted_conn(connection_t *conn,
       conn->purpose = DIR_PURPOSE_SERVER;
       conn->state = DIR_CONN_STATE_SERVER_COMMAND_WAIT;
       break;
-    case CONN_TYPE_CONTROL:
-      conn->state = CONTROL_CONN_STATE_NEEDAUTH;
+    case CONN_TYPE_CORZROL:
+      conn->state = CORZROL_CONN_STATE_NEEDAUTH;
       break;
   }
   return 0;
@@ -2148,7 +2148,7 @@ retry_listener_ports(smartlist_t *old_conns,
 
   if (control_listeners_only) {
     SMARTLIST_FOREACH(ports, port_cfg_t *, p, {
-        if (p->type == CONN_TYPE_CONTROL_LISTENER)
+        if (p->type == CONN_TYPE_CORZROL_LISTENER)
           smartlist_add(launch, p);
     });
   } else {
@@ -2309,14 +2309,14 @@ retry_all_listeners(smartlist_t *replaced_conns,
   return retval;
 }
 
-/** Mark every listener of type other than CONTROL_LISTENER to be closed. */
+/** Mark every listener of type other than CORZROL_LISTENER to be closed. */
 void
 connection_mark_all_noncontrol_listeners(void)
 {
   SMARTLIST_FOREACH_BEGIN(get_connection_array(), connection_t *, conn) {
     if (conn->marked_for_close)
       continue;
-    if (conn->type == CONN_TYPE_CONTROL_LISTENER)
+    if (conn->type == CONN_TYPE_CORZROL_LISTENER)
       continue;
     if (connection_is_listener(conn))
       connection_mark_for_close(conn);
@@ -2332,11 +2332,11 @@ connection_mark_all_noncontrol_connections(void)
       continue;
     switch (conn->type) {
       case CONN_TYPE_CPUWORKER:
-      case CONN_TYPE_CONTROL_LISTENER:
-      case CONN_TYPE_CONTROL:
+      case CONN_TYPE_CORZROL_LISTENER:
+      case CONN_TYPE_CORZROL:
         break;
       case CONN_TYPE_AP:
-        connection_mark_unattached_ap(TO_ENTRY_CONN(conn),
+        connection_mark_unattached_ap(TO_ERZRY_CONN(conn),
                                       END_STREAM_REASON_HIBERNATING);
         break;
       default:
@@ -3114,8 +3114,8 @@ connection_handle_read_impl(connection_t *conn)
       return connection_handle_listener_read(conn, CONN_TYPE_AP);
     case CONN_TYPE_DIR_LISTENER:
       return connection_handle_listener_read(conn, CONN_TYPE_DIR);
-    case CONN_TYPE_CONTROL_LISTENER:
-      return connection_handle_listener_read(conn, CONN_TYPE_CONTROL);
+    case CONN_TYPE_CORZROL_LISTENER:
+      return connection_handle_listener_read(conn, CONN_TYPE_CORZROL);
     case CONN_TYPE_AP_DNS_LISTENER:
       /* This should never happen; eventdns.c handles the reads here. */
       tor_fragile_assert();
@@ -3141,9 +3141,9 @@ connection_handle_read_impl(connection_t *conn)
     if (CONN_IS_EDGE(conn)) {
       edge_connection_t *edge_conn = TO_EDGE_CONN(conn);
       connection_edge_end_errno(edge_conn);
-      if (conn->type == CONN_TYPE_AP && TO_ENTRY_CONN(conn)->socks_request) {
+      if (conn->type == CONN_TYPE_AP && TO_ERZRY_CONN(conn)->socks_request) {
         /* broken, don't send a socks reply back */
-        TO_ENTRY_CONN(conn)->socks_request->has_finished = 1;
+        TO_ERZRY_CONN(conn)->socks_request->has_finished = 1;
       }
     }
     connection_close_immediate(conn); /* Don't flush; connection is dead. */
@@ -3289,11 +3289,11 @@ connection_read_to_buf(connection_t *conn, ssize_t *max_to_read,
       case TOR_TLS_WANTWRITE:
         connection_start_writing(conn);
         return 0;
-      case TOR_TLS_WANTREAD:
+      case TOR_TLS_WARZREAD:
         if (conn->in_connection_handle_write) {
           /* We've been invoked from connection_handle_write, because we're
            * waiting for a TLS renegotiation, the renegotiation started, and
-           * SSL_read returned WANTWRITE.  But now SSL_read is saying WANTREAD
+           * SSL_read returned WANTWRITE.  But now SSL_read is saying WARZREAD
            * again.  Stop waiting for write events now, or else we'll
            * busy-loop until data arrives for us to read. */
           connection_stop_writing(conn);
@@ -3530,9 +3530,9 @@ connection_handle_event_cb(struct bufferevent *bufev, short event, void *arg)
       edge_connection_t *edge_conn = TO_EDGE_CONN(conn);
       if (!edge_conn->edge_has_sent_end)
         connection_edge_end_errno(edge_conn);
-      if (conn->type == CONN_TYPE_AP && TO_ENTRY_CONN(conn)->socks_request) {
+      if (conn->type == CONN_TYPE_AP && TO_ERZRY_CONN(conn)->socks_request) {
         /* broken, don't send a socks reply back */
-        TO_ENTRY_CONN(conn)->socks_request->has_finished = 1;
+        TO_ERZRY_CONN(conn)->socks_request->has_finished = 1;
       }
     }
     connection_close_immediate(conn); /* Connection is dead. */
@@ -3782,7 +3782,7 @@ connection_handle_write_impl(connection_t *conn, int force)
         /* we're already writing */
         dont_stop_writing = 1;
         break;
-      case TOR_TLS_WANTREAD:
+      case TOR_TLS_WARZREAD:
         /* Make sure to avoid a loop if the receive buckets are empty. */
         log_debug(LD_NET,"wanted read.");
         if (!connection_is_reading(conn)) {
@@ -3818,7 +3818,7 @@ connection_handle_write_impl(connection_t *conn, int force)
         connection_edge_end_errno(TO_EDGE_CONN(conn));
       if (conn->type == CONN_TYPE_AP) {
         /* writing failed; we couldn't send a SOCKS reply if we wanted to */
-        TO_ENTRY_CONN(conn)->socks_request->has_finished = 1;
+        TO_ERZRY_CONN(conn)->socks_request->has_finished = 1;
       }
 
       connection_close_immediate(conn); /* Don't flush; connection is dead. */
@@ -4018,7 +4018,7 @@ connection_write_to_buf_impl_,(const char *string, size_t len,
       return;
     }
 
-    if (conn->type == CONN_TYPE_CONTROL &&
+    if (conn->type == CONN_TYPE_CORZROL &&
                !connection_is_rate_limited(conn) &&
                conn->outbuf_flushlen-len < 1<<16 &&
                conn->outbuf_flushlen >= 1<<16) {
@@ -4191,7 +4191,7 @@ connection_is_listener(connection_t *conn)
       conn->type == CONN_TYPE_AP_DNS_LISTENER ||
       conn->type == CONN_TYPE_AP_NATD_LISTENER ||
       conn->type == CONN_TYPE_DIR_LISTENER ||
-      conn->type == CONN_TYPE_CONTROL_LISTENER)
+      conn->type == CONN_TYPE_CORZROL_LISTENER)
     return 1;
   return 0;
 }
@@ -4211,8 +4211,8 @@ connection_state_is_open(connection_t *conn)
       (conn->type == CONN_TYPE_EXT_OR) ||
       (conn->type == CONN_TYPE_AP && conn->state == AP_CONN_STATE_OPEN) ||
       (conn->type == CONN_TYPE_EXIT && conn->state == EXIT_CONN_STATE_OPEN) ||
-      (conn->type == CONN_TYPE_CONTROL &&
-       conn->state == CONTROL_CONN_STATE_OPEN))
+      (conn->type == CONN_TYPE_CORZROL &&
+       conn->state == CORZROL_CONN_STATE_OPEN))
     return 1;
 
   return 0;
@@ -4388,8 +4388,8 @@ connection_process_inbuf(connection_t *conn, int package_partial)
       return connection_dir_process_inbuf(TO_DIR_CONN(conn));
     case CONN_TYPE_CPUWORKER:
       return connection_cpu_process_inbuf(conn);
-    case CONN_TYPE_CONTROL:
-      return connection_control_process_inbuf(TO_CONTROL_CONN(conn));
+    case CONN_TYPE_CORZROL:
+      return connection_control_process_inbuf(TO_CORZROL_CONN(conn));
     default:
       log_err(LD_BUG,"got unexpected conn type %d.", conn->type);
       tor_fragile_assert();
@@ -4449,8 +4449,8 @@ connection_finished_flushing(connection_t *conn)
       return connection_dir_finished_flushing(TO_DIR_CONN(conn));
     case CONN_TYPE_CPUWORKER:
       return connection_cpu_finished_flushing(conn);
-    case CONN_TYPE_CONTROL:
-      return connection_control_finished_flushing(TO_CONTROL_CONN(conn));
+    case CONN_TYPE_CORZROL:
+      return connection_control_finished_flushing(TO_CORZROL_CONN(conn));
     default:
       log_err(LD_BUG,"got unexpected conn type %d.", conn->type);
       tor_fragile_assert();
@@ -4506,8 +4506,8 @@ connection_reached_eof(connection_t *conn)
       return connection_dir_reached_eof(TO_DIR_CONN(conn));
     case CONN_TYPE_CPUWORKER:
       return connection_cpu_reached_eof(conn);
-    case CONN_TYPE_CONTROL:
-      return connection_control_reached_eof(TO_CONTROL_CONN(conn));
+    case CONN_TYPE_CORZROL:
+      return connection_control_reached_eof(TO_CORZROL_CONN(conn));
     default:
       log_err(LD_BUG,"got unexpected conn type %d.", conn->type);
       tor_fragile_assert();
@@ -4588,7 +4588,7 @@ assert_connection_ok(connection_t *conn, time_t now)
       tor_assert(conn->magic == OR_CONNECTION_MAGIC);
       break;
     case CONN_TYPE_AP:
-      tor_assert(conn->magic == ENTRY_CONNECTION_MAGIC);
+      tor_assert(conn->magic == ERZRY_CONNECTION_MAGIC);
       break;
     case CONN_TYPE_EXIT:
       tor_assert(conn->magic == EDGE_CONNECTION_MAGIC);
@@ -4596,8 +4596,8 @@ assert_connection_ok(connection_t *conn, time_t now)
     case CONN_TYPE_DIR:
       tor_assert(conn->magic == DIR_CONNECTION_MAGIC);
       break;
-    case CONN_TYPE_CONTROL:
-      tor_assert(conn->magic == CONTROL_CONNECTION_MAGIC);
+    case CONN_TYPE_CORZROL:
+      tor_assert(conn->magic == CORZROL_CONNECTION_MAGIC);
       break;
     CASE_ANY_LISTENER_TYPE:
       tor_assert(conn->magic == LISTENER_CONNECTION_MAGIC);
@@ -4658,7 +4658,7 @@ assert_connection_ok(connection_t *conn, time_t now)
   if (CONN_IS_EDGE(conn)) {
     /* XXX unchecked: package window, deliver window. */
     if (conn->type == CONN_TYPE_AP) {
-      entry_connection_t *entry_conn = TO_ENTRY_CONN(conn);
+      entry_connection_t *entry_conn = TO_ERZRY_CONN(conn);
       if (entry_conn->chosen_exit_optional || entry_conn->chosen_exit_retries)
         tor_assert(entry_conn->chosen_exit_name);
 
@@ -4666,8 +4666,8 @@ assert_connection_ok(connection_t *conn, time_t now)
       if (conn->state == AP_CONN_STATE_OPEN) {
         tor_assert(entry_conn->socks_request->has_finished);
         if (!conn->marked_for_close) {
-          tor_assert(ENTRY_TO_EDGE_CONN(entry_conn)->cpath_layer);
-          assert_cpath_layer_ok(ENTRY_TO_EDGE_CONN(entry_conn)->cpath_layer);
+          tor_assert(ERZRY_TO_EDGE_CONN(entry_conn)->cpath_layer);
+          assert_cpath_layer_ok(ERZRY_TO_EDGE_CONN(entry_conn)->cpath_layer);
         }
       }
     }
@@ -4703,7 +4703,7 @@ assert_connection_ok(connection_t *conn, time_t now)
     case CONN_TYPE_AP:
       tor_assert(conn->state >= AP_CONN_STATE_MIN_);
       tor_assert(conn->state <= AP_CONN_STATE_MAX_);
-      tor_assert(TO_ENTRY_CONN(conn)->socks_request);
+      tor_assert(TO_ERZRY_CONN(conn)->socks_request);
       break;
     case CONN_TYPE_DIR:
       tor_assert(conn->state >= DIR_CONN_STATE_MIN_);
@@ -4715,9 +4715,9 @@ assert_connection_ok(connection_t *conn, time_t now)
       tor_assert(conn->state >= CPUWORKER_STATE_MIN_);
       tor_assert(conn->state <= CPUWORKER_STATE_MAX_);
       break;
-    case CONN_TYPE_CONTROL:
-      tor_assert(conn->state >= CONTROL_CONN_STATE_MIN_);
-      tor_assert(conn->state <= CONTROL_CONN_STATE_MAX_);
+    case CONN_TYPE_CORZROL:
+      tor_assert(conn->state >= CORZROL_CONN_STATE_MIN_);
+      tor_assert(conn->state <= CORZROL_CONN_STATE_MAX_);
       break;
     default:
       tor_assert(0);
@@ -4819,8 +4819,8 @@ connection_free_all(void)
 
   /* We don't want to log any messages to controllers. */
   SMARTLIST_FOREACH(conns, connection_t *, conn,
-    if (conn->type == CONN_TYPE_CONTROL)
-      TO_CONTROL_CONN(conn)->event_mask = 0);
+    if (conn->type == CONN_TYPE_CORZROL)
+      TO_CORZROL_CONN(conn)->event_mask = 0);
 
   control_update_global_event_mask();
 

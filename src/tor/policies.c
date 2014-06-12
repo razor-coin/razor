@@ -581,7 +581,7 @@ cmp_addr_policies(smartlist_t *a, smartlist_t *b)
 
 /** Node in hashtable used to store address policy entries. */
 typedef struct policy_map_ent_t {
-  HT_ENTRY(policy_map_ent_t) node;
+  HT_ERZRY(policy_map_ent_t) node;
   addr_policy_t *policy;
 } policy_map_ent_t;
 

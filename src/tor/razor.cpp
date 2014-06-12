@@ -1,9 +1,9 @@
 /* Copyright (c) 2009-2010 Satoshi Nakamoto
    Copyright (c) 2009-2012 The Bitcoin developers
-   Copyright (c) 2013-2014 The Neutrinocoin developers */
+   Copyright (c) 2013-2014 The Razor developers */
 /* See LICENSE for licensing information */
 
-#include "neutrinocoin.h"
+#include "razor.h"
 #include "util.h"
 
 #include <boost/filesystem.hpp>
@@ -12,7 +12,7 @@
 #include <string>
 #include <cstring>
 
-char const* neutrinocoin_tor_data_directory(
+char const* razor_tor_data_directory(
 ) {
     static std::string const retrieved = (
         GetDefaultDataDir(
@@ -23,7 +23,7 @@ char const* neutrinocoin_tor_data_directory(
     );
 }
 
-char const* neutrinocoin_service_directory(
+char const* razor_service_directory(
 ) {
     static std::string const retrieved = (
         GetDefaultDataDir(

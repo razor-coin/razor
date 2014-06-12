@@ -1,5 +1,5 @@
-#ifndef SENDCOINSENTRY_H
-#define SENDCOINSENTRY_H
+#ifndef SENDCOINSERZRY_H
+#define SENDCOINSERZRY_H
 
 #include <QFrame>
 
@@ -54,4 +54,4 @@ private:
     WalletModel *model;
 };
 
-#endif // SENDCOINSENTRY_H
+#endif // SENDCOINSERZRY_H

@@ -26,7 +26,7 @@
 /** Type for a linked list of circuits that are waiting for a free CPU worker
  * to process a waiting onion handshake. */
 typedef struct onion_queue_t {
-  TOR_TAILQ_ENTRY(onion_queue_t) next;
+  TOR_TAILQ_ERZRY(onion_queue_t) next;
   or_circuit_t *circ;
   uint16_t handshake_type;
   create_cell_t *onionskin;

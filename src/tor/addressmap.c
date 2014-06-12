@@ -573,7 +573,7 @@ client_dns_incr_failures(const char *address)
   addressmap_entry_t *ent = strmap_get(addressmap, address);
   if (!ent) {
     ent = tor_malloc_zero(sizeof(addressmap_entry_t));
-    ent->expires = time(NULL) + MAX_DNS_ENTRY_AGE;
+    ent->expires = time(NULL) + MAX_DNS_ERZRY_AGE;
     strmap_set(addressmap,address,ent);
   }
   if (ent->num_resolve_failures < SHORT_MAX)

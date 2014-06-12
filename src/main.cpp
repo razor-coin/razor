@@ -31,8 +31,9 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 const hashGenesisBlock("0xd4fadf07eb214ffabf5a1e10058bb81528405ea29c898ddbaef632642ff97ae7");
-static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Neutrinocoin: starting difficulty is 1 / 2^12
+
+uint256 const hashGenesisBlock("0xb2926a56ca64e0cd2430347e383f63ad7092f406088b9b86d6d68c2a34baef51");
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Razor: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 uint256 nBestChainWork = 0;
@@ -64,7 +65,7 @@ map<uint256, set<uint256> > mapOrphanTransactionsByPrev;
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "Neutrinocoin Signed Message:\n";
+const string strMessageMagic = "Razor Signed Message:\n";
 
 double dHashesPerSec = 0.0;
 int64 nHPSTimerStart = 0;
@@ -355,7 +356,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 
 bool CTxOut::IsDust() const
 {
-    // Neutrinocoin: IsDust() detection disabled, allows any valid dust to be relayed.
+    // Razor: IsDust() detection disabled, allows any valid dust to be relayed.
     // The fees imposed on each dust txo is considered sufficient spam deterrant. 
     return false;
 }
@@ -612,7 +613,7 @@ int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
             nMinFee = 0;
     }
 
-    // Neutrinocoin
+    // Razor
     // To limit dust spam, add nBaseFee for each output less than DUST_SOFT_LIMIT
     BOOST_FOREACH(const CTxOut& txout, vout)
         if (txout.nValue < DUST_SOFT_LIMIT)
@@ -1061,26 +1062,21 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
     return pblock->GetHash();
 }
 
+
 int64 static GetBlockValue(int nHeight, int64 nFees)
 {
-    // Neutrinocoin: 210M in the first 3 months, 1.1% increase in coins per year after that
-    int64 nSubsidy = 3992 * COIN;
-    int64 const quarter_year_blocks = 52596;
-    int64 remaining_height = nHeight;
-    int quarter = 2;
-    while ( remaining_height > quarter_year_blocks + 1 ) {
-        remaining_height -= quarter_year_blocks;
-        if (quarter == 2) {
-            nSubsidy = nSubsidy * 275 / 100000; // at beginning of second quarter year period, subsidy is reduced to 1/4 of 1.1% of original subsidy
-        } else if ( ( ( quarter - 1 ) % 4 ) + 1 == 2 ) {
-            nSubsidy = nSubsidy * 1011 / 1000; // thereafter, subsidy increases by 1.1% each year
-        }
-    }
+    // Razor: 210M in the first 3 months, 1.1% increase in coins per year after that
+    int64 nSubsidy = 100 * COIN;
+    int64 nSubsidyHalvingInterval = 10000;
+
+    int halvings = nHeight / nSubsidyHalvingInterval;
+    nSubsidy >>= halvings;
+
     return nSubsidy + nFees;
 }
 
 static const int64 nTargetTimespan = 30 * 60; // 30 minutes
-static const int64 nTargetSpacing = 2.5 * 60; // 2.5 minutes
+static const int64 nTargetSpacing = 1.25 * 60; // 1.25 minutes
 static const int64 nInterval = nTargetTimespan / nTargetSpacing; // 12 blocks
 static const int64 nMaxDifficultyIncrease = 10;
 static const int64 nMaxDifficultyDecrease = 50;
@@ -1110,77 +1106,76 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
     return bnResult.GetCompact();
 }
 
+unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const CBlockHeader *pblock, uint64 TargetBlocksSpacingSeconds, uint64 PastBlocksMin, uint64 PastBlocksMax) {
+        /* current difficulty formula, megacoin - kimoto gravity well */
+        const CBlockIndex *BlockLastSolved = pindexLast;
+        const CBlockIndex *BlockReading = pindexLast;
+        const CBlockHeader *BlockCreating = pblock;
+                                                BlockCreating = BlockCreating;
+        uint64 PastBlocksMass = 0;
+        int64 PastRateActualSeconds = 0;
+        int64 PastRateTargetSeconds = 0;
+        double PastRateAdjustmentRatio = double(1);
+        CBigNum PastDifficultyAverage;
+        CBigNum PastDifficultyAveragePrev;
+        double EventHorizonDeviation;
+        double EventHorizonDeviationFast;
+        double EventHorizonDeviationSlow;
+        
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || (uint64)BlockLastSolved->nHeight < PastBlocksMin) { return bnProofOfWorkLimit.GetCompact(); }
+        
+        for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+                if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+                PastBlocksMass++;
+                
+                if (i == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+                else { PastDifficultyAverage = ((CBigNum().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / i) + PastDifficultyAveragePrev; }
+                PastDifficultyAveragePrev = PastDifficultyAverage;
+                
+                PastRateActualSeconds = BlockLastSolved->GetBlockTime() - BlockReading->GetBlockTime();
+                PastRateTargetSeconds = TargetBlocksSpacingSeconds * PastBlocksMass;
+                PastRateAdjustmentRatio = double(1);
+                if (PastRateActualSeconds < 0) { PastRateActualSeconds = 0; }
+                if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
+                PastRateAdjustmentRatio = double(PastRateTargetSeconds) / double(PastRateActualSeconds);
+                }
+                EventHorizonDeviation = 1 + (0.7084 * pow((double(PastBlocksMass)/double(28.2)), -1.228));
+                EventHorizonDeviationFast = EventHorizonDeviation;
+                EventHorizonDeviationSlow = 1 / EventHorizonDeviation;
+                
+                if (PastBlocksMass >= PastBlocksMin) {
+                        if ((PastRateAdjustmentRatio <= EventHorizonDeviationSlow) || (PastRateAdjustmentRatio >= EventHorizonDeviationFast)) { assert(BlockReading); break; }
+                }
+                if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
+                BlockReading = BlockReading->pprev;
+        }
+        
+        CBigNum bnNew(PastDifficultyAverage);
+        if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
+                bnNew *= PastRateActualSeconds;
+                bnNew /= PastRateTargetSeconds;
+        }
+    if (bnNew > bnProofOfWorkLimit) { bnNew = bnProofOfWorkLimit; }
+        
+    /// debug print
+    printf("Difficulty Retarget - Kimoto Gravity Well\n");
+    printf("PastRateAdjustmentRatio = %g\n", PastRateAdjustmentRatio);
+    printf("Before: %08x %s\n", BlockLastSolved->nBits, CBigNum().SetCompact(BlockLastSolved->nBits).getuint256().ToString().c_str());
+    printf("After: %08x %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
+        
+        return bnNew.GetCompact();
+}
+
 unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
-    unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
-
-    // Genesis block
-    if (pindexLast == NULL)
-        return nProofOfWorkLimit;
-
-    // Only change once per interval
-    if ((pindexLast->nHeight+1) % nInterval != 0)
-    {
-        // Special difficulty rule for testnet:
-        if (fTestNet)
-        {
-            // If the new block's timestamp is more than 2* 10 minutes
-            // then allow mining of a min-difficulty block.
-            if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
-                return nProofOfWorkLimit;
-            else
-            {
-                // Return the last non-special-min-difficulty-rules-block
-                const CBlockIndex* pindex = pindexLast;
-                while (pindex->pprev && pindex->nHeight % nInterval != 0 && pindex->nBits == nProofOfWorkLimit)
-                    pindex = pindex->pprev;
-                return pindex->nBits;
-            }
-        }
-
-        return pindexLast->nBits;
-    }
-
-    // Neutrinocoin: This fixes an issue where a 51% attack can change difficulty at will.
-    // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
-    int blockstogoback = nInterval-1;
-    if ((pindexLast->nHeight+1) != nInterval)
-        blockstogoback = nInterval;
-
-    // Go back by what we want to be 14 days worth of blocks
-    const CBlockIndex* pindexFirst = pindexLast;
-    for (int i = 0; pindexFirst && i < blockstogoback; i++)
-        pindexFirst = pindexFirst->pprev;
-    assert(pindexFirst);
-
-    // Limit adjustment step
-    int64 nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
-    printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
-
-    int64 minTime = nTargetTimespan * 100 / (100 + nMaxDifficultyIncrease); // limit the difficulty change to no more than 10% up
-    int64 maxTime = nTargetTimespan * 100 / (100 - nMaxDifficultyDecrease); // limit the difficulty change to no more than 50% down
-
-    if (nActualTimespan < minTime)
-        nActualTimespan = minTime;
-    if (nActualTimespan > maxTime)
-        nActualTimespan = maxTime;
-
-    // Retarget
-    CBigNum bnNew;
-    bnNew.SetCompact(pindexLast->nBits);
-    bnNew *= nActualTimespan;
-    bnNew /= nTargetTimespan;
-
-    if (bnNew > bnProofOfWorkLimit)
-        bnNew = bnProofOfWorkLimit;
-
-    /// debug print
-    printf("GetNextWorkRequired RETARGET\n");
-    printf("nTargetTimespan = %"PRI64d"    nActualTimespan = %"PRI64d"\n", nTargetTimespan, nActualTimespan);
-    printf("Before: %08x  %s %15f\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str(), GetQuickDifficulty(pindexLast->nBits));
-    printf("After:  %08x  %s %15f\n\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str(), GetQuickDifficulty(bnNew.GetCompact()));
-
-    return bnNew.GetCompact();
+        static const int64 BlocksTargetSpacing = 1.25 * 60; // 30 seconds
+        unsigned int TimeDaySeconds = 60 * 60 * 24;
+        int64 PastSecondsMin = TimeDaySeconds * 0.23;
+        int64 PastSecondsMax = TimeDaySeconds * 1;
+        uint64 PastBlocksMin = PastSecondsMin / BlocksTargetSpacing;
+        uint64 PastBlocksMax = PastSecondsMax / BlocksTargetSpacing;
+        
+        return KimotoGravityWell(pindexLast, pblock, BlocksTargetSpacing, PastBlocksMin, PastBlocksMax);
 }
 
 double GetQuickDifficulty(const unsigned int nBits)
@@ -2110,7 +2105,7 @@ bool CBlock::CheckBlock(CValidationState &state, bool fCheckPOW, bool fCheckMerk
     if (vtx.empty() || vtx.size() > MAX_BLOCK_SIZE || ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_SIZE)
         return state.DoS(100, error("CheckBlock() : size limits failed"));
 
-    // Neutrinocoin: Special short-term limits to avoid 10,000 BDB lock limit:
+    // Razor: Special short-term limits to avoid 10,000 BDB lock limit:
     if (GetBlockTime() < 1376568000)  // stop enforcing 15 August 2013 00:00:00
     {
         // Rule is: #unique txids referenced <= 4,500
@@ -2272,7 +2267,7 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
 
 bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
 {
-    // Neutrinocoin: temporarily disable v2 block lockin until we are ready for v2 transition
+    // Razor: temporarily disable v2 block lockin until we are ready for v2 transition
     return false;
     unsigned int nFound = 0;
     for (unsigned int i = 0; i < nToCheck && nFound < nRequired && pstart != NULL; i++)
@@ -2753,10 +2748,10 @@ bool LoadBlockIndex()
 {
     if (fTestNet)
     {
-        pchMessageStart[0] = 0xfe;
-        pchMessageStart[1] = 0xc3;
-        pchMessageStart[2] = 0xb9;
-        pchMessageStart[3] = 0xde;
+        pchMessageStart[0] = 0xff;
+        pchMessageStart[1] = 0xc5;
+        pchMessageStart[2] = 0xc1;
+        pchMessageStart[3] = 0xe1;
     }
 
     //
@@ -2782,14 +2777,13 @@ bool InitBlockIndex() {
     // Only add the genesis block if not reindexing (in which case we reuse the one already on disk)
     if (!fReindex) {
         // Genesis Block:
-        // CBlock(hash=12a765e31ffd4059bada, PoW=0000050c34a64b415b6b, ver=1, hashPrevBlock=00000000000000000000, hashMerkleRoot=97ddfbbae6, nTime=1317972665, nBits=1e0ffff0, nNonce=2084524493, vtx=1)
-        //   CTransaction(hash=97ddfbbae6, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-        //     CTxIn(COutPoint(0000000000, -1), coinbase 04ffff001d0104404e592054696d65732030352f4f63742f32303131205374657665204a6f62732c204170706c65e280997320566973696f6e6172792c2044696573206174203536)
-        //     CTxOut(nValue=50.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
-        //   vMerkleTree: 97ddfbbae6
-
+//CBlock(hash=b2926a56ca64e0cd2430347e383f63ad7092f406088b9b86d6d68c2a34baef51, //input=01000000000000000000000000000000000000000000000000000000000000000000000010e47ac25e5a19d8f56a5439b0d603300600c03e7b313a7685dc85f3d205f765003f9a53f0ff0f1e19381b00, PoW=00000c3af6ec631ff6e280ebd61dd640e09e4e8b7bc6797af6ae653da02ebbc5, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410, nTime=1402617600, nBits=1e0ffff0, nNonce=1783833, vtx=1)
+//CTransaction(hash=65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+//    CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01043f49726973682054696d65732031302f4a756e2f32303134204368696e6120616e64204a6170616e207365656b20636c6f736572207472616465206c696e6b73)
+//    CTxOut(nValue=3992.00000000, scriptPubKey=046e4cd7a81b37218401c5cc3f11d0)
+//  vMerkleTree: 65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410 
         // Genesis block
-        const char* pszTimestamp = "Financial Times 31/Mar/2014 Hollande fires French prime minister";
+        const char* pszTimestamp = "Irish Times 10/Jun/2014 China and Japan seek closer trade links";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2801,14 +2795,14 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1396290660;
+        block.nTime    = 1402617600;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 177184;
+        block.nNonce   = 1783833;
 
         if (fTestNet)
         {
-            block.nTime    = 1396290660;
-            block.nNonce   = 177184;
+            block.nTime    = 1402617600;
+            block.nNonce   = 1783833;
         }
 
         //// debug print
@@ -2816,7 +2810,7 @@ bool InitBlockIndex() {
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x229aa68d953a7adc41b8178280d033ec91189f0b33cbb1b07d13cf6ac8b7b5d5"));
+        assert(block.hashMerkleRoot == uint256("0x65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410"));
 
         // If genesis block hash does not match, then generate new genesis hash.
         if (false && block.GetHash() != hashGenesisBlock)
@@ -3134,7 +3128,7 @@ bool static AlreadyHave(const CInv& inv)
 // The message start string is designed to be unlikely to occur in normal data.
 // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
 // a large 4-byte int at any alignment.
-unsigned char pchMessageStart[4] = { 0xfd, 0xc2, 0xb8, 0xdd }; // Neutrinocoin: increase each by adding 2 to bitcoin's value.
+unsigned char pchMessageStart[4] = { 0xf9, 0xe8, 0xb4, 0xd9 }; // Razor: decrease each by subtracting 2 to bitcoin's value.
 
 
 void static ProcessGetData(CNode* pfrom)
@@ -4173,7 +4167,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// NeutrinocoinMiner
+// RazorMiner
 //
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
@@ -4586,7 +4580,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         return false;
 
     //// debug print
-    printf("NeutrinocoinMiner:\n");
+    printf("RazorMiner:\n");
     printf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
     printf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
@@ -4595,7 +4589,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
-            return error("NeutrinocoinMiner : generated block is stale");
+            return error("RazorMiner : generated block is stale");
 
         // Remove key from key pool
         reservekey.KeepKey();
@@ -4609,17 +4603,17 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         // Process this block the same as if we had received it from another node
         CValidationState state;
         if (!ProcessBlock(state, NULL, pblock))
-            return error("NeutrinocoinMiner : ProcessBlock, block not accepted");
+            return error("RazorMiner : ProcessBlock, block not accepted");
     }
 
     return true;
 }
 
-void static NeutrinocoinMiner(CWallet *pwallet)
+void static RazorMiner(CWallet *pwallet)
 {
-    printf("NeutrinocoinMiner started\n");
+    printf("RazorMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-    RenameThread("neutrinocoin-miner");
+    RenameThread("razor-miner");
 
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
@@ -4644,7 +4638,7 @@ void static NeutrinocoinMiner(CWallet *pwallet)
         CBlock *pblock = &pblocktemplate->block;
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
-        printf("Running NeutrinocoinMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
+        printf("Running RazorMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
                ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
         //
@@ -4756,7 +4750,7 @@ void static NeutrinocoinMiner(CWallet *pwallet)
     } }
     catch (boost::thread_interrupted)
     {
-        printf("NeutrinocoinMiner terminated\n");
+        printf("RazorMiner terminated\n");
         throw;
     }
 }
@@ -4781,7 +4775,7 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 
     minerThreads = new boost::thread_group();
     for (int i = 0; i < nThreads; i++)
-        minerThreads->create_thread(boost::bind(&NeutrinocoinMiner, pwallet));
+        minerThreads->create_thread(boost::bind(&RazorMiner, pwallet));
 }
 
 // Amount compression:

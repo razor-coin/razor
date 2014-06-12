@@ -178,7 +178,7 @@ rend_encode_v2_intro_points(char **encoded, rend_service_descriptor_t *desc)
   unenc_len = smartlist_len(desc->intro_nodes) * 1000; /* too long, but ok. */
   unenc = tor_malloc_zero(unenc_len);
   for (i = 0; i < smartlist_len(desc->intro_nodes); i++) {
-    char id_base32[REND_INTRO_POINT_ID_LEN_BASE32 + 1];
+    char id_base32[REND_IRZRO_POINT_ID_LEN_BASE32 + 1];
     char *onion_key = NULL;
     size_t onion_key_len;
     crypto_pk_t *intro_key;
@@ -279,7 +279,7 @@ rend_encrypt_v2_intro_points_basic(char **encrypted_out,
   client_blocks = 1 + ((smartlist_len(client_cookies) - 1) /
                        REND_BASIC_AUTH_CLIENT_MULTIPLE);
   client_entries_len = client_blocks * REND_BASIC_AUTH_CLIENT_MULTIPLE *
-                       REND_BASIC_AUTH_CLIENT_ENTRY_LEN;
+                       REND_BASIC_AUTH_CLIENT_ERZRY_LEN;
   len = 2 + client_entries_len + CIPHER_IV_LEN + strlen(encoded);
   if (client_blocks >= 256) {
     log_warn(LD_REND, "Too many clients in introduction point string.");
@@ -304,7 +304,7 @@ rend_encrypt_v2_intro_points_basic(char **encrypted_out,
    * in a smartlist. */
   encrypted_session_keys = smartlist_new();
   SMARTLIST_FOREACH_BEGIN(client_cookies, const char *, cookie) {
-    client_part = tor_malloc_zero(REND_BASIC_AUTH_CLIENT_ENTRY_LEN);
+    client_part = tor_malloc_zero(REND_BASIC_AUTH_CLIENT_ERZRY_LEN);
     /* Encrypt session key. */
     cipher = crypto_cipher_new(cookie);
     if (crypto_cipher_encrypt(cipher, client_part +
@@ -333,8 +333,8 @@ rend_encrypt_v2_intro_points_basic(char **encrypted_out,
   for (i = (smartlist_len(client_cookies) - 1) %
            REND_BASIC_AUTH_CLIENT_MULTIPLE;
        i < REND_BASIC_AUTH_CLIENT_MULTIPLE - 1; i++) {
-    client_part = tor_malloc_zero(REND_BASIC_AUTH_CLIENT_ENTRY_LEN);
-    if (crypto_rand(client_part, REND_BASIC_AUTH_CLIENT_ENTRY_LEN) < 0) {
+    client_part = tor_malloc_zero(REND_BASIC_AUTH_CLIENT_ERZRY_LEN);
+    if (crypto_rand(client_part, REND_BASIC_AUTH_CLIENT_ERZRY_LEN) < 0) {
       log_warn(LD_REND, "Unable to generate fake client entry.");
       tor_free(client_part);
       goto done;
@@ -345,8 +345,8 @@ rend_encrypt_v2_intro_points_basic(char **encrypted_out,
   smartlist_sort_digests(encrypted_session_keys);
   pos = 2;
   SMARTLIST_FOREACH(encrypted_session_keys, const char *, entry, {
-    memcpy(enc + pos, entry, REND_BASIC_AUTH_CLIENT_ENTRY_LEN);
-    pos += REND_BASIC_AUTH_CLIENT_ENTRY_LEN;
+    memcpy(enc + pos, entry, REND_BASIC_AUTH_CLIENT_ERZRY_LEN);
+    pos += REND_BASIC_AUTH_CLIENT_ERZRY_LEN;
   });
   *encrypted_out = enc;
   *encrypted_len_out = len;
@@ -1004,7 +1004,7 @@ rend_cache_lookup_v2_desc_as_dir(const char *desc_id, const char **desc)
 
 /* Do not allow more than this many introduction points in a hidden service
  * descriptor */
-#define MAX_INTRO_POINTS 10
+#define MAX_IRZRO_POINTS 10
 
 /** Parse *desc, calculate its service id, and store it in the cache.
  * If we have a newer v0 descriptor with the same ID, ignore this one.
@@ -1075,7 +1075,7 @@ rend_cache_store(const char *desc, size_t desc_len, int published,
     return -1;
   }
   if (parsed->intro_nodes &&
-      smartlist_len(parsed->intro_nodes) > MAX_INTRO_POINTS) {
+      smartlist_len(parsed->intro_nodes) > MAX_IRZRO_POINTS) {
     log_warn(LD_REND, "Found too many introduction points on a hidden "
              "service descriptor for %s. This is probably a (misguided) "
              "attempt to improve reliability, but it could also be an "
@@ -1331,7 +1331,7 @@ rend_cache_store_v2_desc_as_client(const char *desc,
                "provided invalid authorization data.");
       retval = -2;
       goto err;
-    } else if (n_intro_points > MAX_INTRO_POINTS) {
+    } else if (n_intro_points > MAX_IRZRO_POINTS) {
       log_warn(LD_REND, "Found too many introduction points on a hidden "
                "service descriptor for %s. This is probably a (misguided) "
                "attempt to improve reliability, but it could also be an "
@@ -1431,7 +1431,7 @@ rend_process_relay_cell(circuit_t *circ, const crypt_path_t *layer_hint,
   }
 
   switch (command) {
-    case RELAY_COMMAND_ESTABLISH_INTRO:
+    case RELAY_COMMAND_ESTABLISH_IRZRO:
       if (or_circ)
         r = rend_mid_establish_intro(or_circ,payload,length);
       break;
@@ -1439,15 +1439,15 @@ rend_process_relay_cell(circuit_t *circ, const crypt_path_t *layer_hint,
       if (or_circ)
         r = rend_mid_establish_rendezvous(or_circ,payload,length);
       break;
-    case RELAY_COMMAND_INTRODUCE1:
+    case RELAY_COMMAND_IRZRODUCE1:
       if (or_circ)
         r = rend_mid_introduce(or_circ,payload,length);
       break;
-    case RELAY_COMMAND_INTRODUCE2:
+    case RELAY_COMMAND_IRZRODUCE2:
       if (origin_circ)
         r = rend_service_introduce(origin_circ,payload,length);
       break;
-    case RELAY_COMMAND_INTRODUCE_ACK:
+    case RELAY_COMMAND_IRZRODUCE_ACK:
       if (origin_circ)
         r = rend_client_introduction_acked(origin_circ,payload,length);
       break;
@@ -1459,7 +1459,7 @@ rend_process_relay_cell(circuit_t *circ, const crypt_path_t *layer_hint,
       if (origin_circ)
         r = rend_client_receive_rendezvous(origin_circ,payload,length);
       break;
-    case RELAY_COMMAND_INTRO_ESTABLISHED:
+    case RELAY_COMMAND_IRZRO_ESTABLISHED:
       if (origin_circ)
         r = rend_service_intro_established(origin_circ,payload,length);
       break;

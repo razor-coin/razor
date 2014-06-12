@@ -40,7 +40,7 @@
 #define DIR_REGEN_SLACK_TIME 30
 /** If we're a cache, keep this many networkstatuses around from non-trusted
  * directory authorities. */
-#define MAX_UNTRUSTED_NETWORKSTATUSES 16
+#define MAX_URZRUSTED_NETWORKSTATUSES 16
 
 /** If a v1 directory is older than this, discard it. */
 #define MAX_V1_DIRECTORY_AGE (30*24*60*60)
@@ -2229,7 +2229,7 @@ version_from_platform(const char *platform)
  *        consensus entry.
  *   NS_V3_VOTE - Output a complete V3 NS vote. If <b>vrs</b> is present,
  *        it contains additional information for the vote.
- *   NS_CONTROL_PORT - Output a NS document for the control port
+ *   NS_CORZROL_PORT - Output a NS document for the control port
  */
 char *
 routerstatus_format_entry(const routerstatus_t *rs, const char *version,
@@ -2305,7 +2305,7 @@ routerstatus_format_entry(const routerstatus_t *rs, const char *version,
     const routerinfo_t* desc = router_get_by_id_digest(rs->identity_digest);
     uint32_t bw_kb;
 
-    if (format != NS_CONTROL_PORT) {
+    if (format != NS_CORZROL_PORT) {
       /* Blow up more or less nicely if we didn't get anything or not the
        * thing we expected.
        */
@@ -2324,7 +2324,7 @@ routerstatus_format_entry(const routerstatus_t *rs, const char *version,
       /* This assert could fire for the control port, because
        * it can request NS documents before all descriptors
        * have been fetched. Therefore, we only do this test when
-       * format != NS_CONTROL_PORT. */
+       * format != NS_CORZROL_PORT. */
       if (tor_memneq(desc->cache_info.signed_descriptor_digest,
             rs->descriptor_digest,
             DIGEST_LEN)) {
@@ -2347,7 +2347,7 @@ routerstatus_format_entry(const routerstatus_t *rs, const char *version,
       }
     }
 
-    if (format == NS_CONTROL_PORT && rs->has_bandwidth) {
+    if (format == NS_CORZROL_PORT && rs->has_bandwidth) {
       bw_kb = rs->bandwidth_kb;
     } else {
       tor_assert(desc);

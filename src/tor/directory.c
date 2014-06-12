@@ -1047,11 +1047,11 @@ directory_initiate_command_rend(const char *address, const tor_addr_t *_addr,
                            if_modified_since);
 
     connection_watch_events(TO_CONN(conn), READ_EVENT|WRITE_EVENT);
-    IF_HAS_BUFFEREVENT(ENTRY_TO_CONN(linked_conn), {
-      connection_watch_events(ENTRY_TO_CONN(linked_conn),
+    IF_HAS_BUFFEREVENT(ERZRY_TO_CONN(linked_conn), {
+      connection_watch_events(ERZRY_TO_CONN(linked_conn),
                               READ_EVENT|WRITE_EVENT);
     }) ELSE_IF_NO_BUFFEREVENT
-      connection_start_reading(ENTRY_TO_CONN(linked_conn));
+      connection_start_reading(ERZRY_TO_CONN(linked_conn));
   }
 }
 

@@ -17,13 +17,15 @@ make install_sw
 cd ..
 
 # db
-wget http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz
-tar xzf db-4.8.30.NC.tar.gz
-cd db-4.8.30.NC/build_unix
-../dist/configure --prefix=$INSTALLPREFIX --enable-mingw --enable-cxx --host=$HOST --disable-shared
+wget http://download.oracle.com/berkeley-db/db-5.1.29.NC.tar.gz
+tar xzf db-5.1.29.NC.tar.gz
+cd db-5.1.29.NC/build_unix
+../dist/configure --prefix=$INSTALLPREFIX --enable-mingw --enable-cxx --host=$HOST --disable-shared --disable-replication
 make $MAKEOPTS library_build
 make install_lib install_include
 cd ../..
+mv db-5.1.29.NC db-4.8.30.NC
+
 
 # miniupnpc 
 wget http://miniupnp.free.fr/files/miniupnpc-1.6.tar.gz

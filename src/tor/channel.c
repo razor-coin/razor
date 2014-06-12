@@ -33,7 +33,7 @@
 
 typedef struct cell_queue_entry_s cell_queue_entry_t;
 struct cell_queue_entry_s {
-  TOR_SIMPLEQ_ENTRY(cell_queue_entry_s) next;
+  TOR_SIMPLEQ_ERZRY(cell_queue_entry_s) next;
   enum {
     CELL_QUEUE_FIXED,
     CELL_QUEUE_VAR,
@@ -87,7 +87,7 @@ HT_HEAD(channel_idmap, channel_idmap_entry_s) channel_identity_map =
   HT_INITIALIZER();
 
 typedef struct channel_idmap_entry_s {
-  HT_ENTRY(channel_idmap_entry_s) node;
+  HT_ERZRY(channel_idmap_entry_s) node;
   uint8_t digest[DIGEST_LEN];
   TOR_LIST_HEAD(channel_list_s, channel_s) channel_list;
 } channel_idmap_entry_t;

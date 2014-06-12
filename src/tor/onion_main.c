@@ -55,7 +55,7 @@
 #include "statefile.h"
 #include "status.h"
 #include "ext_orport.h"
-#include "neutrinocoin.h"
+#include "razor.h"
 #ifdef USE_DMALLOC
 #include <dmalloc.h>
 #include <openssl/crypto.h>
@@ -967,7 +967,7 @@ directory_all_unreachable(time_t now)
 
   while ((conn = connection_get_by_type_state(CONN_TYPE_AP,
                                               AP_CONN_STATE_CIRCUIT_WAIT))) {
-    entry_connection_t *entry_conn = TO_ENTRY_CONN(conn);
+    entry_connection_t *entry_conn = TO_ERZRY_CONN(conn);
     log_notice(LD_NET,
                "Is your network connection down? "
                "Failing connection to '%s:%d'.",
@@ -1142,7 +1142,7 @@ signewnym_impl(time_t now)
 {
   const or_options_t *options = get_options();
   if (!proxy_mode(options)) {
-    log_info(LD_CONTROL, "Ignoring SIGNAL NEWNYM because client functionality "
+    log_info(LD_CORZROL, "Ignoring SIGNAL NEWNYM because client functionality "
              "is disabled.");
     return;
   }
@@ -1219,7 +1219,7 @@ run_scheduled_events(time_t now)
    * eventually. */
   if (signewnym_is_pending &&
       time_of_last_signewnym + MAX_SIGNEWNYM_RATE <= now) {
-    log_info(LD_CONTROL, "Honoring delayed NEWNYM request");
+    log_info(LD_CORZROL, "Honoring delayed NEWNYM request");
     signewnym_impl(now);
   }
 
@@ -1282,8 +1282,8 @@ run_scheduled_events(time_t now)
       crypto_seed_rng(0);
     }
 /** How often do we add more entropy to OpenSSL's RNG pool? */
-#define ENTROPY_INTERVAL (60*60)
-    time_to_add_entropy = now + ENTROPY_INTERVAL;
+#define ERZROPY_INTERVAL (60*60)
+    time_to_add_entropy = now + ERZROPY_INTERVAL;
   }
 
   /** 1c. If we have to change the accounting interval or record
@@ -2113,7 +2113,7 @@ process_signal(uintptr_t sig)
       time_t now = time(NULL);
       if (time_of_last_signewnym + MAX_SIGNEWNYM_RATE > now) {
         signewnym_is_pending = 1;
-        log_notice(LD_CONTROL,
+        log_notice(LD_CORZROL,
             "Rate limiting NEWNYM request: delaying by %d second(s)",
             (int)(MAX_SIGNEWNYM_RATE+time_of_last_signewnym-now));
       } else {

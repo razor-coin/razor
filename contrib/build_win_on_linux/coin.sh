@@ -66,7 +66,7 @@ git archive HEAD | tar -x -C nsis
 cd nsis/src
 mkdir ../release
 cp ../../release/* ../release/
-cp ../../src/*.exe .
+#cp ../../src/*.exe .
 makensis ../share/setup.nsi
 rm -rf $OUTDIR/setup
 mkdir $OUTDIR/setup

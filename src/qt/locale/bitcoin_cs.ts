@@ -5,7 +5,7 @@
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
         <source>About Razor</source>
-        <translation>O Neutrinocoinu</translation>
+        <translation>O Razoru</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -35,7 +35,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="+0"/>
         <source>The Razor developers</source>
-        <translation>Vývojáři Neutrinocoinu</translation>
+        <translation>Vývojáři Razoru</translation>
     </message>
 </context>
 <context>
@@ -68,7 +68,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location filename="../addressbookpage.cpp" line="+63"/>
         <source>These are your Razor addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
-        <translation>Tohle jsou tvé Neutrinocoinové adresy pro příjem plateb. Můžeš dát pokaždé každému plátci novou adresu, abys věděl, kdo ti kdy kolik platil.</translation>
+        <translation>Tohle jsou tvé Razorové adresy pro příjem plateb. Můžeš dát pokaždé každému plátci novou adresu, abys věděl, kdo ti kdy kolik platil.</translation>
     </message>
     <message>
         <location filename="../forms/addressbookpage.ui" line="+14"/>
@@ -83,7 +83,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="+11"/>
         <source>Sign a message to prove you own a Razor address</source>
-        <translation>Podepiš zprávu, čímž prokážeš, že jsi vlastníkem Neutrinocoinové adresy</translation>
+        <translation>Podepiš zprávu, čímž prokážeš, že jsi vlastníkem Razorové adresy</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -108,7 +108,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="-44"/>
         <source>Verify a message to ensure it was signed with a specified Razor address</source>
-        <translation>Ověř zprávu, aby ses ujistil, že byla podepsána danou Neutrinocoinovou adresou</translation>
+        <translation>Ověř zprávu, aby ses ujistil, že byla podepsána danou Razorovou adresou</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -123,7 +123,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location filename="../addressbookpage.cpp" line="-5"/>
         <source>These are your Razor addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Tohle jsou tvé Neutrinocoinové adresy pro posílání plateb. Před odesláním mincí si vždy zkontroluj částku a cílovou adresu.</translation>
+        <translation>Tohle jsou tvé Razorové adresy pro posílání plateb. Před odesláním mincí si vždy zkontroluj částku a cílovou adresu.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -248,8 +248,8 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
-        <translation>Varování: Pokud si zašifruješ peněženku a ztratíš či zapomeneš heslo, &lt;b&gt;PŘIJDEŠ O VŠECHNY NEUTRINOCOINY&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
+        <translation>Varování: Pokud si zašifruješ peněženku a ztratíš či zapomeneš heslo, &lt;b&gt;PŘIJDEŠ O VŠECHNY RAZORY&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -275,7 +275,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
         <translation>Razor se teď ukončí, aby dokončil zašifrování. Pamatuj však, že pouhé zašifrování peněženky úplně nezabraňuje krádeži tvých razorů malwarem, kterým se může počítač nakazit.</translation>
     </message>
     <message>
@@ -375,7 +375,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="+4"/>
         <source>Show information about Razor</source>
-        <translation>Zobraz informace o Neutrinocoinu</translation>
+        <translation>Zobraz informace o Razoru</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -420,12 +420,12 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="-347"/>
         <source>Send coins to a Razor address</source>
-        <translation>Pošli mince na Neutrinocoinovou adresu</translation>
+        <translation>Pošli mince na Razorovou adresu</translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Modify configuration options for Razor</source>
-        <translation>Uprav nastavení Neutrinocoinu</translation>
+        <translation>Uprav nastavení Razoru</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -481,7 +481,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="+22"/>
         <source>&amp;About Razor</source>
-        <translation>O &amp;Neutrinocoinu</translation>
+        <translation>O &amp;Razoru</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -501,12 +501,12 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message>
         <location line="+7"/>
         <source>Sign messages with your Razor addresses to prove you own them</source>
-        <translation>Podepiš zprávy svými Neutrinocoinovými adresami, čímž prokážeš, že jsi jejich vlastníkem</translation>
+        <translation>Podepiš zprávy svými Razorovými adresami, čímž prokážeš, že jsi jejich vlastníkem</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Verify messages to ensure they were signed with specified Razor addresses</source>
-        <translation>Ověř zprávy, aby ses ujistil, že byly podepsány danými Neutrinocoinovými adresami</translation>
+        <translation>Ověř zprávy, aby ses ujistil, že byly podepsány danými Razorovými adresami</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -542,7 +542,7 @@ Tento produkt zahrnuje programy vyvinuté OpenSSL Projektem pro použití v Open
     <message numerus="yes">
         <location line="+141"/>
         <source>%n active connection(s) to Razor network</source>
-        <translation><numerusform>%n aktivní spojení do Neutrinocoinové sítě</numerusform><numerusform>%n aktivní spojení do Neutrinocoinové sítě</numerusform><numerusform>%n aktivních spojení do Neutrinocoinové sítě</numerusform></translation>
+        <translation><numerusform>%n aktivní spojení do Razorové sítě</numerusform><numerusform>%n aktivní spojení do Razorové sítě</numerusform><numerusform>%n aktivních spojení do Razorové sítě</numerusform></translation>
     </message>
     <message>
         <location line="+22"/>
@@ -657,7 +657,7 @@ Adresa: %4
         <location line="-23"/>
         <location line="+23"/>
         <source>URI can not be parsed! This can be caused by an invalid Razor address or malformed URI parameters.</source>
-        <translation>Nepodařilo se analyzovat URI! Důvodem může být neplatná Neutrinocoinová adresa nebo poškozené parametry URI.</translation>
+        <translation>Nepodařilo se analyzovat URI! Důvodem může být neplatná Razorová adresa nebo poškozené parametry URI.</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -738,7 +738,7 @@ Adresa: %4
     <message>
         <location line="-5"/>
         <source>The entered address &quot;%1&quot; is not a valid Razor address.</source>
-        <translation>Zadaná adresa &quot;%1&quot; není platná Neutrinocoinová adresa.</translation>
+        <translation>Zadaná adresa &quot;%1&quot; není platná Razorová adresa.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -855,7 +855,7 @@ Adresa: %4
     <message>
         <location line="+7"/>
         <source>Connect to the Razor network through a SOCKS proxy (e.g. when connecting through Tor).</source>
-        <translation>Připojí se do Neutrinocoinové sítě přes SOCKS proxy (např. když se připojuje přes Tor).</translation>
+        <translation>Připojí se do Razorové sítě přes SOCKS proxy (např. když se připojuje přes Tor).</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -930,7 +930,7 @@ Adresa: %4
     <message>
         <location line="+13"/>
         <source>The user interface language can be set here. This setting will take effect after restarting Razor.</source>
-        <translation>Tady lze nastavit jazyk uživatelského rozhraní. Nastavení se projeví až po restartování Neutrinocoinu.</translation>
+        <translation>Tady lze nastavit jazyk uživatelského rozhraní. Nastavení se projeví až po restartování Razoru.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -945,7 +945,7 @@ Adresa: %4
     <message>
         <location line="+9"/>
         <source>Whether to show Razor addresses in the transaction list or not.</source>
-        <translation>Zda ukazovat neutrinocoinové adresy ve výpisu transakcí nebo ne.</translation>
+        <translation>Zda ukazovat razorové adresy ve výpisu transakcí nebo ne.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -997,7 +997,7 @@ Adresa: %4
         <location line="-9"/>
         <location line="+9"/>
         <source>This setting will take effect after restarting Razor.</source>
-        <translation>Nastavení se projeví až po restartování Neutrinocoinu.</translation>
+        <translation>Nastavení se projeví až po restartování Razoru.</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1016,7 +1016,7 @@ Adresa: %4
         <location line="+50"/>
         <location line="+166"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Razor network after a connection is established, but this process has not completed yet.</source>
-        <translation>Zobrazené informace nemusí být aktuální. Tvá peněženka se automaticky sesynchronizuje s Neutrinocoinovou sítí, jakmile se s ní spojí. Zatím ale ještě není synchronizace dokončena.</translation>
+        <translation>Zobrazené informace nemusí být aktuální. Tvá peněženka se automaticky sesynchronizuje s Razorovou sítí, jakmile se s ní spojí. Zatím ale ještě není synchronizace dokončena.</translation>
     </message>
     <message>
         <location line="-124"/>
@@ -1220,7 +1220,7 @@ Adresa: %4
     <message>
         <location line="+7"/>
         <source>Show the Razor-Qt help message to get a list with possible Razor command-line options.</source>
-        <translation>Seznam parametrů Neutrinocoinu pro příkazovou řádku získáš v nápovědě Neutrinocoinu Qt.</translation>
+        <translation>Seznam parametrů Razoru pro příkazovou řádku získáš v nápovědě Razoru Qt.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1245,7 +1245,7 @@ Adresa: %4
     <message>
         <location line="+25"/>
         <source>Razor Core</source>
-        <translation>Jádro Neutrinocoinu</translation>
+        <translation>Jádro Razoru</translation>
     </message>
     <message>
         <location line="+279"/>
@@ -1255,7 +1255,7 @@ Adresa: %4
     <message>
         <location line="+7"/>
         <source>Open the Razor debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Otevři soubor s ladicími záznamy Neutrinocoinu z aktuálního datového adresáře. U velkých logů to může pár vteřin zabrat.</translation>
+        <translation>Otevři soubor s ladicími záznamy Razoru z aktuálního datového adresáře. U velkých logů to může pár vteřin zabrat.</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -1265,7 +1265,7 @@ Adresa: %4
     <message>
         <location filename="../rpcconsole.cpp" line="-30"/>
         <source>Welcome to the Razor RPC console.</source>
-        <translation>Vítej v Neutrinocoinové RPC konzoli.</translation>
+        <translation>Vítej v Razorové RPC konzoli.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1449,7 +1449,7 @@ Adresa: %4
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
         <source>Enter a Razor address (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Zadej Neutrinocoinovou adresu (např. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <translation>Zadej Razorovou adresu (např. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
     </message>
 </context>
 <context>
@@ -1514,7 +1514,7 @@ Adresa: %4
     <message>
         <location line="+21"/>
         <source>Sign the message to prove you own this Razor address</source>
-        <translation>Podepiš zprávu, čímž prokážeš, že jsi vlastníkem této Neutrinocoinové adresy</translation>
+        <translation>Podepiš zprávu, čímž prokážeš, že jsi vlastníkem této Razorové adresy</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1550,7 +1550,7 @@ Adresa: %4
     <message>
         <location line="+40"/>
         <source>Verify the message to ensure it was signed with the specified Razor address</source>
-        <translation>Ověř zprávu, aby ses ujistil, že byla podepsána danou Neutrinocoinovou adresou</translation>
+        <translation>Ověř zprávu, aby ses ujistil, že byla podepsána danou Razorovou adresou</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1566,7 +1566,7 @@ Adresa: %4
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
         <source>Enter a Razor address (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Zadej Neutrinocoinovou adresu (např. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <translation>Zadej Razorovou adresu (např. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -1576,7 +1576,7 @@ Adresa: %4
     <message>
         <location line="+3"/>
         <source>Enter Razor signature</source>
-        <translation>Vlož Neutrinocoinový podpis</translation>
+        <translation>Vlož Razorový podpis</translation>
     </message>
     <message>
         <location line="+82"/>
@@ -1650,7 +1650,7 @@ Adresa: %4
     <message>
         <location filename="../splashscreen.cpp" line="+22"/>
         <source>The Razor developers</source>
-        <translation>Vývojáři Neutrinocoinu</translation>
+        <translation>Vývojáři Razoru</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2188,7 +2188,7 @@ Adresa: %4
     <message>
         <location filename="../bitcoinstrings.cpp" line="+94"/>
         <source>Razor version</source>
-        <translation>Verze Neutrinocoinu</translation>
+        <translation>Verze Razoru</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -2197,8 +2197,8 @@ Adresa: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or neutrinocoind</source>
-        <translation>Poslat příkaz pro -server nebo neutrinocoind</translation>
+        <source>Send command to -server or razord</source>
+        <translation>Poslat příkaz pro -server nebo razord</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2222,8 +2222,8 @@ Adresa: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: neutrinocoind.pid)</source>
-        <translation>PID soubor (výchozí: neutrinocoind.pid)</translation>
+        <source>Specify pid file (default: razord.pid)</source>
+        <translation>PID soubor (výchozí: razord.pid)</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2818,7 +2818,7 @@ například: alertnotify=echo %%s | mail -s &quot;Razor Alert&quot; admin@foo.co
     <message>
         <location line="+1"/>
         <source>Error loading wallet.dat: Wallet requires newer version of Razor</source>
-        <translation>Chyba při načítání wallet.dat: peněženka vyžaduje novější verzi Neutrinocoinu</translation>
+        <translation>Chyba při načítání wallet.dat: peněženka vyžaduje novější verzi Razoru</translation>
     </message>
     <message>
         <location line="+93"/>

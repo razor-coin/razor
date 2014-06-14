@@ -6,17 +6,17 @@
  * \brief Headers for razor.cpp
  **/
 
-#ifndef TOR_NEUTRINOCOIN_H
-#define TOR_NEUTRINOCOIN_H
+#ifndef TOR_RAZOR_H
+#define TOR_RAZOR_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    char const* neutrinocoin_tor_data_directory(
+    char const* razor_tor_data_directory(
     );
 
-    char const* neutrinocoin_service_directory(
+    char const* razor_service_directory(
     );
 
     int check_interrupted(

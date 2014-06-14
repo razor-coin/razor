@@ -4165,7 +4165,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// NeutrinocoinMiner
+// RazorMiner
 //
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
@@ -4578,7 +4578,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         return false;
 
     //// debug print
-    printf("NeutrinocoinMiner:\n");
+    printf("RazorMiner:\n");
     printf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
     printf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
@@ -4587,7 +4587,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
-            return error("NeutrinocoinMiner : generated block is stale");
+            return error("RazorMiner : generated block is stale");
 
         // Remove key from key pool
         reservekey.KeepKey();
@@ -4601,15 +4601,15 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         // Process this block the same as if we had received it from another node
         CValidationState state;
         if (!ProcessBlock(state, NULL, pblock))
-            return error("NeutrinocoinMiner : ProcessBlock, block not accepted");
+            return error("RazorMiner : ProcessBlock, block not accepted");
     }
 
     return true;
 }
 
-void static NeutrinocoinMiner(CWallet *pwallet)
+void static RazorMiner(CWallet *pwallet)
 {
-    printf("NeutrinocoinMiner started\n");
+    printf("RazorMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     RenameThread("razor-miner");
 
@@ -4636,7 +4636,7 @@ void static NeutrinocoinMiner(CWallet *pwallet)
         CBlock *pblock = &pblocktemplate->block;
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
-        printf("Running NeutrinocoinMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
+        printf("Running RazorMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
                ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
         //
@@ -4748,7 +4748,7 @@ void static NeutrinocoinMiner(CWallet *pwallet)
     } }
     catch (boost::thread_interrupted)
     {
-        printf("NeutrinocoinMiner terminated\n");
+        printf("RazorMiner terminated\n");
         throw;
     }
 }
@@ -4773,7 +4773,7 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 
     minerThreads = new boost::thread_group();
     for (int i = 0; i < nThreads; i++)
-        minerThreads->create_thread(boost::bind(&NeutrinocoinMiner, pwallet));
+        minerThreads->create_thread(boost::bind(&RazorMiner, pwallet));
 }
 
 // Amount compression:

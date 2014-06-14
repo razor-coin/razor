@@ -5,7 +5,7 @@
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
         <source>About Razor</source>
-        <translation>A Neutrinocoinról</translation>
+        <translation>A Razorról</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -247,8 +247,8 @@ Ez a termék az OpenSSL Project által lett kifejlesztve az OpenSSL Toolkit (htt
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
-        <translation>Figyelem: Ha kódolod a tárcát, és elveszíted a jelszavad, akkor &lt;b&gt;AZ ÖSSZES NEUTRINOCOINODAT IS EL FOGOD VESZÍTENI!&lt;/b&gt;</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
+        <translation>Figyelem: Ha kódolod a tárcát, és elveszíted a jelszavad, akkor &lt;b&gt;AZ ÖSSZES RAZORODAT IS EL FOGOD VESZÍTENI!&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -274,7 +274,7 @@ Ez a termék az OpenSSL Project által lett kifejlesztve az OpenSSL Toolkit (htt
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
         <translation>Razor will close now to finish the encryption process. Ne feledd, hogy a tárca titkosítása sem nyújt teljes védelmet az adathalász programok fertőzésével szemben.</translation>
     </message>
     <message>
@@ -374,7 +374,7 @@ Ez a termék az OpenSSL Project által lett kifejlesztve az OpenSSL Toolkit (htt
     <message>
         <location line="+4"/>
         <source>Show information about Razor</source>
-        <translation>Információk a Neutrinocoinról</translation>
+        <translation>Információk a Razorról</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -480,7 +480,7 @@ Ez a termék az OpenSSL Project által lett kifejlesztve az OpenSSL Toolkit (htt
     <message>
         <location line="+22"/>
         <source>&amp;About Razor</source>
-        <translation>&amp;A Neutrinocoinról</translation>
+        <translation>&amp;A Razorról</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2198,8 +2198,8 @@ Cím: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or neutrinocoind</source>
-        <translation>Parancs küldése a -serverhez vagy a neutrinocoindhez
+        <source>Send command to -server or razord</source>
+        <translation>Parancs küldése a -serverhez vagy a razordhez
 </translation>
     </message>
     <message>
@@ -2228,8 +2228,8 @@ Cím: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: neutrinocoind.pid)</source>
-        <translation>pid-fájl (alapértelmezett: neutrinocoind.pid)
+        <source>Specify pid file (default: razord.pid)</source>
+        <translation>pid-fájl (alapértelmezett: razord.pid)
 </translation>
     </message>
     <message>
@@ -2880,7 +2880,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Razor Alert&quot; admin@foo.co
     <message>
         <location line="-6"/>
         <source>Insufficient funds</source>
-        <translation>Nincs elég neutrinocoinod.</translation>
+        <translation>Nincs elég razorod.</translation>
     </message>
     <message>
         <location line="+10"/>

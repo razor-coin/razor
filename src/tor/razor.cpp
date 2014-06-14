@@ -12,7 +12,7 @@
 #include <string>
 #include <cstring>
 
-char const* neutrinocoin_tor_data_directory(
+char const* razor_tor_data_directory(
 ) {
     static std::string const retrieved = (
         GetDefaultDataDir(
@@ -23,7 +23,7 @@ char const* neutrinocoin_tor_data_directory(
     );
 }
 
-char const* neutrinocoin_service_directory(
+char const* razor_service_directory(
 ) {
     static std::string const retrieved = (
         GetDefaultDataDir(

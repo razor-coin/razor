@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = razor-qt
-macx:TARGET = "Neutrinocoin-Qt"
+macx:TARGET = "Razor-Qt"
 VERSION = 0.1.3.1
 INCLUDEPATH += src src/json src/qt src/tor
 QT += core gui network

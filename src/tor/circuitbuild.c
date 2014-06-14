@@ -1315,7 +1315,7 @@ new_route_len(uint8_t purpose, extend_info_t *exit, smartlist_t *nodes)
   routelen = DEFAULT_ROUTE_LEN;
   if (exit &&
       purpose != CIRCUIT_PURPOSE_TESTING &&
-      purpose != CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO)
+      purpose != CIRCUIT_PURPOSE_S_ESTABLISH_INTRO)
     routelen++;
 
   num_acceptable_routers = count_acceptable_nodes(nodes);
@@ -1405,7 +1405,7 @@ ap_stream_wants_exit_attention(connection_t *conn)
   entry_connection_t *entry;
   if (conn->type != CONN_TYPE_AP)
     return 0;
-  entry = TO_ERZRY_CONN(conn);
+  entry = TO_ENTRY_CONN(conn);
 
   if (conn->state == AP_CONN_STATE_CIRCUIT_WAIT &&
       !conn->marked_for_close &&
@@ -1413,7 +1413,7 @@ ap_stream_wants_exit_attention(connection_t *conn)
       !(entry->use_begindir) && /* ignore targeted dir fetches */
       !(entry->chosen_exit_name) && /* ignore defined streams */
       !connection_edge_is_rendezvous_stream(TO_EDGE_CONN(conn)) &&
-      !circuit_stream_is_being_handled(TO_ERZRY_CONN(conn), 0,
+      !circuit_stream_is_being_handled(TO_ENTRY_CONN(conn), 0,
                                        MIN_CIRCUITS_HANDLING_STREAM))
     return 1;
   return 0;
@@ -1523,7 +1523,7 @@ choose_good_exit_server_general(int need_uptime, int need_capacity)
     SMARTLIST_FOREACH_BEGIN(connections, connection_t *, conn) {
       if (!ap_stream_wants_exit_attention(conn))
         continue; /* Skip everything but APs in CIRCUIT_WAIT */
-      if (connection_ap_can_use_exit(TO_ERZRY_CONN(conn), node)) {
+      if (connection_ap_can_use_exit(TO_ENTRY_CONN(conn), node)) {
         ++n_supported[i];
 //        log_fn(LOG_DEBUG,"%s is supported. n_supported[%d] now %d.",
 //               router->nickname, i, n_supported[i]);
@@ -1686,7 +1686,7 @@ warn_if_last_router_excluded(origin_circuit_t *circ, const extend_info_t *exit)
     {
     default:
     case CIRCUIT_PURPOSE_OR:
-    case CIRCUIT_PURPOSE_IRZRO_POINT:
+    case CIRCUIT_PURPOSE_INTRO_POINT:
     case CIRCUIT_PURPOSE_REND_POINT_WAITING:
     case CIRCUIT_PURPOSE_REND_ESTABLISHED:
       log_warn(LD_BUG, "Called on non-origin circuit (purpose %d, %s)",
@@ -1699,21 +1699,21 @@ warn_if_last_router_excluded(origin_circuit_t *circ, const extend_info_t *exit)
       description = "requested exit node";
       rs = options->ExcludeExitNodesUnion_;
       break;
-    case CIRCUIT_PURPOSE_C_IRZRODUCING:
-    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT:
-    case CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED:
-    case CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO:
+    case CIRCUIT_PURPOSE_C_INTRODUCING:
+    case CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT:
+    case CIRCUIT_PURPOSE_C_INTRODUCE_ACKED:
+    case CIRCUIT_PURPOSE_S_ESTABLISH_INTRO:
     case CIRCUIT_PURPOSE_S_CONNECT_REND:
     case CIRCUIT_PURPOSE_S_REND_JOINED:
     case CIRCUIT_PURPOSE_TESTING:
       return;
     case CIRCUIT_PURPOSE_C_ESTABLISH_REND:
     case CIRCUIT_PURPOSE_C_REND_READY:
-    case CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED:
+    case CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED:
     case CIRCUIT_PURPOSE_C_REND_JOINED:
       description = "chosen rendezvous point";
       break;
-    case CIRCUIT_PURPOSE_CORZROLLER:
+    case CIRCUIT_PURPOSE_CONTROLLER:
       rs = options->ExcludeExitNodesUnion_;
       description = "controller-selected circuit target";
       break;
@@ -1978,7 +1978,7 @@ choose_good_entry_server(uint8_t purpose, cpath_build_state_t *state)
     if (state->need_capacity)
       flags |= CRN_NEED_CAPACITY;
   }
-  if (options->AllowInvalid_ & ALLOW_INVALID_ERZRY)
+  if (options->AllowInvalid_ & ALLOW_INVALID_ENTRY)
     flags |= CRN_ALLOW_INVALID;
 
   choice = router_choose_random_node(excluded, options->ExcludeNodes, flags);

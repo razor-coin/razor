@@ -243,7 +243,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -270,7 +270,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
         <translation>Razor aizvērsies, lai pabeigtu šifrēšanu. Atcerieties, ka maciņa šifrēšana nevar pilnībā novērst bitkoinu zādzību, ko veic datorā ieviesušās kaitīgas programmas.</translation>
     </message>
     <message>
@@ -2192,8 +2192,8 @@ Adrese: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>Nosūtīt komantu uz -server vai razord</translation>
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>Nosūtīt komantu uz -server vai neutrinocoind</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2217,8 +2217,8 @@ Adrese: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
-        <translation>Norādiet pid failu (pēc noklusēšanas: razord.pid)</translation>
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
+        <translation>Norādiet pid failu (pēc noklusēšanas: neutrinocoind.pid)</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2232,8 +2232,8 @@ Adrese: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Gaidīt savienojumus portā &lt;port&gt; (pēc noklusēšanas: 8777 vai testnet: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Gaidīt savienojumus portā &lt;port&gt; (pēc noklusēšanas: 7272 vai testnet: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

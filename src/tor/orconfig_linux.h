@@ -606,7 +606,7 @@
 /* #undef _LARGE_FILES */
 
 /* Define on some platforms to activate x_r() functions in time.h */
-/* #undef _REERZRANT */
+/* #undef _REENTRANT */
 
 /* Define to `unsigned short' if <sys/types.h> does not define. */
 /* #undef u_int16_t */

@@ -248,7 +248,7 @@ Questo prodotto include software sviluppato dal progetto OpenSSL per l&apos;uso 
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
         <translation>Attenzione: se si cifra il portamonete e si perde la frase d&apos;ordine, &lt;b&gt;SI PERDERANNO TUTTI I PROPRI RAZOR&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -275,7 +275,7 @@ Questo prodotto include software sviluppato dal progetto OpenSSL per l&apos;uso 
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
         <translation>Razor verrà ora chiuso per finire il processo di crittazione. Ricorda che criptare il tuo portamonete non può fornire una protezione totale contro furti causati da malware che dovessero infettare il tuo computer.</translation>
     </message>
     <message>
@@ -2199,8 +2199,8 @@ Indirizzo: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>Manda il comando a -server o razord
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>Manda il comando a -server o neutrinocoind
 </translation>
     </message>
     <message>
@@ -2229,8 +2229,8 @@ Indirizzo: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
-        <translation>Specifica il file pid (default: razord.pid)
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
+        <translation>Specifica il file pid (default: neutrinocoind.pid)
 </translation>
     </message>
     <message>
@@ -2246,8 +2246,8 @@ Indirizzo: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Ascolta le connessioni JSON-RPC su &lt;porta&gt; (default: 8777 o testnet: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Ascolta le connessioni JSON-RPC su &lt;porta&gt; (default: 7272 o testnet: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

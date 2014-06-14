@@ -243,8 +243,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
-        <translation>Advertència: Si encripteu el vostre moneder i perdeu la constrasenya, &lt;b&gt;PERDREU TOTS ELS VOSTRES RAZORS&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
+        <translation>Advertència: Si encripteu el vostre moneder i perdeu la constrasenya, &lt;b&gt;PERDREU TOTS ELS VOSTRES NEUTRINOCOINS&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -270,8 +270,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
-        <translation>Razor es tancarà ara per acabar el procés d&apos;encriptació. Recorda que encriptar el teu moneder no protegeix completament els teus razors de ser robades per programari maliciós instal·lat al teu ordinador.</translation>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
+        <translation>Razor es tancarà ara per acabar el procés d&apos;encriptació. Recorda que encriptar el teu moneder no protegeix completament els teus neutrinocoins de ser robades per programari maliciós instal·lat al teu ordinador.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2188,8 +2188,8 @@ Address: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>Enviar comanda a -servidor o razord</translation>
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>Enviar comanda a -servidor o neutrinocoind</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2213,8 +2213,8 @@ Address: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
-        <translation>Especificar arxiu pid (per defecte: razord.pid)</translation>
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
+        <translation>Especificar arxiu pid (per defecte: neutrinocoind.pid)</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2228,8 +2228,8 @@ Address: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Escoltar connexions a &lt;port&gt; (per defecte: 8777 o testnet: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Escoltar connexions a &lt;port&gt; (per defecte: 7272 o testnet: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

@@ -9,8 +9,8 @@
  * \brief Header file for circuitbuild.c.
  **/
 
-#ifndef TOR_ERZRYNODES_H
-#define TOR_ERZRYNODES_H
+#ifndef TOR_ENTRYNODES_H
+#define TOR_ENTRYNODES_H
 
 #if 1
 /* XXXX NM I would prefer that all of this stuff be private to

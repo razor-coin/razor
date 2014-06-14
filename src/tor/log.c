@@ -1075,7 +1075,7 @@ log_level_to_string(int level)
  * is a description of <b>dom</b>. */
 static const char *domain_list[] = {
   "GENERAL", "CRYPTO", "NET", "CONFIG", "FS", "PROTOCOL", "MM",
-  "HTTP", "APP", "CORZROL", "CIRC", "REND", "BUG", "DIR", "DIRSERV",
+  "HTTP", "APP", "CONTROL", "CIRC", "REND", "BUG", "DIR", "DIRSERV",
   "OR", "EDGE", "ACCT", "HIST", "HANDSHAKE", "HEARTBEAT", "CHANNEL", NULL
 };
 

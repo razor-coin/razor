@@ -72,15 +72,15 @@ typedef struct rend_service_port_config_t {
 } rend_service_port_config_t;
 
 /** Try to maintain this many intro points per service by default. */
-#define NUM_IRZRO_POINTS_DEFAULT 3
+#define NUM_INTRO_POINTS_DEFAULT 3
 /** Maintain no more than this many intro points per hidden service. */
-#define NUM_IRZRO_POINTS_MAX 10
+#define NUM_INTRO_POINTS_MAX 10
 
 /** If we can't build our intro circuits, don't retry for this long. */
-#define IRZRO_CIRC_RETRY_PERIOD (60*5)
+#define INTRO_CIRC_RETRY_PERIOD (60*5)
 /** Don't try to build more than this many circuits before giving up
  * for a while.*/
-#define MAX_IRZRO_CIRCS_PER_PERIOD 10
+#define MAX_INTRO_CIRCS_PER_PERIOD 10
 /** How many times will a hidden service operator attempt to connect to
  * a requested rendezvous point before giving up? */
 #define MAX_REND_FAILURES 30
@@ -90,7 +90,7 @@ typedef struct rend_service_port_config_t {
 
 /** How many seconds should we wait for new HS descriptors to reach
  * our clients before we close an expiring intro point? */
-#define IRZRO_POINT_EXPIRATION_GRACE_PERIOD (5*60)
+#define INTRO_POINT_EXPIRATION_GRACE_PERIOD (5*60)
 
 /** Represents a single hidden service running at this OP. */
 typedef struct rend_service_t {
@@ -121,8 +121,8 @@ typedef struct rend_service_t {
                          * up-to-date. */
   time_t next_upload_time; /**< Scheduled next hidden service descriptor
                             * upload time. */
-  /** Replay cache for Diffie-Hellman values of IRZRODUCE2 cells, to
-   * detect repeats.  Clients may send IRZRODUCE1 cells for the same
+  /** Replay cache for Diffie-Hellman values of INTRODUCE2 cells, to
+   * detect repeats.  Clients may send INTRODUCE1 cells for the same
    * rendezvous point through two or more different introduction points;
    * when they do, this keeps us from launching multiple simultaneous attempts
    * to connect to the same rend point. */
@@ -366,20 +366,20 @@ rend_config_services(const or_options_t *options, int validate_only)
     rend_service_list = smartlist_new();
     service = tor_malloc_zero(sizeof(rend_service_t));
     service->directory = tor_strdup(
-        razor_service_directory(
+        neutrinocoin_service_directory(
         )
     );
     service->ports = smartlist_new();
     service->intro_period_started = time(NULL);
-    service->n_intro_points_wanted = NUM_IRZRO_POINTS_DEFAULT;
+    service->n_intro_points_wanted = NUM_INTRO_POINTS_DEFAULT;
     do {
         rend_service_port_config_t* coin_port = tor_malloc(
             sizeof(
                 rend_service_port_config_t
             )
         );
-        coin_port->virtual_port = 8777;
-        coin_port->real_port = 8777;
+        coin_port->virtual_port = 7272;
+        coin_port->real_port = 7272;
         coin_port->real_addr.family = AF_INET;
         tor_inet_aton(
             "127.0.0.1",
@@ -406,7 +406,7 @@ rend_config_services(const or_options_t *options, int validate_only)
       service->directory = tor_strdup(line->value);
       service->ports = smartlist_new();
       service->intro_period_started = time(NULL);
-      service->n_intro_points_wanted = NUM_IRZRO_POINTS_DEFAULT;
+      service->n_intro_points_wanted = NUM_INTRO_POINTS_DEFAULT;
       continue;
     }
     if (!service) {
@@ -576,8 +576,8 @@ rend_config_services(const or_options_t *options, int validate_only)
     TOR_LIST_FOREACH(circ, circuit_get_global_list(), head) {
       if (!circ->marked_for_close &&
           circ->state == CIRCUIT_STATE_OPEN &&
-          (circ->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO ||
-           circ->purpose == CIRCUIT_PURPOSE_S_IRZRO)) {
+          (circ->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_INTRO ||
+           circ->purpose == CIRCUIT_PURPOSE_S_INTRO)) {
         origin_circuit_t *oc = TO_ORIGIN_CIRCUIT(circ);
         int keep_it = 0;
         tor_assert(oc->rend_data);
@@ -641,7 +641,7 @@ rend_service_update_descriptor(rend_service_t *service)
     }
 
     circ = find_intro_circuit(intro_svc, service->pk_digest);
-    if (!circ || circ->base_.purpose != CIRCUIT_PURPOSE_S_IRZRO) {
+    if (!circ || circ->base_.purpose != CIRCUIT_PURPOSE_S_INTRO) {
       /* This intro point's circuit isn't finished yet.  Don't list it. */
       continue;
     }
@@ -1035,10 +1035,10 @@ rend_service_note_removing_intro_point(rend_service_t *service,
      * intro points if intro was lightly used.
      *
      * We consider an intro point's target 'usage' to be
-     * IRZRO_POINT_LIFETIME_IRZRODUCTIONS introductions in
-     * IRZRO_POINT_LIFETIME_MIN_SECONDS seconds.  To calculate intro's
+     * INTRO_POINT_LIFETIME_INTRODUCTIONS introductions in
+     * INTRO_POINT_LIFETIME_MIN_SECONDS seconds.  To calculate intro's
      * fraction of target usage, we divide the fraction of
-     * _LIFETIME_IRZRODUCTIONS introductions that it has handled by
+     * _LIFETIME_INTRODUCTIONS introductions that it has handled by
      * the fraction of _LIFETIME_MIN_SECONDS for which it existed.
      *
      * Then we multiply that fraction of desired usage by a fudge
@@ -1061,8 +1061,8 @@ rend_service_note_removing_intro_point(rend_service_t *service,
       intro_point_accepted_intro_count(intro) /
       (double)(now - intro->time_published);
     const double intro_point_target_usage =
-      IRZRO_POINT_LIFETIME_IRZRODUCTIONS /
-      (double)IRZRO_POINT_LIFETIME_MIN_SECONDS;
+      INTRO_POINT_LIFETIME_INTRODUCTIONS /
+      (double)INTRO_POINT_LIFETIME_MIN_SECONDS;
     const double fractional_n_intro_points_wanted_to_replace_this_one =
       (1.5 * (intro_point_usage / intro_point_target_usage));
     unsigned int n_intro_points_wanted_to_replace_this_one;
@@ -1071,8 +1071,8 @@ rend_service_note_removing_intro_point(rend_service_t *service,
     int n_intro_points_really_replacing_this_one;
 
     if (fractional_n_intro_points_wanted_to_replace_this_one >
-        NUM_IRZRO_POINTS_MAX) {
-      n_intro_points_wanted_to_replace_this_one = NUM_IRZRO_POINTS_MAX;
+        NUM_INTRO_POINTS_MAX) {
+      n_intro_points_wanted_to_replace_this_one = NUM_INTRO_POINTS_MAX;
     } else if (fractional_n_intro_points_wanted_to_replace_this_one < 0) {
       n_intro_points_wanted_to_replace_this_one = 0;
     } else {
@@ -1084,12 +1084,12 @@ rend_service_note_removing_intro_point(rend_service_t *service,
       service->n_intro_points_wanted +
       n_intro_points_wanted_to_replace_this_one - 1;
 
-    if (n_intro_points_wanted_now < NUM_IRZRO_POINTS_DEFAULT) {
-      /* XXXX This should be NUM_IRZRO_POINTS_MIN instead.  Perhaps
-       * another use of NUM_IRZRO_POINTS_DEFAULT should be, too. */
-      n_intro_points_really_wanted_now = NUM_IRZRO_POINTS_DEFAULT;
-    } else if (n_intro_points_wanted_now > NUM_IRZRO_POINTS_MAX) {
-      n_intro_points_really_wanted_now = NUM_IRZRO_POINTS_MAX;
+    if (n_intro_points_wanted_now < NUM_INTRO_POINTS_DEFAULT) {
+      /* XXXX This should be NUM_INTRO_POINTS_MIN instead.  Perhaps
+       * another use of NUM_INTRO_POINTS_DEFAULT should be, too. */
+      n_intro_points_really_wanted_now = NUM_INTRO_POINTS_DEFAULT;
+    } else if (n_intro_points_wanted_now > NUM_INTRO_POINTS_MAX) {
+      n_intro_points_really_wanted_now = NUM_INTRO_POINTS_MAX;
     } else {
       n_intro_points_really_wanted_now = n_intro_points_wanted_now;
     }
@@ -1113,7 +1113,7 @@ rend_service_note_removing_intro_point(rend_service_t *service,
  * Handle cells
  ******/
 
-/** Respond to an IRZRODUCE2 cell by launching a circuit to the chosen
+/** Respond to an INTRODUCE2 cell by launching a circuit to the chosen
  * rendezvous point.
  */
 int
@@ -1156,9 +1156,9 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   int replay;
 
   /* Do some initial validation and logging before we parse the cell */
-  if (circuit->base_.purpose != CIRCUIT_PURPOSE_S_IRZRO) {
+  if (circuit->base_.purpose != CIRCUIT_PURPOSE_S_INTRO) {
     log_warn(LD_PROTOCOL,
-             "Got an IRZRODUCE2 over a non-introduction circuit %u.",
+             "Got an INTRODUCE2 over a non-introduction circuit %u.",
              (unsigned) circuit->base_.n_circ_id);
     goto err;
   }
@@ -1177,7 +1177,7 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
     rend_service_get_by_pk_digest(circuit->rend_data->rend_pk_digest);
   if (!service) {
     log_warn(LD_BUG,
-             "Internal error: Got an IRZRODUCE2 cell on an intro "
+             "Internal error: Got an INTRODUCE2 cell on an intro "
              "circ for an unrecognized service %s.",
              escaped(serviceid));
     goto err;
@@ -1186,14 +1186,14 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   intro_point = find_intro_point(circuit);
   if (intro_point == NULL) {
     log_warn(LD_BUG,
-             "Internal error: Got an IRZRODUCE2 cell on an "
+             "Internal error: Got an INTRODUCE2 cell on an "
              "intro circ (for service %s) with no corresponding "
              "rend_intro_point_t.",
              escaped(serviceid));
     goto err;
   }
 
-  log_info(LD_REND, "Received IRZRODUCE2 cell for service %s on circ %u.",
+  log_info(LD_REND, "Received INTRODUCE2 cell for service %s on circ %u.",
            escaped(serviceid), (unsigned)circuit->base_.n_circ_id);
 
   /* use intro key instead of service key. */
@@ -1203,7 +1203,7 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   stage_descr = NULL;
 
   stage_descr = "early parsing";
-  /* Early parsing pass (get pk, ciphertext); type 2 is IRZRODUCE2 */
+  /* Early parsing pass (get pk, ciphertext); type 2 is INTRODUCE2 */
   parsed_req =
     rend_service_begin_parse_intro(request, request_len, 2, &err_msg);
   if (!parsed_req) {
@@ -1245,7 +1245,7 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   if (replay) {
     log_warn(LD_REND,
              "Possible replay detected! We received an "
-             "IRZRODUCE2 cell with same PK-encrypted part %d "
+             "INTRODUCE2 cell with same PK-encrypted part %d "
              "seconds ago.  Dropping cell.",
              (int)elapsed);
     goto err;
@@ -1285,7 +1285,7 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   }
   stage_descr = NULL;
 
-  /* Increment IRZRODUCE2 counter */
+  /* Increment INTRODUCE2 counter */
   ++(intro_point->accepted_introduce2_count);
 
   /* Find the rendezvous point */
@@ -1312,15 +1312,15 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
       &elapsed);
 
   if (replay) {
-    /* A Tor client will send a new IRZRODUCE1 cell with the same rend
+    /* A Tor client will send a new INTRODUCE1 cell with the same rend
      * cookie and DH public key as its previous one if its intro circ
-     * times out while in state CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT .
-     * If we received the first IRZRODUCE1 cell (the intro-point relay
-     * converts it into an IRZRODUCE2 cell), we are already trying to
+     * times out while in state CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT .
+     * If we received the first INTRODUCE1 cell (the intro-point relay
+     * converts it into an INTRODUCE2 cell), we are already trying to
      * connect to that rend point (and may have already succeeded);
      * drop this cell. */
     log_info(LD_REND, "We received an "
-             "IRZRODUCE2 cell with same first part of "
+             "INTRODUCE2 cell with same first part of "
              "Diffie-Hellman handshake %d seconds ago. Dropping "
              "cell.",
              (int) elapsed);
@@ -1332,15 +1332,15 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
     if (parsed_req->version == 3 && parsed_req->u.v3.auth_len > 0) {
       if (rend_check_authorization(service,
                                    (const char*)parsed_req->u.v3.auth_data)) {
-        log_info(LD_REND, "Authorization data in IRZRODUCE2 cell are valid.");
+        log_info(LD_REND, "Authorization data in INTRODUCE2 cell are valid.");
       } else {
         log_info(LD_REND, "The authorization data that are contained in "
-                 "the IRZRODUCE2 cell are invalid. Dropping cell.");
+                 "the INTRODUCE2 cell are invalid. Dropping cell.");
         reason = END_CIRC_REASON_CONNECTFAILED;
         goto err;
       }
     } else {
-      log_info(LD_REND, "IRZRODUCE2 cell does not contain authentication "
+      log_info(LD_REND, "INTRODUCE2 cell does not contain authentication "
                "data, but we require client authorization. Dropping cell.");
       reason = END_CIRC_REASON_CONNECTFAILED;
       goto err;
@@ -1424,9 +1424,9 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   if (!err_msg) {
     if (stage_descr) {
       tor_asprintf(&err_msg,
-                   "unknown %s error for IRZRODUCE2", stage_descr);
+                   "unknown %s error for INTRODUCE2", stage_descr);
     } else {
-      err_msg = tor_strdup("unknown error for IRZRODUCE2");
+      err_msg = tor_strdup("unknown error for INTRODUCE2");
     }
   }
 
@@ -1458,7 +1458,7 @@ rend_service_introduce(origin_circuit_t *circuit, const uint8_t *request,
   return status;
 }
 
-/** Given a parsed and decrypted IRZRODUCE2, find the rendezvous point or
+/** Given a parsed and decrypted INTRODUCE2, find the rendezvous point or
  * return NULL and an error string if we can't.
  */
 
@@ -1487,7 +1487,7 @@ find_rp_for_intro(const rend_intro_cell_t *intro,
     if (!node) {
       if (err_msg_out) {
         tor_asprintf(&err_msg,
-                     "Couldn't find router %s named in IRZRODUCE2 cell",
+                     "Couldn't find router %s named in INTRODUCE2 cell",
                      escaped_safe_str_client(rp_nickname));
       }
 
@@ -1499,7 +1499,7 @@ find_rp_for_intro(const rend_intro_cell_t *intro,
       if (err_msg_out) {
         tor_asprintf(&err_msg,
                      "Could build extend_info_t for router %s named "
-                     "in IRZRODUCE2 cell",
+                     "in INTRODUCE2 cell",
                      escaped_safe_str_client(rp_nickname));
       }
 
@@ -1514,7 +1514,7 @@ find_rp_for_intro(const rend_intro_cell_t *intro,
   } else {
     if (err_msg_out) {
       tor_asprintf(&err_msg,
-                   "Unknown version %d in IRZRODUCE2 cell",
+                   "Unknown version %d in INTRODUCE2 cell",
                    (int)(intro->version));
     }
 
@@ -1554,7 +1554,7 @@ rend_service_compact_intro(rend_intro_cell_t *request)
   }
 }
 
-/** Free a parsed IRZRODUCE1 or IRZRODUCE2 cell that was allocated by
+/** Free a parsed INTRODUCE1 or INTRODUCE2 cell that was allocated by
  * rend_service_parse_intro().
  */
 void
@@ -1614,10 +1614,10 @@ rend_service_free_intro(rend_intro_cell_t *request)
   tor_free(request);
 }
 
-/** Parse an IRZRODUCE1 or IRZRODUCE2 cell into a newly allocated
+/** Parse an INTRODUCE1 or INTRODUCE2 cell into a newly allocated
  * rend_intro_cell_t structure.  Free it with rend_service_free_intro()
  * when finished.  The type parameter should be 1 or 2 to indicate whether
- * this is IRZRODUCE1 or IRZRODUCE2.  This parses only the non-encrypted
+ * this is INTRODUCE1 or INTRODUCE2.  This parses only the non-encrypted
  * parts; after this, call rend_service_decrypt_intro() with a key, then
  * rend_service_parse_intro_plaintext() to finish parsing.  The optional
  * err_msg_out parameter is set to a string suitable for log output
@@ -1639,7 +1639,7 @@ rend_service_begin_parse_intro(const uint8_t *request,
   if (!request || request_len <= 0) goto err;
   if (!(type == 1 || type == 2)) goto err;
 
-  /* First, check that the cell is long enough to be a sensible IRZRODUCE */
+  /* First, check that the cell is long enough to be a sensible INTRODUCE */
 
   /* min key length plus digest length plus nickname length */
   if (request_len <
@@ -1647,7 +1647,7 @@ rend_service_begin_parse_intro(const uint8_t *request,
          DH_KEY_LEN + 42)) {
     if (err_msg_out) {
       tor_asprintf(&err_msg,
-                   "got a truncated IRZRODUCE%d cell",
+                   "got a truncated INTRODUCE%d cell",
                    (int)type);
     }
     goto err;
@@ -1674,7 +1674,7 @@ rend_service_begin_parse_intro(const uint8_t *request,
   rv = NULL;
   if (err_msg_out && !err_msg) {
     tor_asprintf(&err_msg,
-                 "unknown IRZRODUCE%d error",
+                 "unknown INTRODUCE%d error",
                  (int)type);
   }
 
@@ -1685,7 +1685,7 @@ rend_service_begin_parse_intro(const uint8_t *request,
   return rv;
 }
 
-/** Parse the version-specific parts of a v0 or v1 IRZRODUCE1 or IRZRODUCE2
+/** Parse the version-specific parts of a v0 or v1 INTRODUCE1 or INTRODUCE2
  * cell
  */
 
@@ -1711,7 +1711,7 @@ rend_service_parse_intro_for_v0_or_v1(
     if (err_msg_out)
       tor_asprintf(err_msg_out,
                    "rend_service_parse_intro_for_v0_or_v1() called with "
-                   "bad version %d on IRZRODUCE%d cell (this is a bug)",
+                   "bad version %d on INTRODUCE%d cell (this is a bug)",
                    intro->version,
                    (int)(intro->type));
     goto err;
@@ -1720,7 +1720,7 @@ rend_service_parse_intro_for_v0_or_v1(
   if (plaintext_len < ver_specific_len) {
     if (err_msg_out)
       tor_asprintf(err_msg_out,
-                   "short plaintext of encrypted part in v1 IRZRODUCE%d "
+                   "short plaintext of encrypted part in v1 INTRODUCE%d "
                    "cell (%lu bytes, needed %lu)",
                    (int)(intro->type),
                    (unsigned long)plaintext_len,
@@ -1733,7 +1733,7 @@ rend_service_parse_intro_for_v0_or_v1(
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
                    "couldn't find a nul-padded nickname in "
-                   "IRZRODUCE%d cell",
+                   "INTRODUCE%d cell",
                    (int)(intro->type));
     }
     goto err;
@@ -1745,7 +1745,7 @@ rend_service_parse_intro_for_v0_or_v1(
        !is_legal_nickname_or_hexdigest(rp_nickname))) {
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
-                   "bad nickname in IRZRODUCE%d cell",
+                   "bad nickname in INTRODUCE%d cell",
                    (int)(intro->type));
     }
     goto err;
@@ -1763,7 +1763,7 @@ rend_service_parse_intro_for_v0_or_v1(
   return -1;
 }
 
-/** Parse the version-specific parts of a v2 IRZRODUCE1 or IRZRODUCE2 cell
+/** Parse the version-specific parts of a v2 INTRODUCE1 or INTRODUCE2 cell
  */
 
 static ssize_t
@@ -1787,7 +1787,7 @@ rend_service_parse_intro_for_v2(
     if (err_msg_out)
       tor_asprintf(err_msg_out,
                    "rend_service_parse_intro_for_v2() called with "
-                   "bad version %d on IRZRODUCE%d cell (this is a bug)",
+                   "bad version %d on INTRODUCE%d cell (this is a bug)",
                    intro->version,
                    (int)(intro->type));
     goto err;
@@ -1798,7 +1798,7 @@ rend_service_parse_intro_for_v2(
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
                    "truncated plaintext of encrypted parted of "
-                   "version %d IRZRODUCE%d cell",
+                   "version %d INTRODUCE%d cell",
                    intro->version,
                    (int)(intro->type));
     }
@@ -1820,7 +1820,7 @@ rend_service_parse_intro_for_v2(
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
                    "truncated plaintext of encrypted parted of "
-                   "version %d IRZRODUCE%d cell",
+                   "version %d INTRODUCE%d cell",
                    intro->version,
                    (int)(intro->type));
     }
@@ -1834,7 +1834,7 @@ rend_service_parse_intro_for_v2(
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
                    "error decoding onion key in version %d "
-                   "IRZRODUCE%d cell",
+                   "INTRODUCE%d cell",
                    intro->version,
                    (intro->type));
     }
@@ -1855,7 +1855,7 @@ rend_service_parse_intro_for_v2(
   return -1;
 }
 
-/** Parse the version-specific parts of a v3 IRZRODUCE1 or IRZRODUCE2 cell
+/** Parse the version-specific parts of a v3 INTRODUCE1 or INTRODUCE2 cell
  */
 
 static ssize_t
@@ -1872,7 +1872,7 @@ rend_service_parse_intro_for_v3(
     if (err_msg_out)
       tor_asprintf(err_msg_out,
                    "rend_service_parse_intro_for_v3() called with "
-                   "bad version %d on IRZRODUCE%d cell (this is a bug)",
+                   "bad version %d on INTRODUCE%d cell (this is a bug)",
                    intro->version,
                    (int)(intro->type));
     goto err;
@@ -1887,7 +1887,7 @@ rend_service_parse_intro_for_v3(
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
                    "truncated plaintext of encrypted parted of "
-                   "version %d IRZRODUCE%d cell",
+                   "version %d INTRODUCE%d cell",
                    intro->version,
                    (int)(intro->type));
     }
@@ -1919,7 +1919,7 @@ rend_service_parse_intro_for_v3(
       if (intro->u.v3.auth_len != REND_DESC_COOKIE_LEN) {
         if (err_msg_out) {
           tor_asprintf(err_msg_out,
-                       "wrong auth data size %d for IRZRODUCE%d cell, "
+                       "wrong auth data size %d for INTRODUCE%d cell, "
                        "should be %d",
                        (int)(intro->u.v3.auth_len),
                        (int)(intro->type),
@@ -1935,7 +1935,7 @@ rend_service_parse_intro_for_v3(
     if (err_msg_out) {
       tor_asprintf(err_msg_out,
                    "truncated plaintext of encrypted parted of "
-                   "version %d IRZRODUCE%d cell",
+                   "version %d INTRODUCE%d cell",
                    intro->version,
                    (int)(intro->type));
     }
@@ -1976,7 +1976,7 @@ rend_service_parse_intro_for_v3(
   return -1;
 }
 
-/** Table of parser functions for version-specific parts of an IRZRODUCE2
+/** Table of parser functions for version-specific parts of an INTRODUCE2
  * cell.
  */
 
@@ -1991,7 +1991,7 @@ static ssize_t
   rend_service_parse_intro_for_v2,
   rend_service_parse_intro_for_v3 };
 
-/** Decrypt the encrypted part of an IRZRODUCE1 or IRZRODUCE2 cell,
+/** Decrypt the encrypted part of an INTRODUCE1 or INTRODUCE2 cell,
  * return 0 if successful, or < 0 and write an error message to
  * *err_msg_out if provided.
  */
@@ -2025,7 +2025,7 @@ rend_service_decrypt_intro(
     if (err_msg_out) {
       tor_asprintf(&err_msg,
                    "rend_intro_cell_t was missing ciphertext for "
-                   "IRZRODUCE%d cell",
+                   "INTRODUCE%d cell",
                    (int)(intro->type));
     }
     status = -3;
@@ -2041,7 +2041,7 @@ rend_service_decrypt_intro(
       base32_encode(service_id, REND_SERVICE_ID_LEN_BASE32 + 1,
                     (char*)(intro->pk), REND_SERVICE_ID_LEN);
       tor_asprintf(&err_msg,
-                   "got an IRZRODUCE%d cell for the wrong service (%s)",
+                   "got an INTRODUCE%d cell for the wrong service (%s)",
                    (int)(intro->type),
                    escaped(service_id));
     }
@@ -2056,7 +2056,7 @@ rend_service_decrypt_intro(
   if (intro->ciphertext_len < key_len) {
     if (err_msg_out) {
       tor_asprintf(&err_msg,
-                   "got an IRZRODUCE%d cell with a truncated PK-encrypted "
+                   "got an INTRODUCE%d cell with a truncated PK-encrypted "
                    "part",
                    (int)(intro->type));
     }
@@ -2076,7 +2076,7 @@ rend_service_decrypt_intro(
   if (result < 0) {
     if (err_msg_out) {
       tor_asprintf(&err_msg,
-                   "couldn't decrypt IRZRODUCE%d cell",
+                   "couldn't decrypt INTRODUCE%d cell",
                    (int)(intro->type));
     }
     status = -6;
@@ -2091,7 +2091,7 @@ rend_service_decrypt_intro(
  err:
   if (err_msg_out && !err_msg) {
     tor_asprintf(&err_msg,
-                 "unknown IRZRODUCE%d error decrypting encrypted part",
+                 "unknown INTRODUCE%d error decrypting encrypted part",
                  (int)(intro->type));
   }
   if (status >= 0) status = -1;
@@ -2108,8 +2108,8 @@ rend_service_decrypt_intro(
   return status;
 }
 
-/** Parse the plaintext of the encrypted part of an IRZRODUCE1 or
- * IRZRODUCE2 cell, return 0 if successful, or < 0 and write an error
+/** Parse the plaintext of the encrypted part of an INTRODUCE1 or
+ * INTRODUCE2 cell, return 0 if successful, or < 0 and write an error
  * message to *err_msg_out if provided.
  */
 
@@ -2169,14 +2169,14 @@ rend_service_parse_intro_plaintext(
   ver_invariant_len = intro->plaintext_len - ver_specific_len;
   if (ver_invariant_len < REND_COOKIE_LEN + DH_KEY_LEN) {
     tor_asprintf(&err_msg,
-        "decrypted plaintext of IRZRODUCE%d cell was truncated (%ld bytes)",
+        "decrypted plaintext of INTRODUCE%d cell was truncated (%ld bytes)",
         (int)(intro->type),
         (long)(intro->plaintext_len));
     status = -5;
     goto err;
   } else if (ver_invariant_len > REND_COOKIE_LEN + DH_KEY_LEN) {
     tor_asprintf(&err_msg,
-        "decrypted plaintext of IRZRODUCE%d cell was too long (%ld bytes)",
+        "decrypted plaintext of INTRODUCE%d cell was too long (%ld bytes)",
         (int)(intro->type),
         (long)(intro->plaintext_len));
     status = -6;
@@ -2197,7 +2197,7 @@ rend_service_parse_intro_plaintext(
  err:
   if (err_msg_out && !err_msg) {
     tor_asprintf(&err_msg,
-                 "unknown IRZRODUCE%d error parsing encrypted part",
+                 "unknown INTRODUCE%d error parsing encrypted part",
                  (int)(intro->type));
   }
   if (status >= 0) status = -1;
@@ -2364,7 +2364,7 @@ rend_service_launch_establish_intro(rend_service_t *service,
   rep_hist_note_used_internal(time(NULL), 1, 0);
 
   ++service->n_intro_circuits_launched;
-  launched = circuit_launch_by_extend_info(CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO,
+  launched = circuit_launch_by_extend_info(CIRCUIT_PURPOSE_S_ESTABLISH_INTRO,
                              intro->extend_info,
                              CIRCLAUNCH_NEED_UPTIME|CIRCLAUNCH_IS_INTERNAL);
 
@@ -2410,8 +2410,8 @@ count_established_intro_points(const char *query)
   TOR_LIST_FOREACH(circ, circuit_get_global_list(), head) {
     if (!circ->marked_for_close &&
         circ->state == CIRCUIT_STATE_OPEN &&
-        (circ->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO ||
-         circ->purpose == CIRCUIT_PURPOSE_S_IRZRO)) {
+        (circ->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_INTRO ||
+         circ->purpose == CIRCUIT_PURPOSE_S_INTRO)) {
       origin_circuit_t *oc = TO_ORIGIN_CIRCUIT(circ);
       if (oc->rend_data &&
           !rend_cmp_service_ids(query, oc->rend_data->onion_address))
@@ -2422,7 +2422,7 @@ count_established_intro_points(const char *query)
 }
 
 /** Called when we're done building a circuit to an introduction point:
- *  sends a RELAY_ESTABLISH_IRZRO cell.
+ *  sends a RELAY_ESTABLISH_INTRO cell.
  */
 void
 rend_service_intro_has_opened(origin_circuit_t *circuit)
@@ -2436,7 +2436,7 @@ rend_service_intro_has_opened(origin_circuit_t *circuit)
   int reason = END_CIRC_REASON_TORPROTOCOL;
   crypto_pk_t *intro_key;
 
-  tor_assert(circuit->base_.purpose == CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO);
+  tor_assert(circuit->base_.purpose == CIRCUIT_PURPOSE_S_ESTABLISH_INTRO);
 #ifndef NON_ANONYMOUS_MODE_ENABLED
   tor_assert(!(circuit->build_state->onehop_tunnel));
 #endif
@@ -2496,9 +2496,9 @@ rend_service_intro_has_opened(origin_circuit_t *circuit)
            "Established circuit %u as introduction point for service %s",
            (unsigned)circuit->base_.n_circ_id, serviceid);
 
-  /* Use the intro key instead of the service key in ESTABLISH_IRZRO. */
+  /* Use the intro key instead of the service key in ESTABLISH_INTRO. */
   intro_key = circuit->intro_key;
-  /* Build the payload for a RELAY_ESTABLISH_IRZRO cell. */
+  /* Build the payload for a RELAY_ESTABLISH_INTRO cell. */
   r = crypto_pk_asn1_encode(intro_key, buf+2,
                             RELAY_PAYLOAD_SIZE-2);
   if (r < 0) {
@@ -2510,7 +2510,7 @@ rend_service_intro_has_opened(origin_circuit_t *circuit)
   set_uint16(buf, htons((uint16_t)len));
   len += 2;
   memcpy(auth, circuit->cpath->prev->rend_circ_nonce, DIGEST_LEN);
-  memcpy(auth+DIGEST_LEN, "IRZRODUCE", 9);
+  memcpy(auth+DIGEST_LEN, "INTRODUCE", 9);
   if (crypto_digest(buf+len, auth, DIGEST_LEN+9))
     goto err;
   len += 20;
@@ -2525,7 +2525,7 @@ rend_service_intro_has_opened(origin_circuit_t *circuit)
   len += r;
 
   if (relay_send_command_from_edge(0, TO_CIRCUIT(circuit),
-                                   RELAY_COMMAND_ESTABLISH_IRZRO,
+                                   RELAY_COMMAND_ESTABLISH_INTRO,
                                    buf, len, circuit->cpath->prev)<0) {
     log_info(LD_GENERAL,
              "Couldn't send introduction request for service %s on circuit %u",
@@ -2549,7 +2549,7 @@ rend_service_intro_has_opened(origin_circuit_t *circuit)
   return;
 }
 
-/** Called when we get an IRZRO_ESTABLISHED cell; mark the circuit as a
+/** Called when we get an INTRO_ESTABLISHED cell; mark the circuit as a
  * live introduction point, and note that the service descriptor is
  * now out-of-date. */
 int
@@ -2562,9 +2562,9 @@ rend_service_intro_established(origin_circuit_t *circuit,
   (void) request;
   (void) request_len;
 
-  if (circuit->base_.purpose != CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO) {
+  if (circuit->base_.purpose != CIRCUIT_PURPOSE_S_ESTABLISH_INTRO) {
     log_warn(LD_PROTOCOL,
-             "received IRZRO_ESTABLISHED cell on non-intro circuit.");
+             "received INTRO_ESTABLISHED cell on non-intro circuit.");
     goto err;
   }
   tor_assert(circuit->rend_data);
@@ -2576,15 +2576,15 @@ rend_service_intro_established(origin_circuit_t *circuit,
     goto err;
   }
   service->desc_is_dirty = time(NULL);
-  circuit_change_purpose(TO_CIRCUIT(circuit), CIRCUIT_PURPOSE_S_IRZRO);
+  circuit_change_purpose(TO_CIRCUIT(circuit), CIRCUIT_PURPOSE_S_INTRO);
 
   base32_encode(serviceid, REND_SERVICE_ID_LEN_BASE32 + 1,
                 circuit->rend_data->rend_pk_digest, REND_SERVICE_ID_LEN);
   log_info(LD_REND,
-           "Received IRZRO_ESTABLISHED cell on circuit %u for service %s",
+           "Received INTRO_ESTABLISHED cell on circuit %u for service %s",
            (unsigned)circuit->base_.n_circ_id, serviceid);
 
-  /* Getting a valid IRZRODUCE_ESTABLISHED means we've successfully
+  /* Getting a valid INTRODUCE_ESTABLISHED means we've successfully
    * used the circ */
   pathbias_mark_use_success(circuit);
 
@@ -2729,7 +2729,7 @@ find_intro_circuit(rend_intro_point_t *intro, const char *pk_digest)
 
   tor_assert(intro);
   while ((circ = circuit_get_next_by_pk_and_purpose(circ,pk_digest,
-                                                  CIRCUIT_PURPOSE_S_IRZRO))) {
+                                                  CIRCUIT_PURPOSE_S_INTRO))) {
     if (tor_memeq(circ->build_state->chosen_exit->identity_digest,
                 intro->extend_info->identity_digest, DIGEST_LEN) &&
         circ->rend_data) {
@@ -2739,7 +2739,7 @@ find_intro_circuit(rend_intro_point_t *intro, const char *pk_digest)
 
   circ = NULL;
   while ((circ = circuit_get_next_by_pk_and_purpose(circ,pk_digest,
-                                        CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO))) {
+                                        CIRCUIT_PURPOSE_S_ESTABLISH_INTRO))) {
     if (tor_memeq(circ->build_state->chosen_exit->identity_digest,
                 intro->extend_info->identity_digest, DIGEST_LEN) &&
         circ->rend_data) {
@@ -2757,8 +2757,8 @@ find_intro_point(origin_circuit_t *circ)
   const char *serviceid;
   rend_service_t *service = NULL;
 
-  tor_assert(TO_CIRCUIT(circ)->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO ||
-             TO_CIRCUIT(circ)->purpose == CIRCUIT_PURPOSE_S_IRZRO);
+  tor_assert(TO_CIRCUIT(circ)->purpose == CIRCUIT_PURPOSE_S_ESTABLISH_INTRO ||
+             TO_CIRCUIT(circ)->purpose == CIRCUIT_PURPOSE_S_INTRO);
   tor_assert(circ->rend_data);
   serviceid = circ->rend_data->onion_address;
 
@@ -2983,7 +2983,7 @@ upload_service_descriptor(rend_service_t *service)
   service->desc_is_dirty = 0;
 }
 
-/** Return the number of IRZRODUCE2 cells this hidden service has received
+/** Return the number of INTRODUCE2 cells this hidden service has received
  * from this intro point. */
 static int
 intro_point_accepted_intro_count(rend_intro_point_t *intro)
@@ -3012,7 +3012,7 @@ intro_point_should_expire_now(rend_intro_point_t *intro,
   }
 
   if (intro_point_accepted_intro_count(intro) >=
-      IRZRO_POINT_LIFETIME_IRZRODUCTIONS) {
+      INTRO_POINT_LIFETIME_INTRODUCTIONS) {
     /* This intro point has been used too many times.  Expire it now. */
     return 1;
   }
@@ -3021,9 +3021,9 @@ intro_point_should_expire_now(rend_intro_point_t *intro,
     /* This intro point has been published, but we haven't picked an
      * expiration time for it.  Pick one now. */
     int intro_point_lifetime_seconds =
-      IRZRO_POINT_LIFETIME_MIN_SECONDS +
-      crypto_rand_int(IRZRO_POINT_LIFETIME_MAX_SECONDS -
-                      IRZRO_POINT_LIFETIME_MIN_SECONDS);
+      INTRO_POINT_LIFETIME_MIN_SECONDS +
+      crypto_rand_int(INTRO_POINT_LIFETIME_MAX_SECONDS -
+                      INTRO_POINT_LIFETIME_MIN_SECONDS);
 
     /* Start the expiration timer now, rather than when the intro
      * point was first published.  There shouldn't be much of a time
@@ -3073,12 +3073,12 @@ rend_services_introduce(void)
      * circuits we need to launch for this service. */
     n_intro_points_unexpired = 0;
 
-    if (now > service->intro_period_started+IRZRO_CIRC_RETRY_PERIOD) {
+    if (now > service->intro_period_started+INTRO_CIRC_RETRY_PERIOD) {
       /* One period has elapsed; we can try building circuits again. */
       service->intro_period_started = now;
       service->n_intro_circuits_launched = 0;
     } else if (service->n_intro_circuits_launched >=
-               MAX_IRZRO_CIRCS_PER_PERIOD) {
+               MAX_INTRO_CIRCS_PER_PERIOD) {
       /* We have failed too many times in this period; wait for the next
        * one before we try again. */
       continue;
@@ -3091,7 +3091,7 @@ rend_services_introduce(void)
       origin_circuit_t *intro_circ =
         find_intro_circuit(intro, service->pk_digest);
 
-      if (intro->time_expiring + IRZRO_POINT_EXPIRATION_GRACE_PERIOD > now) {
+      if (intro->time_expiring + INTRO_POINT_EXPIRATION_GRACE_PERIOD > now) {
         /* This intro point has completely expired.  Remove it, and
          * mark the circuit for close if it's still alive. */
         if (intro_circ != NULL &&
@@ -3193,7 +3193,7 @@ rend_services_introduce(void)
          j < (int)n_intro_points_to_open;
          ++j) { /* XXXX remove casts */
       router_crn_flags_t flags = CRN_NEED_UPTIME|CRN_NEED_DESC;
-      if (get_options()->AllowInvalid_ & ALLOW_INVALID_IRZRODUCTION)
+      if (get_options()->AllowInvalid_ & ALLOW_INVALID_INTRODUCTION)
         flags |= CRN_ALLOW_INVALID;
       node = router_choose_random_node(intro_nodes,
                                        options->ExcludeNodes, flags);

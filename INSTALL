@@ -1,9 +1,9 @@
-Building Razor
+Building Neutrinocoin
 
-See doc/readme-qt.rst for instructions on building Razor-Qt,
+See doc/readme-qt.rst for instructions on building Neutrinocoin-Qt,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of Razor.
+implementation of Neutrinocoin.
 
-See doc/build-*.txt for instructions on building razord,
+See doc/build-*.txt for instructions on building neutrinocoind,
 the intended-for-services, no-graphical-interface, reference
-implementation of Razor.
+implementation of Neutrinocoin.

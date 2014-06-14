@@ -248,7 +248,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
         <translation>警告: 如果將錢包加密後忘記密碼, 你會&lt;b&gt;失去其中所有的莱特幣&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -275,7 +275,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
         <translation>莱特幣現在要關閉以完成加密程序. 請記住, 加密錢包無法完全防止入侵電腦的惡意程式偷取你的莱特幣.</translation>
     </message>
     <message>
@@ -2197,8 +2197,8 @@ Address: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>送指令給 -server 或 razord
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>送指令給 -server 或 neutrinocoind
 </translation>
     </message>
     <message>
@@ -2227,8 +2227,8 @@ Address: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
-        <translation>指定行程識別碼檔案 (預設: razord.pid)
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
+        <translation>指定行程識別碼檔案 (預設: neutrinocoind.pid)
 </translation>
     </message>
     <message>
@@ -2244,8 +2244,8 @@ Address: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>在通訊埠 &lt;port&gt; 聽候連線 (預設: 8777, 或若為測試網路: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>在通訊埠 &lt;port&gt; 聽候連線 (預設: 7272, 或若為測試網路: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

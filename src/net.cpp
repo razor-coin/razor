@@ -1196,6 +1196,9 @@ void MapPort(bool)
 }
 #endif
 
+
+
+
 // hidden service seeds
 static const char *strMainNetOnionSeed[][1] = {
     {"ujv7a7cjpsx5y22n.onion"},
@@ -1217,6 +1220,29 @@ static const char *strTestNetOnionSeed[][1] = {
     {NULL}
 };
 
+
+
+
+/*
+// hidden service seeds
+static const char *strMainNetOnionSeed[][1] = {
+    {"ip2hmlyxtsqsogjz.onion"},
+    {"mphzihjmldmnshnv.onion"},
+    {"gsblxj3nuuvjvrm4.onion"},
+    {"oiqkwjtb4mzmotnz.onion"},
+    {"wza27vftw2wsb44y.onion"},
+    {NULL}
+};
+
+static const char *strTestNetOnionSeed[][1] = {
+    {"ip2hmlyxtsqsogjz.onion"},
+    {"mphzihjmldmnshnv.onion"},
+    {"gsblxj3nuuvjvrm4.onion"},
+    {"oiqkwjtb4mzmotnz.onion"},
+    {"wza27vftw2wsb44y.onion"},
+    {NULL}
+};
+*/
 void ThreadOnionSeed()
 {
     static const char *(*strOnionSeed)[1] = fTestNet ? strTestNetOnionSeed : strMainNetOnionSeed;
@@ -1244,9 +1270,19 @@ void ThreadOnionSeed()
     printf("%d addresses found from .onion seeds\n", found);
 }
 
+
+
+
+
+
+
+
+
+
+
+
 unsigned int pnSeed[] =
 {
-    0x6BAA3F9D, 0x6BAA958A, 0xC0F1FEDE, 0x6BAAAC8F
 };
 
 void DumpAddresses()

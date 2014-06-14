@@ -129,7 +129,7 @@ struct channel_s {
    * Linked list of channels with the same identity digest, for the
    * digest->channel map
    */
-  TOR_LIST_ERZRY(channel_s) next_with_same_id;
+  TOR_LIST_ENTRY(channel_s) next_with_same_id;
 
   /* List of incoming cells to handle */
   chan_cell_queue_t incoming_queue;

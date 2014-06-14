@@ -5,7 +5,7 @@
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
         <source>About Razor</source>
-        <translation>Tietoa Razorista</translation>
+        <translation>Tietoa Neutrinocoinista</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -249,8 +249,8 @@ Tämä ohjelma sisältää OpenSSL projektin OpenSSL työkalupakin (http://www.o
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
-        <translation>Varoitus: Jos salaat lompakkosi ja menetät tunnuslauseesi, &lt;b&gt;MENETÄT KAIKKI RAZORISI&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
+        <translation>Varoitus: Jos salaat lompakkosi ja menetät tunnuslauseesi, &lt;b&gt;MENETÄT KAIKKI NEUTRINOCOINISI&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -276,7 +276,7 @@ Tämä ohjelma sisältää OpenSSL projektin OpenSSL työkalupakin (http://www.o
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
         <translation>Razor sulkeutuu lopettaakseen salausprosessin. Muista, että salattukaan lompakko ei täysin suojaa sitä haittaohjelmien aiheuttamilta varkauksilta.</translation>
     </message>
     <message>
@@ -361,7 +361,7 @@ Tämä ohjelma sisältää OpenSSL projektin OpenSSL työkalupakin (http://www.o
     <message>
         <location line="-14"/>
         <source>Show the list of addresses for receiving payments</source>
-        <translation>Näytä Razorien vastaanottamiseen käytetyt osoitteet</translation>
+        <translation>Näytä Neutrinocoinien vastaanottamiseen käytetyt osoitteet</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -426,7 +426,7 @@ Tämä ohjelma sisältää OpenSSL projektin OpenSSL työkalupakin (http://www.o
     <message>
         <location line="+49"/>
         <source>Modify configuration options for Razor</source>
-        <translation>Muuta Razorin konfiguraatioasetuksia</translation>
+        <translation>Muuta Neutrinocoinin konfiguraatioasetuksia</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -482,7 +482,7 @@ Tämä ohjelma sisältää OpenSSL projektin OpenSSL työkalupakin (http://www.o
     <message>
         <location line="+22"/>
         <source>&amp;About Razor</source>
-        <translation>&amp;Tietoa Razorista</translation>
+        <translation>&amp;Tietoa Neutrinocoinista</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -1051,7 +1051,7 @@ Osoite: %4</translation>
     <message>
         <location line="-101"/>
         <source>Your current balance</source>
-        <translation>Tililläsi tällä hetkellä olevien Razorien määrä</translation>
+        <translation>Tililläsi tällä hetkellä olevien Neutrinocoinien määrä</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1290,7 +1290,7 @@ Osoite: %4</translation>
         <location line="+5"/>
         <location line="+5"/>
         <source>Send Coins</source>
-        <translation>Lähetä Razoreja</translation>
+        <translation>Lähetä Neutrinocoineja</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -1340,7 +1340,7 @@ Osoite: %4</translation>
     <message>
         <location line="+5"/>
         <source>Confirm send coins</source>
-        <translation>Hyväksy Razorien lähettäminen</translation>
+        <translation>Hyväksy Neutrinocoinien lähettäminen</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1360,7 +1360,7 @@ Osoite: %4</translation>
     <message>
         <location line="+5"/>
         <source>The amount to pay must be larger than 0.</source>
-        <translation>Maksettavan summan tulee olla suurempi kuin 0 Razoria.</translation>
+        <translation>Maksettavan summan tulee olla suurempi kuin 0 Neutrinocoinia.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1385,7 +1385,7 @@ Osoite: %4</translation>
     <message>
         <location line="+5"/>
         <source>Error: The transaction was rejected. This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Virhe: Rahansiirto hylättiin.  Tämä voi tapahtua jos jotkin razoreistasi on jo käytetty, esimerkiksi jos olet käyttänyt kopiota wallet.dat-lompakkotiedostosta ja razorit on merkitty käytetyksi vain kopiossa.</translation>
+        <translation>Virhe: Rahansiirto hylättiin.  Tämä voi tapahtua jos jotkin neutrinocoineistasi on jo käytetty, esimerkiksi jos olet käyttänyt kopiota wallet.dat-lompakkotiedostosta ja neutrinocoinit on merkitty käytetyksi vain kopiossa.</translation>
     </message>
 </context>
 <context>
@@ -2137,7 +2137,7 @@ Osoite: %4</translation>
     <message>
         <location filename="../walletmodel.cpp" line="+193"/>
         <source>Send Coins</source>
-        <translation>Lähetä Razoreja</translation>
+        <translation>Lähetä Neutrinocoineja</translation>
     </message>
 </context>
 <context>
@@ -2188,7 +2188,7 @@ Osoite: %4</translation>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+94"/>
         <source>Razor version</source>
-        <translation>Razorin versio</translation>
+        <translation>Neutrinocoinin versio</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -2197,8 +2197,8 @@ Osoite: %4</translation>
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>Lähetä käsky palvelimelle tai razord:lle</translation>
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>Lähetä käsky palvelimelle tai neutrinocoind:lle</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2222,7 +2222,7 @@ Osoite: %4</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
         <translation>Määritä pid-tiedosto (oletus: razor.pid)</translation>
     </message>
     <message>
@@ -2237,8 +2237,8 @@ Osoite: %4</translation>
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Kuuntele yhteyksiä portista &lt;port&gt; (oletus: 8777 tai testnet: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Kuuntele yhteyksiä portista &lt;port&gt; (oletus: 7272 tai testnet: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2809,7 +2809,7 @@ TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)</translation>
     <message>
         <location line="+1"/>
         <source>Error loading wallet.dat: Wallet requires newer version of Razor</source>
-        <translation>Virhe ladattaessa wallet.dat-tiedostoa: Tarvitset uudemman version Razorista</translation>
+        <translation>Virhe ladattaessa wallet.dat-tiedostoa: Tarvitset uudemman version Neutrinocoinista</translation>
     </message>
     <message>
         <location line="+93"/>

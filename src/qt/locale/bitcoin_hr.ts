@@ -243,8 +243,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
-        <translation>Upozorenje: Ako šifrirate vaš novčanik i izgubite lozinku, &lt;b&gt;IZGUBIT ĆETE SVE SVOJE RAZORSE!&lt;/b&gt;</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
+        <translation>Upozorenje: Ako šifrirate vaš novčanik i izgubite lozinku, &lt;b&gt;IZGUBIT ĆETE SVE SVOJE NEUTRINOCOINSE!&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -270,8 +270,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
-        <translation>Razor će se sada zatvoriti kako bi dovršio postupak šifriranja. Zapamtite da šifriranje vašeg novčanika ne može u potpunosti zaštititi vaše razore od krađe preko zloćudnog softvera koji bi bio na vašem računalu.</translation>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
+        <translation>Razor će se sada zatvoriti kako bi dovršio postupak šifriranja. Zapamtite da šifriranje vašeg novčanika ne može u potpunosti zaštititi vaše neutrinocoine od krađe preko zloćudnog softvera koji bi bio na vašem računalu.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -370,7 +370,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+4"/>
         <source>Show information about Razor</source>
-        <translation>Prikaži informacije o Razoru</translation>
+        <translation>Prikaži informacije o Neutrinocoinu</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -476,7 +476,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+22"/>
         <source>&amp;About Razor</source>
-        <translation>&amp;O Razoru</translation>
+        <translation>&amp;O Neutrinocoinu</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -935,7 +935,7 @@ Adresa:%4
     <message>
         <location line="+13"/>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Izaberite željeni najmanji dio razora koji će biti prikazan u sučelju i koji će se koristiti za plaćanje.</translation>
+        <translation>Izaberite željeni najmanji dio neutrinocoina koji će biti prikazan u sučelju i koji će se koristiti za plaćanje.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2192,8 +2192,8 @@ Adresa:%4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>Pošalji komandu usluzi -server ili razord</translation>
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>Pošalji komandu usluzi -server ili neutrinocoind</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2217,7 +2217,7 @@ Adresa:%4
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
         <translation>Odredi proces ID datoteku (ugrađeni izbor: razor.pid)</translation>
     </message>
     <message>
@@ -2232,8 +2232,8 @@ Adresa:%4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Slušaj na &lt;port&gt;u (default: 8777 ili testnet: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Slušaj na &lt;port&gt;u (default: 7272 ili testnet: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2803,7 +2803,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Razor Alert&quot; admin@foo.co
     <message>
         <location line="+1"/>
         <source>Error loading wallet.dat: Wallet requires newer version of Razor</source>
-        <translation>Greška kod učitavanja wallet.dat: Novčanik zahtjeva noviju verziju Razora</translation>
+        <translation>Greška kod učitavanja wallet.dat: Novčanik zahtjeva noviju verziju Neutrinocoina</translation>
     </message>
     <message>
         <location line="+93"/>

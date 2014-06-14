@@ -98,7 +98,7 @@ stream_end_reason_to_socks5_response(int reason)
       return SOCKS5_HOST_UNREACHABLE;
     case END_STREAM_REASON_CONNECTREFUSED:
       return SOCKS5_CONNECTION_REFUSED;
-    case END_STREAM_REASON_ERZRYPOLICY:
+    case END_STREAM_REASON_ENTRYPOLICY:
       return SOCKS5_NOT_ALLOWED;
     case END_STREAM_REASON_EXITPOLICY:
       return SOCKS5_NOT_ALLOWED;
@@ -253,7 +253,7 @@ tls_error_to_orconn_end_reason(int e)
       return END_OR_CONN_REASON_NO_ROUTE;
     case TOR_TLS_ERROR_TIMEOUT:
       return END_OR_CONN_REASON_TIMEOUT;
-    case TOR_TLS_WARZREAD:
+    case TOR_TLS_WANTREAD:
     case TOR_TLS_WANTWRITE:
     case TOR_TLS_CLOSE:
     case TOR_TLS_DONE:

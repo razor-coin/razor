@@ -1,27 +1,27 @@
-Razor integration/staging tree
+Neutrinocoin integration/staging tree
 ================================
 
-http://www.razor.org
+http://www.neutrinocoin.org
 
 * Copyright (c) 2009-2013 Bitcoin Developers
 * Copyright (c) 2011-2013 Litecoin Developers
-* Copyright (c) 2013-2014 Razor Developers
+* Copyright (c) 2013-2014 Neutrinocoin Developers
 
-What is Razor?
+What is Neutrinocoin?
 ----------------
 
-Razor is a version of Litecoin that provides extra privacy features.
+Neutrinocoin is a version of Litecoin that provides extra privacy features.
  - 2.5 minute block targets
  - during the first 3 months, subsidy is 3992 coins per block, reduced thereafter to result in 1.1% annual growth.
  - 210 million coins created in the first 3 months, increasing 1.1% thereafter
  - 12 blocks to retarget difficulty
 
-For more information, see http://www.razor.org.
+For more information, see http://www.neutrinocoin.org.
 
 License
 -------
 
-Razor is released under the terms of the MIT license. See `COPYING` for more
+Neutrinocoin is released under the terms of the MIT license. See `COPYING` for more
 information or see http://opensource.org/licenses/MIT.
 
 Development process
@@ -30,7 +30,7 @@ Development process
 Developers work in their own trees, then submit pull requests when they think
 their feature or bug fix is ready.
 
-If it is a simple/trivial/non-controversial change, then one of the Razor
+If it is a simple/trivial/non-controversial change, then one of the Neutrinocoin
 development team members simply pulls it.
 
 If it is a *more complicated or potentially controversial* change, then the patch
@@ -42,8 +42,8 @@ match the project's coding conventions (see `doc/coding.txt`) or are
 controversial.
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/razor/razor/tags) are created
-regularly to indicate new official, stable release versions of Razor.
+completely stable. [Tags](https://github.com/neutrinocoin/neutrinocoin/tags) are created
+regularly to indicate new official, stable release versions of Neutrinocoin.
 
 Testing
 -------
@@ -66,5 +66,5 @@ Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
 
     qmake BITCOIN_QT_TEST=1 -o Makefile.test bitcoin-qt.pro
     make -f Makefile.test
-    ./razor-qt_test
+    ./neutrinocoin-qt_test
 

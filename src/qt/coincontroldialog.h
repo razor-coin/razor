@@ -1,5 +1,5 @@
-#ifndef COINCORZROLDIALOG_H
-#define COINCORZROLDIALOG_H
+#ifndef COINCONTROLDIALOG_H
+#define COINCONTROLDIALOG_H
 
 #include <QAbstractButton>
 #include <QAction>
@@ -89,4 +89,4 @@ private slots:
     void updateLabelLocked();
 };
 
-#endif // COINCORZROLDIALOG_H
+#endif // COINCONTROLDIALOG_H

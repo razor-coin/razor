@@ -31,7 +31,6 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-
 uint256 const hashGenesisBlock("0xb2926a56ca64e0cd2430347e383f63ad7092f406088b9b86d6d68c2a34baef51");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Razor: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -1062,10 +1061,8 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
     return pblock->GetHash();
 }
 
-
 int64 static GetBlockValue(int nHeight, int64 nFees)
 {
-    // Razor: 210M in the first 3 months, 1.1% increase in coins per year after that
     int64 nSubsidy = 100 * COIN;
     int64 nSubsidyHalvingInterval = 10000;
 
@@ -1076,7 +1073,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 }
 
 static const int64 nTargetTimespan = 30 * 60; // 30 minutes
-static const int64 nTargetSpacing = 1.25 * 60; // 1.25 minutes
+static const int64 nTargetSpacing = 1.25 * 60; // 2.5 minutes
 static const int64 nInterval = nTargetTimespan / nTargetSpacing; // 12 blocks
 static const int64 nMaxDifficultyIncrease = 10;
 static const int64 nMaxDifficultyDecrease = 50;
@@ -2777,11 +2774,12 @@ bool InitBlockIndex() {
     // Only add the genesis block if not reindexing (in which case we reuse the one already on disk)
     if (!fReindex) {
         // Genesis Block:
-//CBlock(hash=b2926a56ca64e0cd2430347e383f63ad7092f406088b9b86d6d68c2a34baef51, //input=01000000000000000000000000000000000000000000000000000000000000000000000010e47ac25e5a19d8f56a5439b0d603300600c03e7b313a7685dc85f3d205f765003f9a53f0ff0f1e19381b00, PoW=00000c3af6ec631ff6e280ebd61dd640e09e4e8b7bc6797af6ae653da02ebbc5, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410, nTime=1402617600, nBits=1e0ffff0, nNonce=1783833, vtx=1)
-//CTransaction(hash=65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-//    CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01043f49726973682054696d65732031302f4a756e2f32303134204368696e6120616e64204a6170616e207365656b20636c6f736572207472616465206c696e6b73)
-//    CTxOut(nValue=3992.00000000, scriptPubKey=046e4cd7a81b37218401c5cc3f11d0)
-//  vMerkleTree: 65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410 
+        //CBlock(hash=b2926a56ca64e0cd2430347e383f63ad7092f406088b9b86d6d68c2a34baef51, //input=01000000000000000000000000000000000000000000000000000000000000000000000010e47ac25e5a19d8f56a5439b0d603300600c03e7b313a7685dc85f3d205f765003f9a53f0ff0f1e19381b00, PoW=00000c3af6ec631ff6e280ebd61dd640e09e4e8b7bc6797af6ae653da02ebbc5, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410, nTime=1402617600, nBits=1e0ffff0, nNonce=1783833, vtx=1)
+        //CTransaction(hash=65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+        //    CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01043f49726973682054696d65732031302f4a756e2f32303134204368696e6120616e64204a6170616e207365656b20636c6f736572207472616465206c696e6b73)
+        //    CTxOut(nValue=3992.00000000, scriptPubKey=046e4cd7a81b37218401c5cc3f11d0)
+        //  vMerkleTree: 65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410 
+
         // Genesis block
         const char* pszTimestamp = "Irish Times 10/Jun/2014 China and Japan seek closer trade links";
         CTransaction txNew;
@@ -3128,7 +3126,7 @@ bool static AlreadyHave(const CInv& inv)
 // The message start string is designed to be unlikely to occur in normal data.
 // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
 // a large 4-byte int at any alignment.
-unsigned char pchMessageStart[4] = { 0xf9, 0xe8, 0xb4, 0xd9 }; 
+unsigned char pchMessageStart[4] = { 0xf9, 0xe8, 0xb4, 0xd9 }; // Razor: increase each by adding 2 to bitcoin's value.
 
 
 void static ProcessGetData(CNode* pfrom)
@@ -4167,7 +4165,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// RazorMiner
+// NeutrinocoinMiner
 //
 
 int static FormatHashBlocks(void* pbuffer, unsigned int len)
@@ -4580,7 +4578,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         return false;
 
     //// debug print
-    printf("RazorMiner:\n");
+    printf("NeutrinocoinMiner:\n");
     printf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
     printf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
@@ -4589,7 +4587,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
-            return error("RazorMiner : generated block is stale");
+            return error("NeutrinocoinMiner : generated block is stale");
 
         // Remove key from key pool
         reservekey.KeepKey();
@@ -4603,15 +4601,15 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         // Process this block the same as if we had received it from another node
         CValidationState state;
         if (!ProcessBlock(state, NULL, pblock))
-            return error("RazorMiner : ProcessBlock, block not accepted");
+            return error("NeutrinocoinMiner : ProcessBlock, block not accepted");
     }
 
     return true;
 }
 
-void static RazorMiner(CWallet *pwallet)
+void static NeutrinocoinMiner(CWallet *pwallet)
 {
-    printf("RazorMiner started\n");
+    printf("NeutrinocoinMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     RenameThread("razor-miner");
 
@@ -4638,7 +4636,7 @@ void static RazorMiner(CWallet *pwallet)
         CBlock *pblock = &pblocktemplate->block;
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
-        printf("Running RazorMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
+        printf("Running NeutrinocoinMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
                ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
         //
@@ -4750,7 +4748,7 @@ void static RazorMiner(CWallet *pwallet)
     } }
     catch (boost::thread_interrupted)
     {
-        printf("RazorMiner terminated\n");
+        printf("NeutrinocoinMiner terminated\n");
         throw;
     }
 }
@@ -4775,7 +4773,7 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 
     minerThreads = new boost::thread_group();
     for (int i = 0; i < nThreads; i++)
-        minerThreads->create_thread(boost::bind(&RazorMiner, pwallet));
+        minerThreads->create_thread(boost::bind(&NeutrinocoinMiner, pwallet));
 }
 
 // Amount compression:

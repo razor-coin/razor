@@ -308,11 +308,11 @@ pathbias_should_count(origin_circuit_t *circ)
    * malicious intro points. */
   if (get_options()->UseEntryGuards == 0 ||
           circ->base_.purpose == CIRCUIT_PURPOSE_TESTING ||
-          circ->base_.purpose == CIRCUIT_PURPOSE_CORZROLLER ||
+          circ->base_.purpose == CIRCUIT_PURPOSE_CONTROLLER ||
           circ->base_.purpose == CIRCUIT_PURPOSE_S_CONNECT_REND ||
           circ->base_.purpose == CIRCUIT_PURPOSE_S_REND_JOINED ||
-          (circ->base_.purpose >= CIRCUIT_PURPOSE_C_IRZRODUCING &&
-           circ->base_.purpose <= CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED)) {
+          (circ->base_.purpose >= CIRCUIT_PURPOSE_C_INTRODUCING &&
+           circ->base_.purpose <= CIRCUIT_PURPOSE_C_INTRODUCE_ACKED)) {
 
     /* Check to see if the shouldcount result has changed due to a
      * unexpected purpose change that would affect our results.

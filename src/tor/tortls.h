@@ -30,7 +30,7 @@ typedef struct tor_cert_t tor_cert_t;
 #define TOR_TLS_ERROR_NO_ROUTE     -5
 #define TOR_TLS_ERROR_TIMEOUT      -4
 #define TOR_TLS_CLOSE              -3
-#define TOR_TLS_WARZREAD           -2
+#define TOR_TLS_WANTREAD           -2
 #define TOR_TLS_WANTWRITE          -1
 #define TOR_TLS_DONE                0
 

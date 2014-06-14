@@ -1,5 +1,5 @@
-#ifndef COINCORZROLTREEWIDGET_H
-#define COINCORZROLTREEWIDGET_H
+#ifndef COINCONTROLTREEWIDGET_H
+#define COINCONTROLTREEWIDGET_H
 
 #include <QKeyEvent>
 #include <QTreeWidget>
@@ -14,4 +14,4 @@ protected:
   virtual void  keyPressEvent(QKeyEvent *event);
 };
 
-#endif // COINCORZROLTREEWIDGET_H
+#endif // COINCONTROLTREEWIDGET_H

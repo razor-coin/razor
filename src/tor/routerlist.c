@@ -4999,7 +4999,7 @@ routerlist_assert_ok(const routerlist_t *rl)
  * and platform string for <b>router</b>,
  * surrounded by quotes and using standard C escapes.
  *
- * THIS FUNCTION IS NOT REERZRANT.  Don't call it from outside the main
+ * THIS FUNCTION IS NOT REENTRANT.  Don't call it from outside the main
  * thread.  Also, each call invalidates the last-returned value, so don't
  * try log_warn(LD_GENERAL, "%s %s", esc_router_info(a), esc_router_info(b));
  *

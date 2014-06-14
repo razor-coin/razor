@@ -94,8 +94,8 @@ typedef enum {
   K_DIRREQ_V3_DIR,
   K_DIRREQ_V2_TUN,
   K_DIRREQ_V3_TUN,
-  K_ERZRY_END,
-  K_ERZRY_IPS,
+  K_ENTRY_END,
+  K_ENTRY_IPS,
   K_CELL_END,
   K_CELL_PROCESSED,
   K_CELL_QUEUED,
@@ -142,7 +142,7 @@ typedef enum {
   R_SECRET_ID_PART,
   R_PUBLICATION_TIME,
   R_PROTOCOL_VERSIONS,
-  R_IRZRODUCTION_POINTS,
+  R_INTRODUCTION_POINTS,
   R_SIGNATURE,
 
   R_IPO_IDENTIFIER,
@@ -322,8 +322,8 @@ static token_rule_t extrainfo_token_table[] = {
   T01("dirreq-v3-direct-dl", K_DIRREQ_V3_DIR,       ARGS,    NO_OBJ ),
   T01("dirreq-v2-tunneled-dl", K_DIRREQ_V2_TUN,     ARGS,    NO_OBJ ),
   T01("dirreq-v3-tunneled-dl", K_DIRREQ_V3_TUN,     ARGS,    NO_OBJ ),
-  T01("entry-stats-end",     K_ERZRY_END,           ARGS,    NO_OBJ ),
-  T01("entry-ips",           K_ERZRY_IPS,           ARGS,    NO_OBJ ),
+  T01("entry-stats-end",     K_ENTRY_END,           ARGS,    NO_OBJ ),
+  T01("entry-ips",           K_ENTRY_IPS,           ARGS,    NO_OBJ ),
   T01("cell-stats-end",      K_CELL_END,            ARGS,    NO_OBJ ),
   T01("cell-processed-cells", K_CELL_PROCESSED,     ARGS,    NO_OBJ ),
   T01("cell-queued-cells",   K_CELL_QUEUED,         ARGS,    NO_OBJ ),
@@ -382,7 +382,7 @@ static token_rule_t desc_token_table[] = {
   T1("secret-id-part", R_SECRET_ID_PART, EQ(1), NO_OBJ),
   T1("publication-time", R_PUBLICATION_TIME, CONCAT_ARGS, NO_OBJ),
   T1("protocol-versions", R_PROTOCOL_VERSIONS, EQ(1), NO_OBJ),
-  T01("introduction-points", R_IRZRODUCTION_POINTS, NO_ARGS, NEED_OBJ),
+  T01("introduction-points", R_INTRODUCTION_POINTS, NO_ARGS, NEED_OBJ),
   T1_END("signature", R_SIGNATURE, NO_ARGS, NEED_OBJ),
   END_OF_TABLE
 };
@@ -4524,7 +4524,7 @@ rend_parse_v2_service_descriptor(rend_service_descriptor_t **parsed_out,
   SMARTLIST_FOREACH(versions, char *, cp, tor_free(cp));
   smartlist_free(versions);
   /* Parse encrypted introduction points. Don't verify. */
-  tok = find_opt_by_keyword(tokens, R_IRZRODUCTION_POINTS);
+  tok = find_opt_by_keyword(tokens, R_INTRODUCTION_POINTS);
   if (tok) {
     if (strcmp(tok->object_type, "MESSAGE")) {
       log_warn(LD_DIR, "Bad object type: introduction points should be of "
@@ -4598,7 +4598,7 @@ rend_decrypt_introduction_points(char **ipos_decrypted,
     crypto_cipher_t *cipher;
     client_blocks = (int) ipos_encrypted[1];
     client_entries_len = client_blocks * REND_BASIC_AUTH_CLIENT_MULTIPLE *
-                         REND_BASIC_AUTH_CLIENT_ERZRY_LEN;
+                         REND_BASIC_AUTH_CLIENT_ENTRY_LEN;
     if (ipos_encrypted_size < 2 + client_entries_len + CIPHER_IV_LEN + 1) {
       log_warn(LD_REND, "Size of encrypted introduction points is too "
                         "small.");
@@ -4612,7 +4612,7 @@ rend_decrypt_introduction_points(char **ipos_decrypted,
                              REND_BASIC_AUTH_CLIENT_ID_LEN);
     crypto_digest_free(digest);
     for (pos = 2; pos < 2 + client_entries_len;
-         pos += REND_BASIC_AUTH_CLIENT_ERZRY_LEN) {
+         pos += REND_BASIC_AUTH_CLIENT_ENTRY_LEN) {
       if (tor_memeq(ipos_encrypted + pos, client_id,
                   REND_BASIC_AUTH_CLIENT_ID_LEN)) {
         /* Attempt to decrypt introduction points. */
@@ -4742,7 +4742,7 @@ rend_parse_introduction_points(rend_service_descriptor_t *parsed,
     /* Parse identifier. */
     tok = find_by_keyword(tokens, R_IPO_IDENTIFIER);
     if (base32_decode(info->identity_digest, DIGEST_LEN,
-                      tok->args[0], REND_IRZRO_POINT_ID_LEN_BASE32) < 0) {
+                      tok->args[0], REND_INTRO_POINT_ID_LEN_BASE32) < 0) {
       log_warn(LD_REND, "Identity digest contains illegal characters: %s",
                tok->args[0]);
       rend_intro_point_free(intro);

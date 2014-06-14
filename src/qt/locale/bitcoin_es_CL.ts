@@ -251,8 +251,8 @@ Eric Young (eay@cryptsoft.com) y UPnP software escrito por Thomas Bernard.</tran
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR RAZORS&lt;/b&gt;!</source>
-        <translation>Atención: ¡Si codificas tu billetera y pierdes la contraseña perderás &lt;b&gt;TODOS TUS RAZORS&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR NEUTRINOCOINS&lt;/b&gt;!</source>
+        <translation>Atención: ¡Si codificas tu billetera y pierdes la contraseña perderás &lt;b&gt;TODOS TUS NEUTRINOCOINS&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -278,8 +278,8 @@ Eric Young (eay@cryptsoft.com) y UPnP software escrito por Thomas Bernard.</tran
     </message>
     <message>
         <location line="-56"/>
-        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your razors from being stolen by malware infecting your computer.</source>
-        <translation>Razor se cerrará para finalizar el proceso de encriptación. Recuerde que encriptar su billetera no protegera completatamente sus razors de ser robados por malware que infecte su computador</translation>
+        <source>Razor will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your neutrinocoins from being stolen by malware infecting your computer.</source>
+        <translation>Razor se cerrará para finalizar el proceso de encriptación. Recuerde que encriptar su billetera no protegera completatamente sus neutrinocoins de ser robados por malware que infecte su computador</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2200,8 +2200,8 @@ Dirección: %4</translation>
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or razord</source>
-        <translation>Envia comando a razor lanzado con -server u razord
+        <source>Send command to -server or neutrinocoind</source>
+        <translation>Envia comando a razor lanzado con -server u neutrinocoind
 </translation>
     </message>
     <message>
@@ -2230,7 +2230,7 @@ Dirección: %4</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: razord.pid)</source>
+        <source>Specify pid file (default: neutrinocoind.pid)</source>
         <translation>Especifica archivo pid (predeterminado: razor.pid)
 </translation>
     </message>
@@ -2247,8 +2247,8 @@ Dirección: %4</translation>
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Escuchar por conecciones en &lt;puerto&gt; (Por defecto: 8777 o red de prueba: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Escuchar por conecciones en &lt;puerto&gt; (Por defecto: 7272 o red de prueba: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

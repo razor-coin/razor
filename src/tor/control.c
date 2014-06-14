@@ -8,7 +8,7 @@
  *   See doc/spec/control-spec.txt for full details on protocol.
  **/
 
-#define CORZROL_PRIVATE
+#define CONTROL_PRIVATE
 
 #include "or.h"
 #include "addressmap.h"
@@ -51,7 +51,7 @@
 
 /** Yield true iff <b>s</b> is the state of a control_connection_t that has
  * finished authentication and is accepting commands. */
-#define STATE_IS_OPEN(s) ((s) == CORZROL_CONN_STATE_OPEN)
+#define STATE_IS_OPEN(s) ((s) == CONTROL_CONN_STATE_OPEN)
 
 /** Bitfield: The bit 1&lt;&lt;e is set if <b>any</b> open control
  * connection is interested in events of type <b>e</b>.  We use this
@@ -85,9 +85,9 @@ static int authentication_cookie_is_set = 0;
  * read it off disk, it has permission to connect.) */
 static uint8_t *authentication_cookie = NULL;
 
-#define SAFECOOKIE_SERVER_TO_CORZROLLER_CONSTANT \
+#define SAFECOOKIE_SERVER_TO_CONTROLLER_CONSTANT \
   "Tor safe cookie authentication server-to-controller hash"
-#define SAFECOOKIE_CORZROLLER_TO_SERVER_CONSTANT \
+#define SAFECOOKIE_CONTROLLER_TO_SERVER_CONSTANT \
   "Tor safe cookie authentication controller-to-server hash"
 #define SAFECOOKIE_SERVER_NONCE_LEN DIGEST256_LEN
 
@@ -217,9 +217,9 @@ control_update_global_event_mask(void)
   global_event_mask = 0;
   SMARTLIST_FOREACH(conns, connection_t *, _conn,
   {
-    if (_conn->type == CONN_TYPE_CORZROL &&
+    if (_conn->type == CONN_TYPE_CONTROL &&
         STATE_IS_OPEN(_conn->state)) {
-      control_connection_t *conn = TO_CORZROL_CONN(_conn);
+      control_connection_t *conn = TO_CONTROL_CONN(_conn);
       global_event_mask |= conn->event_mask;
     }
   });
@@ -522,7 +522,7 @@ control_ports_write_to_file(void)
   lines = smartlist_new();
 
   SMARTLIST_FOREACH_BEGIN(get_connection_array(), const connection_t *, conn) {
-    if (conn->type != CONN_TYPE_CORZROL_LISTENER || conn->marked_for_close)
+    if (conn->type != CONN_TYPE_CONTROL_LISTENER || conn->marked_for_close)
       continue;
 #ifdef AF_UNIX
     if (conn->socket_family == AF_UNIX) {
@@ -536,7 +536,7 @@ control_ports_write_to_file(void)
   joined = smartlist_join_strings(lines, "", 0, NULL);
 
   if (write_str_to_file(options->ControlPortWriteToFile, joined, 0) < 0) {
-    log_warn(LD_CORZROL, "Writing %s failed: %s",
+    log_warn(LD_CONTROL, "Writing %s failed: %s",
              options->ControlPortWriteToFile, strerror(errno));
   }
 #ifndef _WIN32
@@ -578,10 +578,10 @@ send_control_event_string,(uint16_t event, event_format_t which,
   tor_assert(event >= EVENT_MIN_ && event <= EVENT_MAX_);
 
   SMARTLIST_FOREACH_BEGIN(conns, connection_t *, conn) {
-    if (conn->type == CONN_TYPE_CORZROL &&
+    if (conn->type == CONN_TYPE_CONTROL &&
         !conn->marked_for_close &&
-        conn->state == CORZROL_CONN_STATE_OPEN) {
-      control_connection_t *control_conn = TO_CORZROL_CONN(conn);
+        conn->state == CONTROL_CONN_STATE_OPEN) {
+      control_connection_t *control_conn = TO_CONTROL_CONN(conn);
 
       if (control_conn->event_mask & (1<<event)) {
         int is_err = 0;
@@ -661,7 +661,7 @@ get_stream(const char *id)
   conn = connection_get_by_global_id(n_id);
   if (!conn || conn->type != CONN_TYPE_AP || conn->marked_for_close)
     return NULL;
-  return TO_ERZRY_CONN(conn);
+  return TO_ENTRY_CONN(conn);
 }
 
 /** Helper for setconf and resetconf. Acts like setconf, except
@@ -728,7 +728,7 @@ control_setconf_helper(control_connection_t *conn, uint32_t len, char *body,
   smartlist_free(entries);
 
   if (config_get_lines(config, &lines, 0) < 0) {
-    log_warn(LD_CORZROL,"Controller gave us config lines we can't parse.");
+    log_warn(LD_CONTROL,"Controller gave us config lines we can't parse.");
     connection_write_str_to_buf("551 Couldn't parse configuration\r\n",
                                 conn);
     tor_free(config);
@@ -758,7 +758,7 @@ control_setconf_helper(control_connection_t *conn, uint32_t len, char *body,
         send_control_done(conn);
         return 0;
     }
-    log_warn(LD_CORZROL,
+    log_warn(LD_CONTROL,
              "Controller gave us config lines that didn't validate: %s",
              errstring);
     connection_printf_to_buf(conn, "%s: %s\r\n", msg, errstring);
@@ -869,7 +869,7 @@ handle_control_loadconf(control_connection_t *conn, uint32_t len,
   retval = options_init_from_string(NULL, body, CMD_RUN_TOR, NULL, &errstring);
 
   if (retval != SETOPT_OK)
-    log_warn(LD_CORZROL,
+    log_warn(LD_CONTROL,
              "Controller gave us config file that didn't validate: %s",
              errstring);
 
@@ -1086,7 +1086,7 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
     tor_assert(authentication_cookie_is_set);
 
     if (password_len != DIGEST256_LEN) {
-      log_warn(LD_CORZROL,
+      log_warn(LD_CONTROL,
                "Got safe cookie authentication response with wrong length "
                "(%d)", (int)password_len);
       errstr = "Wrong length for safe cookie response.";
@@ -1094,7 +1094,7 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
     }
 
     if (tor_memneq(conn->safecookie_client_hash, password, DIGEST256_LEN)) {
-      log_warn(LD_CORZROL,
+      log_warn(LD_CONTROL,
                "Got incorrect safe cookie authentication response");
       errstr = "Safe cookie response did not match expected value.";
       goto err;
@@ -1116,7 +1116,7 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
       options->HashedControlSessionPassword != NULL;
     if (password_len != AUTHENTICATION_COOKIE_LEN) {
       if (!also_password) {
-        log_warn(LD_CORZROL, "Got authentication cookie with wrong length "
+        log_warn(LD_CONTROL, "Got authentication cookie with wrong length "
                  "(%d)", (int)password_len);
         errstr = "Wrong length on authentication cookie.";
         goto err;
@@ -1124,7 +1124,7 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
       bad_cookie = 1;
     } else if (tor_memneq(authentication_cookie, password, password_len)) {
       if (!also_password) {
-        log_warn(LD_CORZROL, "Got mismatched authentication cookie");
+        log_warn(LD_CONTROL, "Got mismatched authentication cookie");
         errstr = "Authentication cookie did not match expected value.";
         goto err;
       }
@@ -1161,7 +1161,7 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
     }
     if (bad) {
       if (!also_cookie) {
-        log_warn(LD_CORZROL,
+        log_warn(LD_CONTROL,
                  "Couldn't decode HashedControlPassword: invalid base16");
         errstr="Couldn't decode HashedControlPassword value in configuration.";
       }
@@ -1193,7 +1193,7 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
 
   /** We only get here if both kinds of authentication failed. */
   tor_assert(bad_password && bad_cookie);
-  log_warn(LD_CORZROL, "Bad password or authentication cookie on controller.");
+  log_warn(LD_CONTROL, "Bad password or authentication cookie on controller.");
   errstr = "Password did not match HashedControlPassword *or* authentication "
     "cookie.";
 
@@ -1204,10 +1204,10 @@ handle_control_authenticate(control_connection_t *conn, uint32_t len,
   connection_mark_for_close(TO_CONN(conn));
   return 0;
  ok:
-  log_info(LD_CORZROL, "Authenticated control connection ("TOR_SOCKET_T_FORMAT
+  log_info(LD_CONTROL, "Authenticated control connection ("TOR_SOCKET_T_FORMAT
            ")", conn->base_.s);
   send_control_done(conn);
-  conn->base_.state = CORZROL_CONN_STATE_OPEN;
+  conn->base_.state = CONTROL_CONN_STATE_OPEN;
   tor_free(password);
   if (sl) { /* clean up */
     SMARTLIST_FOREACH(sl, char *, cp, tor_free(cp));
@@ -1308,7 +1308,7 @@ handle_control_takeownership(control_connection_t *conn, uint32_t len,
 
   conn->is_owning_control_connection = 1;
 
-  log_info(LD_CORZROL, "Control connection %d has taken ownership of this "
+  log_info(LD_CONTROL, "Control connection %d has taken ownership of this "
            "Tor instance.",
            (int)(conn->base_.s));
 
@@ -1354,7 +1354,7 @@ handle_control_mapaddress(control_connection_t *conn, uint32_t len,
       if (address_is_invalid_mapaddress_target(to)) {
         smartlist_add_asprintf(reply,
                      "512-syntax error: invalid address '%s'", to);
-        log_warn(LD_CORZROL,
+        log_warn(LD_CONTROL,
                  "Skipping invalid argument '%s' in MapAddress msg", to);
       } else if (!strcmp(from, ".") || !strcmp(from, "0.0.0.0") ||
                  !strcmp(from, "::")) {
@@ -1366,7 +1366,7 @@ handle_control_mapaddress(control_connection_t *conn, uint32_t len,
         if (!address) {
           smartlist_add_asprintf(reply,
                        "451-resource exhausted: skipping '%s'", line);
-          log_warn(LD_CORZROL,
+          log_warn(LD_CONTROL,
                    "Unable to allocate address for '%s' in MapAddress msg",
                    safe_str_client(line));
         } else {
@@ -1375,11 +1375,11 @@ handle_control_mapaddress(control_connection_t *conn, uint32_t len,
       } else {
         const char *msg;
         if (addressmap_register_auto(from, to, 1,
-                                     ADDRMAPSRC_CORZROLLER, &msg) < 0) {
+                                     ADDRMAPSRC_CONTROLLER, &msg) < 0) {
           smartlist_add_asprintf(reply,
                                  "512-syntax error: invalid address mapping "
                                  " '%s': %s", line, msg);
-          log_warn(LD_CORZROL,
+          log_warn(LD_CONTROL,
                    "Skipping invalid argument '%s' in MapAddress msg: %s",
                    line, msg);
         } else {
@@ -1389,7 +1389,7 @@ handle_control_mapaddress(control_connection_t *conn, uint32_t len,
     } else {
       smartlist_add_asprintf(reply, "512-syntax error: mapping '%s' is "
                    "not of expected form 'foo=bar'.", line);
-      log_info(LD_CORZROL, "Skipping MapAddress '%s': wrong "
+      log_info(LD_CONTROL, "Skipping MapAddress '%s': wrong "
                            "number of items.",
                            safe_str_client(line));
     }
@@ -1596,7 +1596,7 @@ getinfo_helper_listeners(control_connection_t *control_conn,
   else if (!strcmp(question, "net/listeners/dns"))
     type = CONN_TYPE_AP_DNS_LISTENER;
   else if (!strcmp(question, "net/listeners/control"))
-    type = CONN_TYPE_CORZROL_LISTENER;
+    type = CONN_TYPE_CONTROL_LISTENER;
   else
     return 0; /* unknown key */
 
@@ -1729,7 +1729,7 @@ getinfo_helper_dir(control_connection_t *control_conn,
     tor_asprintf(&url, "/tor/%s", question+4);
     res = dirserv_get_routerdescs(descs, url, &msg);
     if (res) {
-      log_warn(LD_CORZROL, "getinfo '%s': %s", question, msg);
+      log_warn(LD_CONTROL, "getinfo '%s': %s", question, msg);
       smartlist_free(descs);
       tor_free(url);
       *errmsg = msg;
@@ -1918,10 +1918,10 @@ getinfo_helper_events(control_connection_t *control_conn,
           base_conn->state == AP_CONN_STATE_SOCKS_WAIT ||
           base_conn->state == AP_CONN_STATE_NATD_WAIT)
         continue;
-      conn = TO_ERZRY_CONN(base_conn);
+      conn = TO_ENTRY_CONN(base_conn);
       switch (base_conn->state)
         {
-        case AP_CONN_STATE_CORZROLLER_WAIT:
+        case AP_CONN_STATE_CONTROLLER_WAIT:
         case AP_CONN_STATE_CIRCUIT_WAIT:
           if (conn->socks_request &&
               SOCKS_COMMAND_IS_RESOLVE(conn->socks_request->command))
@@ -1933,7 +1933,7 @@ getinfo_helper_events(control_connection_t *control_conn,
         case AP_CONN_STATE_CONNECT_WAIT:
           state = "SENTCONNECT"; break;
         case AP_CONN_STATE_RESOLVE_WAIT:
-          state = "SERZRESOLVE"; break;
+          state = "SENTRESOLVE"; break;
         case AP_CONN_STATE_OPEN:
           state = "SUCCEEDED"; break;
         default:
@@ -1941,7 +1941,7 @@ getinfo_helper_events(control_connection_t *control_conn,
                    base_conn->state);
           continue;
         }
-      circ = circuit_get_by_edge_conn(ERZRY_TO_EDGE_CONN(conn));
+      circ = circuit_get_by_edge_conn(ENTRY_TO_EDGE_CONN(conn));
       if (circ && CIRCUIT_IS_ORIGIN(circ))
         origin_circ = TO_ORIGIN_CIRCUIT(circ);
       write_stream_target_to_buf(conn, buf, sizeof(buf));
@@ -2329,7 +2329,7 @@ circuit_purpose_from_string(const char *string)
   if (!strcasecmp(string, "general"))
     return CIRCUIT_PURPOSE_C_GENERAL;
   else if (!strcasecmp(string, "controller"))
-    return CIRCUIT_PURPOSE_CORZROLLER;
+    return CIRCUIT_PURPOSE_CONTROLLER;
   else
     return CIRCUIT_PURPOSE_UNKNOWN;
 }
@@ -2495,7 +2495,7 @@ handle_control_extendcircuit(control_connection_t *conn, uint32_t len,
       int err_reason = 0;
       circuit_set_state(TO_CIRCUIT(circ), CIRCUIT_STATE_BUILDING);
       if ((err_reason = circuit_send_next_onion_skin(circ)) < 0) {
-        log_info(LD_CORZROL,
+        log_info(LD_CONTROL,
                  "send_next_onion_skin failed; circuit marked for closing.");
         circuit_mark_for_close(TO_CIRCUIT(circ), -err_reason);
         connection_write_str_to_buf("551 Couldn't send onion skin\r\n", conn);
@@ -2602,9 +2602,9 @@ handle_control_attachstream(control_connection_t *conn, uint32_t len,
   if (!ap_conn || (!zero_circ && !circ) || !hop_line_ok)
     return 0;
 
-  if (ERZRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_CORZROLLER_WAIT &&
-      ERZRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_CONNECT_WAIT &&
-      ERZRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_RESOLVE_WAIT) {
+  if (ENTRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_CONTROLLER_WAIT &&
+      ENTRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_CONNECT_WAIT &&
+      ENTRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_RESOLVE_WAIT) {
     connection_write_str_to_buf(
                     "555 Connection is not managed by controller.\r\n",
                     conn);
@@ -2612,8 +2612,8 @@ handle_control_attachstream(control_connection_t *conn, uint32_t len,
   }
 
   /* Do we need to detach it first? */
-  if (ERZRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_CORZROLLER_WAIT) {
-    edge_connection_t *edge_conn = ERZRY_TO_EDGE_CONN(ap_conn);
+  if (ENTRY_TO_CONN(ap_conn)->state != AP_CONN_STATE_CONTROLLER_WAIT) {
+    edge_connection_t *edge_conn = ENTRY_TO_EDGE_CONN(ap_conn);
     circuit_t *tmpcirc = circuit_get_by_edge_conn(edge_conn);
     connection_edge_end(edge_conn, END_STREAM_REASON_TIMEOUT);
     /* Un-mark it as ending, since we're going to reuse it. */
@@ -2621,7 +2621,7 @@ handle_control_attachstream(control_connection_t *conn, uint32_t len,
     edge_conn->end_reason = 0;
     if (tmpcirc)
       circuit_detach_stream(tmpcirc, edge_conn);
-    TO_CONN(edge_conn)->state = AP_CONN_STATE_CORZROLLER_WAIT;
+    TO_CONN(edge_conn)->state = AP_CONN_STATE_CONTROLLER_WAIT;
   }
 
   if (circ && (circ->base_.state != CIRCUIT_STATE_OPEN)) {
@@ -2846,7 +2846,7 @@ handle_control_closecircuit(control_connection_t *conn, uint32_t len,
       if (!strcasecmp(smartlist_get(args, i), "IfUnused"))
         safe = 1;
       else
-        log_info(LD_CORZROL, "Skipping unknown option %s",
+        log_info(LD_CONTROL, "Skipping unknown option %s",
                  (char*)smartlist_get(args,i));
     }
   }
@@ -2874,7 +2874,7 @@ handle_control_resolve(control_connection_t *conn, uint32_t len,
   (void) len; /* body is nul-terminated; it's safe to ignore the length */
 
   if (!(conn->event_mask & ((uint32_t)1L<<EVENT_ADDRMAP))) {
-    log_warn(LD_CORZROL, "Controller asked us to resolve an address, but "
+    log_warn(LD_CONTROL, "Controller asked us to resolve an address, but "
              "isn't listening for ADDRMAP events.  It probably won't see "
              "the answer.");
   }
@@ -3067,14 +3067,14 @@ handle_control_authchallenge(control_connection_t *conn, uint32_t len,
            server_nonce, SAFECOOKIE_SERVER_NONCE_LEN);
 
     crypto_hmac_sha256(server_hash,
-                       SAFECOOKIE_SERVER_TO_CORZROLLER_CONSTANT,
-                       strlen(SAFECOOKIE_SERVER_TO_CORZROLLER_CONSTANT),
+                       SAFECOOKIE_SERVER_TO_CONTROLLER_CONSTANT,
+                       strlen(SAFECOOKIE_SERVER_TO_CONTROLLER_CONSTANT),
                        tmp,
                        tmp_len);
 
     crypto_hmac_sha256(client_hash,
-                       SAFECOOKIE_CORZROLLER_TO_SERVER_CONSTANT,
-                       strlen(SAFECOOKIE_CORZROLLER_TO_SERVER_CONSTANT),
+                       SAFECOOKIE_CONTROLLER_TO_SERVER_CONSTANT,
+                       strlen(SAFECOOKIE_CONTROLLER_TO_SERVER_CONSTANT),
                        tmp,
                        tmp_len);
 
@@ -3171,7 +3171,7 @@ connection_control_reached_eof(control_connection_t *conn)
 {
   tor_assert(conn);
 
-  log_info(LD_CORZROL,"Control connection reached EOF. Closing.");
+  log_info(LD_CONTROL,"Control connection reached EOF. Closing.");
   connection_mark_for_close(TO_CONN(conn));
   return 0;
 }
@@ -3183,7 +3183,7 @@ lost_owning_controller(const char *owner_type, const char *loss_manner)
 {
   int shutdown_slowly = server_mode(get_options());
 
-  log_notice(LD_CORZROL, "Owning controller %s has %s -- %s.",
+  log_notice(LD_CONTROL, "Owning controller %s has %s -- %s.",
              owner_type, loss_manner,
              shutdown_slowly ? "shutting down" : "exiting now");
 
@@ -3218,7 +3218,7 @@ connection_control_closed(control_connection_t *conn)
 static int
 is_valid_initial_command(control_connection_t *conn, const char *cmd)
 {
-  if (conn->base_.state == CORZROL_CONN_STATE_OPEN)
+  if (conn->base_.state == CONTROL_CONN_STATE_OPEN)
     return 1;
   if (!strcasecmp(cmd, "PROTOCOLINFO"))
     return (!conn->have_sent_protocolinfo &&
@@ -3263,8 +3263,8 @@ connection_control_process_inbuf(control_connection_t *conn)
   char *args;
 
   tor_assert(conn);
-  tor_assert(conn->base_.state == CORZROL_CONN_STATE_OPEN ||
-             conn->base_.state == CORZROL_CONN_STATE_NEEDAUTH);
+  tor_assert(conn->base_.state == CONTROL_CONN_STATE_OPEN ||
+             conn->base_.state == CONTROL_CONN_STATE_NEEDAUTH);
 
   if (!conn->incoming_cmd) {
     conn->incoming_cmd = tor_malloc(1024);
@@ -3272,7 +3272,7 @@ connection_control_process_inbuf(control_connection_t *conn)
     conn->incoming_cmd_cur_len = 0;
   }
 
-  if (conn->base_.state == CORZROL_CONN_STATE_NEEDAUTH &&
+  if (conn->base_.state == CONTROL_CONN_STATE_NEEDAUTH &&
       peek_connection_has_control0_command(TO_CONN(conn))) {
     /* Detect v0 commands and send a "no more v0" message. */
     size_t body_len;
@@ -3371,7 +3371,7 @@ connection_control_process_inbuf(control_connection_t *conn)
     return 0;
   }
 
-  if (conn->base_.state == CORZROL_CONN_STATE_NEEDAUTH &&
+  if (conn->base_.state == CONTROL_CONN_STATE_NEEDAUTH &&
       !is_valid_initial_command(conn, conn->incoming_cmd)) {
     connection_write_str_to_buf("514 Authentication required.\r\n", conn);
     connection_mark_for_close(TO_CONN(conn));
@@ -3641,7 +3641,7 @@ write_stream_target_to_buf(entry_connection_t *conn, char *buf, size_t len)
                conn->socks_request->address,
                conn->chosen_exit_name ? buf2 : "",
                !conn->chosen_exit_name && connection_edge_is_rendezvous_stream(
-                                     ERZRY_TO_EDGE_CONN(conn)) ? ".onion" : "",
+                                     ENTRY_TO_EDGE_CONN(conn)) ? ".onion" : "",
                conn->socks_request->port)<0)
     return -1;
   return 0;
@@ -3675,7 +3675,7 @@ control_event_stream_status(entry_connection_t *conn, stream_status_event_t tp,
   switch (tp)
     {
     case STREAM_EVENT_SENT_CONNECT: status = "SENTCONNECT"; break;
-    case STREAM_EVENT_SENT_RESOLVE: status = "SERZRESOLVE"; break;
+    case STREAM_EVENT_SENT_RESOLVE: status = "SENTRESOLVE"; break;
     case STREAM_EVENT_SUCCEEDED: status = "SUCCEEDED"; break;
     case STREAM_EVENT_FAILED: status = "FAILED"; break;
     case STREAM_EVENT_CLOSED: status = "CLOSED"; break;
@@ -3725,9 +3725,9 @@ control_event_stream_status(entry_connection_t *conn, stream_status_event_t tp,
      * it gets set to "(Tor_internal)"; see dnsserv_launch_request() in
      * dnsserv.c.
      */
-    if (strcmp(ERZRY_TO_CONN(conn)->address, "(Tor_internal)") != 0) {
+    if (strcmp(ENTRY_TO_CONN(conn)->address, "(Tor_internal)") != 0) {
       tor_snprintf(addrport_buf,sizeof(addrport_buf), " SOURCE_ADDR=%s:%d",
-                   ERZRY_TO_CONN(conn)->address, ERZRY_TO_CONN(conn)->port);
+                   ENTRY_TO_CONN(conn)->address, ENTRY_TO_CONN(conn)->port);
     } else {
       /*
        * else leave it blank so control on AF_UNIX doesn't need to make
@@ -3743,7 +3743,7 @@ control_event_stream_status(entry_connection_t *conn, stream_status_event_t tp,
     purpose = " PURPOSE=DNS_REQUEST";
   } else if (tp == STREAM_EVENT_NEW) {
     if (conn->use_begindir) {
-      connection_t *linked = ERZRY_TO_CONN(conn)->linked_conn;
+      connection_t *linked = ENTRY_TO_CONN(conn)->linked_conn;
       int linked_dir_purpose = -1;
       if (linked && linked->type == CONN_TYPE_DIR)
         linked_dir_purpose = linked->purpose;
@@ -3755,12 +3755,12 @@ control_event_stream_status(entry_connection_t *conn, stream_status_event_t tp,
       purpose = " PURPOSE=USER";
   }
 
-  circ = circuit_get_by_edge_conn(ERZRY_TO_EDGE_CONN(conn));
+  circ = circuit_get_by_edge_conn(ENTRY_TO_EDGE_CONN(conn));
   if (circ && CIRCUIT_IS_ORIGIN(circ))
     origin_circ = TO_ORIGIN_CIRCUIT(circ);
   send_control_event(EVENT_STREAM_STATUS, ALL_FORMATS,
                         "650 STREAM "U64_FORMAT" %s %lu %s%s%s%s\r\n",
-                     U64_PRINTF_ARG(ERZRY_TO_CONN(conn)->global_identifier),
+                     U64_PRINTF_ARG(ENTRY_TO_CONN(conn)->global_identifier),
                      status,
                         origin_circ?
                            (unsigned long)origin_circ->global_identifier : 0ul,
@@ -4597,7 +4597,7 @@ control_event_guard(const char *nickname, const char *digest,
       tor_snprintf(buf, sizeof(buf), "$%s~%s", hbuf, nickname);
     }
     send_control_event(EVENT_GUARD, ALL_FORMATS,
-                       "650 GUARD ERZRY %s %s\r\n", buf, status);
+                       "650 GUARD ENTRY %s %s\r\n", buf, status);
   }
   return 0;
 }
@@ -4726,7 +4726,7 @@ monitor_owning_controller_process(const char *process_spec)
   owning_controller_process_monitor =
     tor_process_monitor_new(tor_libevent_get_base(),
                             owning_controller_process_spec,
-                            LD_CORZROL,
+                            LD_CONTROL,
                             owning_controller_procmon_cb, NULL,
                             &msg);
 
@@ -4860,7 +4860,7 @@ control_event_bootstrap(bootstrap_status_t status, int progress)
   if (status > bootstrap_percent ||
       (progress && progress > bootstrap_percent)) {
     bootstrap_status_to_string(status, &tag, &summary);
-    tor_log(status ? LOG_NOTICE : LOG_INFO, LD_CORZROL,
+    tor_log(status ? LOG_NOTICE : LOG_INFO, LD_CONTROL,
         "Bootstrapped %d%%: %s.", progress ? progress : status, summary);
     tor_snprintf(buf, sizeof(buf),
         "BOOTSTRAP PROGRESS=%d TAG=%s SUMMARY=\"%s\"",
@@ -4922,7 +4922,7 @@ control_event_bootstrap_problem, (const char *warn, int reason))
   severity = !strcmp(recommendation, "warn") ? LOG_WARN : LOG_INFO;
 
   log_fn(severity,
-         LD_CORZROL, "Problem bootstrapping. Stuck at %d%%: %s. (%s; %s; "
+         LD_CONTROL, "Problem bootstrapping. Stuck at %d%%: %s. (%s; %s; "
          "count %d; recommendation %s)",
          status, summary, warn,
          orconn_end_reason_to_control_string(reason),

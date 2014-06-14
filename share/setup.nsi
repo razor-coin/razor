@@ -1,4 +1,4 @@
-Name Razor
+Name Neutrinocoin
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
@@ -6,8 +6,8 @@ SetCompressor /SOLID lzma
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
 !define VERSION 0.0.3.1
-!define COMPANY "Razor Foundation"
-!define URL http://www.razorco.in/
+!define COMPANY "Neutrinocoin Foundation"
+!define URL http://www.neutrinocoin.org/
 
 # MUI Symbol Definitions
 !define MUI_ICON "../share/pixmaps/bitcoin.ico"
@@ -19,8 +19,8 @@ SetCompressor /SOLID lzma
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER Razor
-!define MUI_FINISHPAGE_RUN $INSTDIR\razor-qt.exe
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER Neutrinocoin
+!define MUI_FINISHPAGE_RUN $INSTDIR\neutrinocoin-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
@@ -45,14 +45,14 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile razor-0.0.3.1-win32-setup.exe
-InstallDir $PROGRAMFILES\Razor
+OutFile neutrinocoin-0.0.3.1-win32-setup.exe
+InstallDir $PROGRAMFILES\Neutrinocoin
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
 VIProductVersion 0.0.3.1
-VIAddVersionKey ProductName Razor
+VIAddVersionKey ProductName Neutrinocoin
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -66,18 +66,18 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File ../release/razor-qt.exe
+    File ../release/neutrinocoin-qt.exe
     File /oname=COPYING.txt ../COPYING
     File /oname=readme.txt ../doc/README_windows.txt
-    #SetOutPath $INSTDIR\daemon
-    #File ../src/razord.exe
-    #SetOutPath $INSTDIR\src
-    #File /r /x *.exe /x *.o ../src\*.*
-    #SetOutPath $INSTDIR
+    SetOutPath $INSTDIR\daemon
+    File ../src/neutrinocoind.exe
+    SetOutPath $INSTDIR\src
+    File /r /x *.exe /x *.o ../src\*.*
+    SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
     # Remove old wxwidgets-based-bitcoin executable and locales:
-    #Delete /REBOOTOK $INSTDIR\razor.exe
+    Delete /REBOOTOK $INSTDIR\neutrinocoin.exe
     RMDir /r /REBOOTOK $INSTDIR\locale
 SectionEnd
 
@@ -87,8 +87,8 @@ Section -post SEC0001
     WriteUninstaller $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory $SMPROGRAMS\$StartMenuGroup
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Razor.lnk" $INSTDIR\razor-qt.exe
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall Razor.lnk" $INSTDIR\uninstall.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Neutrinocoin.lnk" $INSTDIR\neutrinocoin-qt.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall Neutrinocoin.lnk" $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_END
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayVersion "${VERSION}"
@@ -98,10 +98,10 @@ Section -post SEC0001
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" UninstallString $INSTDIR\uninstall.exe
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
-    WriteRegStr HKCR "razor" "URL Protocol" ""
-    WriteRegStr HKCR "razor" "" "URL:Razor"
-    WriteRegStr HKCR "razor\DefaultIcon" "" $INSTDIR\razor-qt.exe
-    WriteRegStr HKCR "razor\shell\open\command" "" '"$INSTDIR\razor-qt.exe" "%1"'
+    WriteRegStr HKCR "neutrinocoin" "URL Protocol" ""
+    WriteRegStr HKCR "neutrinocoin" "" "URL:Neutrinocoin"
+    WriteRegStr HKCR "neutrinocoin\DefaultIcon" "" $INSTDIR\neutrinocoin-qt.exe
+    WriteRegStr HKCR "neutrinocoin\shell\open\command" "" '"$INSTDIR\neutrinocoin-qt.exe" "%1"'
 SectionEnd
 
 # Macro for selecting uninstaller sections
@@ -119,19 +119,19 @@ done${UNSECTION_ID}:
 
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
-    Delete /REBOOTOK $INSTDIR\razor-qt.exe
+    Delete /REBOOTOK $INSTDIR\neutrinocoin-qt.exe
     Delete /REBOOTOK $INSTDIR\COPYING.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
-    #RMDir /r /REBOOTOK $INSTDIR\daemon
-    #RMDir /r /REBOOTOK $INSTDIR\src
+    RMDir /r /REBOOTOK $INSTDIR\daemon
+    RMDir /r /REBOOTOK $INSTDIR\src
     DeleteRegValue HKCU "${REGKEY}\Components" Main
 SectionEnd
 
 Section -un.post UNSEC0001
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall Razor.lnk"
-    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Razor.lnk"
-    Delete /REBOOTOK "$SMSTARTUP\Razor.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall Neutrinocoin.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Neutrinocoin.lnk"
+    Delete /REBOOTOK "$SMSTARTUP\Neutrinocoin.lnk"
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     Delete /REBOOTOK $INSTDIR\debug.log
     Delete /REBOOTOK $INSTDIR\db.log
@@ -139,7 +139,7 @@ Section -un.post UNSEC0001
     DeleteRegValue HKCU "${REGKEY}" Path
     DeleteRegKey /IfEmpty HKCU "${REGKEY}\Components"
     DeleteRegKey /IfEmpty HKCU "${REGKEY}"
-    DeleteRegKey HKCR "razor"
+    DeleteRegKey HKCR "neutrinocoin"
     RmDir /REBOOTOK $SMPROGRAMS\$StartMenuGroup
     RmDir /REBOOTOK $INSTDIR
     Push $R0

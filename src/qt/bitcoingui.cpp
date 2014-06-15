@@ -68,10 +68,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent) :
     rpcConsole(0),
     prevBlocks(0)
 {
-         setStyleSheet("color: #AEB404;"
-    "font: 75 bold 10pt;"
-"background-image: url(:/Background/res/images/wallet.png);");
-   restoreWindowGeometry();
+    restoreWindowGeometry();
     setWindowTitle(tr("Razor") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
     QApplication::setWindowIcon(QIcon(":icons/bitcoin"));

@@ -2238,8 +2238,8 @@ Address: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>Принимать входящие подключения на &lt;port&gt; (по умолчанию: 8777 или 18777 в тестовой сети)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>Принимать входящие подключения на &lt;port&gt; (по умолчанию: 7272 или 17272 в тестовой сети)</translation>
     </message>
     <message>
         <location line="+5"/>

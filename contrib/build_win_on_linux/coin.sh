@@ -12,7 +12,7 @@ unzip -o $OUTDIR/boost-win32-1.54.0-gitian-r6.zip
 unzip -o $OUTDIR/bitcoin-deps-win32-gitian-r9.zip
 cd ~/deps
 rm -rf razor
-git clone https://github.com/razor-coin/razor.git razor	# or just unpack a .tar archive
+git clone -b devel https://github.com/razor-coin/razor.git	# or just unpack a .tar archive
 cd ~/deps/razor
 export PATH=$STAGING/host/bin:$PATH
 ln -sf $STAGING $HOME/qt
@@ -23,11 +23,11 @@ make clean
 echo "
 --- a/Makefile.Release  2014-04-02 11:47:01.100473132 +0300
 +++ b/Makefile.Release  2014-04-02 11:48:10.375602226 +0300
-@@ -18,7 +18,7 @@
+@@ -15,7 +15,7 @@
  INCPATH       = -I'../../qt/include/QtCore' -I'../../qt/include/QtNetwork' -I'../../qt/include/QtGui' -I'../../qt/include' -I'../../staging/include' -I'src' -I'src/json' -I'src/qt' -I'src/tor' -I'../../staging/include' -I'src/leveldb/include' -I'src/leveldb/helpers' -I'../../staging/include' -I'../../staging/include' -I'../../staging/include' -I'../../staging/include' -I'../../qt/include/ActiveQt' -I'build' -I'build' -I'../../qt/mkspecs/unsupported/win32-g++-cross'
  LINK        =        i686-w64-mingw32-g++
  LFLAGS        =        -Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware -static-libgcc -static-libstdc++ -Wl,-s -lmingwthrd -Wl,-subsystem,windows
--LIBS        =        -L'/home/coin/qt//lib' -lmingw32 -lqtmain build/bitcoin-qt_res.o -lqrencode -L/home/coin/staging/lib -lminiupnpc -liphlpapi /home/coin/deps/razor/src/leveldb/libleveldb.a /home/coin/deps/razor/src/leveldb/libmemenv.a -lshlwapi -L/home/coin/staging/lib -L/home/coin/staging/lib -L/home/coin/staging/lib -L/home/coin/staging/lib -ldb_cxx -lz -lshlwapi -lmswsock -lboost_system-mt-s -lboost_filesystem-mt-s -lboost_program_options-mt-s -lboost_thread_win32-mt-s -lboost_chrono-mt-s -L/home/coin/qt//plugins/codecs -lqcncodecs -lqjpcodecs -lqtwcodecs -lqkrcodecs -L/home/coin/qt//plugins/accessible -lqtaccessiblewidgets -lQtGui -lQtNetwork -lcomdlg32 -loleaut32 -limm32 -lwinmm -lwinspool -lmsimg32 -lQtCore -L/home/coin/deps/qt/lib -lssl -lcrypto -lgdi32 -lole32 -luuid -lws2_32 -ladvapi32 -lshell32 -luser32 -lkernel32 
+-LIBS        =        -L'/home/coin/qt//lib' -lmingwthrd -lmingw32 -lqtmain build/bitcoin-qt_res.o -lqrencode -L/home/coin/staging/lib -lminiupnpc -liphlpapi /home/coin/deps/razor/src/leveldb/libleveldb.a /home/coin/deps/razor/src/leveldb/libmemenv.a -lshlwapi -L/home/coin/staging/lib -L/home/coin/staging/lib -L/home/coin/staging/lib -L/home/coin/staging/lib -ldb_cxx -lz -lshlwapi -lmswsock -lboost_system-mt-s -lboost_filesystem-mt-s -lboost_program_options-mt-s -lboost_thread_win32-mt-s -lboost_chrono-mt-s -L/home/coin/qt//plugins/codecs -lqcncodecs -lqjpcodecs -lqtwcodecs -lqkrcodecs -L/home/coin/qt//plugins/accessible -lqtaccessiblewidgets -lQtGui -lQtNetwork -lcomdlg32 -loleaut32 -limm32 -lwinmm -lwinspool -lmsimg32 -lQtCore -L/home/coin/deps/qt/lib -lssl -lcrypto -lgdi32 -lole32 -luuid -lws2_32 -ladvapi32 -lshell32 -luser32 -lkernel32 
 +LIBS        =        -L'/home/coin/qt//lib' -lmingwthrd -lmingw32 -lqtmain build/bitcoin-qt_res.o -lqrencode -L/home/coin/staging/lib -lminiupnpc -liphlpapi /home/coin/deps/razor/src/leveldb/libleveldb.a /home/coin/deps/razor/src/leveldb/libmemenv.a -lshlwapi -L/home/coin/staging/lib -L/home/coin/staging/lib -L/home/coin/staging/lib -L/home/coin/staging/lib -ldb_cxx -lz -lshlwapi -lmswsock -lboost_system-mt-s -lboost_filesystem-mt-s -lboost_program_options-mt-s -lboost_thread_win32-mt-s -lboost_chrono-mt-s -L/home/coin/qt//plugins/codecs -lqcncodecs -lqjpcodecs -lqtwcodecs -lqkrcodecs -L/home/coin/qt//plugins/accessible -lqtaccessiblewidgets -lQtGui -lQtNetwork -lcomdlg32 -loleaut32 -limm32 -lwinmm -lwinspool -lmsimg32 -lQtCore -L/home/coin/deps/qt/lib -lssl -lcrypto -lgdi32 -lole32 -luuid -lws2_32 -ladvapi32 -lshell32 -luser32 -lkernel32 -lcrypt32 STAGING_HERE/lib/libevent.a STAGING_HERE/lib/libevent.dll.a -lws2_32
  QMAKE         = /home/coin/staging/host/bin/qmake
  IDC           = idc
@@ -42,43 +42,22 @@ cp release/*-qt.exe $OUTDIR/client
 # coind
 cd src
 make -f makefile.linux-mingw clean
-#echo "
-#--- a/makefile.linux-mingw 2014-04-02 11:32:16.471594423 +0300
-#+++ b/makefile.linux-mingw 2014-04-02 11:32:59.631051835 +0300
-#@@ -52,7 +52,7 @@
-#DEFS += -DUSE_IPV6=$(USE_IPV6)
-#endif
-#-LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
-#+LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi -lz -lcrypt32 STAGING_HERE/lib/libevent.a STAGING_HERE/lib/libevent.dll.a -lws2_32
-# TODO: make the mingw builds smarter about dependencies, like the linux/osx builds are
-#HEADERS = $(wildcard *.h) " | sed s2"STAGING_HERE"2"$(echo $STAGING)"2g | patch -l
-#make -f makefile.linux-mingw $MAKEOPTS DEPSDIR=$STAGING razord.exe USE_UPNP=0 DEBUGFLAGS="-frandom-seed=razor" USE_SSE2=1
-#$HOST-strip *.exe
-#rm -rf $OUTDIR/daemon
-#mkdir $OUTDIR/daemon
-#cp *.exe $OUTDIR/daemon
+echo "
+--- a/makefile.linux-mingw      2014-04-02 11:32:16.471594423 +0300
++++ b/makefile.linux-mingw      2014-04-02 11:32:59.631051835 +0300
+@@ -52,7 +52,7 @@
+        DEFS += -DUSE_IPV6=$(USE_IPV6)
+ endif
+ 
+-LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
++LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi -lz -lcrypt32 STAGING_HERE/lib/libevent.a STAGING_HERE/lib/libevent.dll.a -lws2_32
+ 
+ # TODO: make the mingw builds smarter about dependencies, like the linux/osx builds are
+ HEADERS = $(wildcard *.h) " | sed s2"STAGING_HERE"2"$(echo $STAGING)"2g | patch -l
+make -f makefile.linux-mingw $MAKEOPTS DEPSDIR=$STAGING razord.exe USE_UPNP=0 DEBUGFLAGS="-frandom-seed=razor" USE_SSE2=1
+$HOST-strip *.exe
+rm -rf $OUTDIR/daemon
+mkdir $OUTDIR/daemon
+cp *.exe $OUTDIR/daemon
 
-# installer
-cd ..
-rm -rf nsis
-mkdir nsis
-git archive HEAD | tar -x -C nsis
-cd nsis/src
-mkdir ../release
-cp ../../release/* ../release/
-#cp ../../src/*.exe .
-makensis ../share/setup.nsi
-rm -rf $OUTDIR/setup
-mkdir $OUTDIR/setup
-cp ../share/razor-*-win32-setup.exe $OUTDIR/setup/
-
-# results
-cd $OUTDIR
-rm -rf razor-dist.zip
-zip -r razor-dist.zip setup client daemon
-
-echo -e "\n\n"
-echo "Results are in $OUTDIR/razor-dist.zip"
-echo -e "\n"
-
-
+. ./nsis.sh

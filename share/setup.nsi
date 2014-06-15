@@ -5,7 +5,7 @@ SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.0.3.1
+!define VERSION 0.1.3.1
 !define COMPANY "Razor Foundation"
 !define URL http://www.razorco.in/
 
@@ -45,13 +45,13 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile razor-0.0.3.1-win32-setup.exe
+OutFile razor-0.1.3.1-win32-setup.exe
 InstallDir $PROGRAMFILES\Razor
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
-VIProductVersion 0.0.3.1
+VIProductVersion 0.1.3.1
 VIAddVersionKey ProductName Razor
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
@@ -69,15 +69,15 @@ Section -Main SEC0000
     File ../release/razor-qt.exe
     File /oname=COPYING.txt ../COPYING
     File /oname=readme.txt ../doc/README_windows.txt
-    #SetOutPath $INSTDIR\daemon
-    #File ../src/razord.exe
-    #SetOutPath $INSTDIR\src
-    #File /r /x *.exe /x *.o ../src\*.*
-    #SetOutPath $INSTDIR
+    SetOutPath $INSTDIR\daemon
+    File ../src/razord.exe
+    SetOutPath $INSTDIR\src
+    File /r /x *.exe /x *.o ../src\*.*
+    SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
     # Remove old wxwidgets-based-bitcoin executable and locales:
-    #Delete /REBOOTOK $INSTDIR\razor.exe
+    Delete /REBOOTOK $INSTDIR\razor.exe
     RMDir /r /REBOOTOK $INSTDIR\locale
 SectionEnd
 
@@ -122,8 +122,8 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\razor-qt.exe
     Delete /REBOOTOK $INSTDIR\COPYING.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
-    #RMDir /r /REBOOTOK $INSTDIR\daemon
-    #RMDir /r /REBOOTOK $INSTDIR\src
+    RMDir /r /REBOOTOK $INSTDIR\daemon
+    RMDir /r /REBOOTOK $INSTDIR\src
     DeleteRegValue HKCU "${REGKEY}\Components" Main
 SectionEnd
 

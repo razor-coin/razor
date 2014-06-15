@@ -2245,8 +2245,8 @@ Address: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>监听端口连接 &lt;port&gt; (缺省: 8777 or testnet: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>监听端口连接 &lt;port&gt; (缺省: 7272 or testnet: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

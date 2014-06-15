@@ -1,7 +1,7 @@
 Razor integration/staging tree
 ================================
 
-http://www.razor.org
+http://www.razorco.in
 
 * Copyright (c) 2009-2013 Bitcoin Developers
 * Copyright (c) 2011-2013 Litecoin Developers
@@ -11,12 +11,11 @@ What is Razor?
 ----------------
 
 Razor is a version of Litecoin that provides extra privacy features.
- - 2.5 minute block targets
- - during the first 3 months, subsidy is 3992 coins per block, reduced thereafter to result in 1.1% annual growth.
- - 210 million coins created in the first 3 months, increasing 1.1% thereafter
- - 12 blocks to retarget difficulty
+ - 75 second block targets
+ - 4 million coins, 100 coin reward, halving every 10,000 blocks
+ - Kimoto's Gravity Well
 
-For more information, see http://www.razor.org.
+For more information, see http://www.razorco.in.
 
 License
 -------

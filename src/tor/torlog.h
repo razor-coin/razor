@@ -70,7 +70,7 @@
 /** Application (socks) requests. */
 #define LD_APP      (1u<<8)
 /** Communication via the controller protocol. */
-#define LD_CORZROL  (1u<<9)
+#define LD_CONTROL  (1u<<9)
 /** Building, using, and managing circuits. */
 #define LD_CIRC     (1u<<10)
 /** Hidden services. */

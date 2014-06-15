@@ -2340,7 +2340,7 @@ crypto_dh_free(crypto_dh_t *dh)
  *
  * This is how much entropy OpenSSL likes to add right now, so maybe it will
  * work for us too. */
-#define ADD_ERZROPY 32
+#define ADD_ENTROPY 32
 
 /** True iff it's safe to use RAND_poll after setup.
  *
@@ -2424,7 +2424,7 @@ int
 crypto_seed_rng(int startup)
 {
   int rand_poll_ok = 0, load_entropy_ok = 0;
-  uint8_t buf[ADD_ERZROPY];
+  uint8_t buf[ADD_ENTROPY];
 
   /* OpenSSL has a RAND_poll function that knows about more kinds of
    * entropy than we do.  We'll try calling that, *and* calling our own entropy

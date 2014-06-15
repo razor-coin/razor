@@ -1,3 +1,6 @@
+
+
+
 #include "bitcoinunits.h"
 
 #include <QStringList>
@@ -45,9 +48,9 @@ QString BitcoinUnits::description(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("Razors");
-    case mBTC: return QString("Milli-Razors (1 / 1,000)");
-    case uBTC: return QString("Micro-Razors (1 / 1,000,000)");
+    case BTC: return QString("Razor");
+    case mBTC: return QString("Milli-Razor (1 / 1,000)");
+    case uBTC: return QString("Micro-Razor (1 / 1,000,000)");
     default: return QString("???");
     }
 }

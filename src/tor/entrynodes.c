@@ -464,7 +464,7 @@ pick_entry_guards(const or_options_t *options, int for_directory)
 
 /** How long (in seconds) do we allow an entry guard to be nonfunctional,
  * unlisted, excluded, or otherwise nonusable before we give up on it? */
-#define ERZRY_GUARD_REMOVE_AFTER (30*24*60*60)
+#define ENTRY_GUARD_REMOVE_AFTER (30*24*60*60)
 
 /** Release all storage held by <b>e</b>. */
 static void
@@ -581,7 +581,7 @@ remove_dead_entry_guards(time_t now)
     entry_guard_t *entry = smartlist_get(entry_guards, i);
     if (entry->bad_since &&
         ! entry->path_bias_disabled &&
-        entry->bad_since + ERZRY_GUARD_REMOVE_AFTER < now) {
+        entry->bad_since + ENTRY_GUARD_REMOVE_AFTER < now) {
 
       base16_encode(dbuf, sizeof(dbuf), entry->identity, DIGEST_LEN);
       format_local_iso_time(tbuf, entry->bad_since);

@@ -164,7 +164,7 @@
 
 /** How long do we keep DNS cache entries before purging them (regardless of
  * their TTL)? */
-#define MAX_DNS_ERZRY_AGE (30*60)
+#define MAX_DNS_ENTRY_AGE (30*60)
 /** How long do we cache/tell clients to cache DNS records when no TTL is
  * known? */
 #define DEFAULT_DNS_TTL (30*60)
@@ -217,9 +217,9 @@ typedef enum {
 /** Connection from the main process to a CPU worker process. */
 #define CONN_TYPE_CPUWORKER 10
 /** Type for listening for connections from user interface process. */
-#define CONN_TYPE_CORZROL_LISTENER 11
+#define CONN_TYPE_CONTROL_LISTENER 11
 /** Type for connections from user interface process. */
-#define CONN_TYPE_CORZROL 12
+#define CONN_TYPE_CONTROL 12
 /** Type for sockets listening for transparent connections redirected by pf or
  * netfilter. */
 #define CONN_TYPE_AP_TRANS_LISTENER 13
@@ -354,7 +354,7 @@ typedef enum {
 #define AP_CONN_STATE_RENDDESC_WAIT 6
 /** The controller will attach this connection to a circuit; it isn't our
  * job to do so. */
-#define AP_CONN_STATE_CORZROLLER_WAIT 7
+#define AP_CONN_STATE_CONTROLLER_WAIT 7
 /** State for a SOCKS connection: waiting for a completed circuit. */
 #define AP_CONN_STATE_CIRCUIT_WAIT 8
 /** State for a SOCKS connection: sent BEGIN, waiting for CONNECTED. */
@@ -392,13 +392,13 @@ typedef enum {
  * directory connection. */
 #define DIR_CONN_IS_SERVER(conn) ((conn)->purpose == DIR_PURPOSE_SERVER)
 
-#define CORZROL_CONN_STATE_MIN_ 1
+#define CONTROL_CONN_STATE_MIN_ 1
 /** State for a control connection: Authenticated and accepting v1 commands. */
-#define CORZROL_CONN_STATE_OPEN 1
+#define CONTROL_CONN_STATE_OPEN 1
 /** State for a control connection: Waiting for authentication; speaking
  * protocol v1. */
-#define CORZROL_CONN_STATE_NEEDAUTH 2
-#define CORZROL_CONN_STATE_MAX_ 2
+#define CONTROL_CONN_STATE_NEEDAUTH 2
+#define CONTROL_CONN_STATE_MAX_ 2
 
 #define DIR_PURPOSE_MIN_ 3
 /** A connection to a directory server: download a rendezvous
@@ -482,7 +482,7 @@ typedef enum {
 /** OR-side circuit purpose: normal circuit, at OR. */
 #define CIRCUIT_PURPOSE_OR 1
 /** OR-side circuit purpose: At OR, from Bob, waiting for intro from Alices. */
-#define CIRCUIT_PURPOSE_IRZRO_POINT 2
+#define CIRCUIT_PURPOSE_INTRO_POINT 2
 /** OR-side circuit purpose: At OR, from Alice, waiting for Bob. */
 #define CIRCUIT_PURPOSE_REND_POINT_WAITING 3
 /** OR-side circuit purpose: At OR, both circuits have this purpose. */
@@ -513,29 +513,29 @@ typedef enum {
 /** Client-side circuit purpose: Normal circuit, with cpath. */
 #define CIRCUIT_PURPOSE_C_GENERAL 5
 /** Client-side circuit purpose: at Alice, connecting to intro point. */
-#define CIRCUIT_PURPOSE_C_IRZRODUCING 6
-/** Client-side circuit purpose: at Alice, sent IRZRODUCE1 to intro point,
+#define CIRCUIT_PURPOSE_C_INTRODUCING 6
+/** Client-side circuit purpose: at Alice, sent INTRODUCE1 to intro point,
  * waiting for ACK/NAK. */
-#define CIRCUIT_PURPOSE_C_IRZRODUCE_ACK_WAIT 7
+#define CIRCUIT_PURPOSE_C_INTRODUCE_ACK_WAIT 7
 /** Client-side circuit purpose: at Alice, introduced and acked, closing. */
-#define CIRCUIT_PURPOSE_C_IRZRODUCE_ACKED 8
+#define CIRCUIT_PURPOSE_C_INTRODUCE_ACKED 8
 /** Client-side circuit purpose: at Alice, waiting for ack. */
 #define CIRCUIT_PURPOSE_C_ESTABLISH_REND 9
 /** Client-side circuit purpose: at Alice, waiting for Bob. */
 #define CIRCUIT_PURPOSE_C_REND_READY 10
-/** Client-side circuit purpose: at Alice, waiting for Bob, IRZRODUCE
+/** Client-side circuit purpose: at Alice, waiting for Bob, INTRODUCE
  * has been acknowledged. */
-#define CIRCUIT_PURPOSE_C_REND_READY_IRZRO_ACKED 11
+#define CIRCUIT_PURPOSE_C_REND_READY_INTRO_ACKED 11
 /** Client-side circuit purpose: at Alice, rendezvous established. */
 #define CIRCUIT_PURPOSE_C_REND_JOINED 12
 /** This circuit is used for build time measurement only */
 #define CIRCUIT_PURPOSE_C_MEASURE_TIMEOUT 13
 #define CIRCUIT_PURPOSE_C_MAX_ 13
 /** Hidden-service-side circuit purpose: at Bob, waiting for introductions. */
-#define CIRCUIT_PURPOSE_S_ESTABLISH_IRZRO 14
+#define CIRCUIT_PURPOSE_S_ESTABLISH_INTRO 14
 /** Hidden-service-side circuit purpose: at Bob, successfully established
  * intro. */
-#define CIRCUIT_PURPOSE_S_IRZRO 15
+#define CIRCUIT_PURPOSE_S_INTRO 15
 /** Hidden-service-side circuit purpose: at Bob, connecting to rend point. */
 #define CIRCUIT_PURPOSE_S_CONNECT_REND 16
 /** Hidden-service-side circuit purpose: at Bob, rendezvous established. */
@@ -543,7 +543,7 @@ typedef enum {
 /** A testing circuit; not meant to be used for actual traffic. */
 #define CIRCUIT_PURPOSE_TESTING 18
 /** A controller made this circuit and Tor should not use it. */
-#define CIRCUIT_PURPOSE_CORZROLLER 19
+#define CIRCUIT_PURPOSE_CONTROLLER 19
 /** This circuit is used for path bias probing only */
 #define CIRCUIT_PURPOSE_PATH_BIAS_TESTING 20
 #define CIRCUIT_PURPOSE_MAX_ 20
@@ -591,15 +591,15 @@ typedef enum {
 #define RELAY_COMMAND_EXTEND2 14
 #define RELAY_COMMAND_EXTENDED2 15
 
-#define RELAY_COMMAND_ESTABLISH_IRZRO 32
+#define RELAY_COMMAND_ESTABLISH_INTRO 32
 #define RELAY_COMMAND_ESTABLISH_RENDEZVOUS 33
-#define RELAY_COMMAND_IRZRODUCE1 34
-#define RELAY_COMMAND_IRZRODUCE2 35
+#define RELAY_COMMAND_INTRODUCE1 34
+#define RELAY_COMMAND_INTRODUCE2 35
 #define RELAY_COMMAND_RENDEZVOUS1 36
 #define RELAY_COMMAND_RENDEZVOUS2 37
-#define RELAY_COMMAND_IRZRO_ESTABLISHED 38
+#define RELAY_COMMAND_INTRO_ESTABLISHED 38
 #define RELAY_COMMAND_RENDEZVOUS_ESTABLISHED 39
-#define RELAY_COMMAND_IRZRODUCE_ACK 40
+#define RELAY_COMMAND_INTRODUCE_ACK 40
 
 /* Reasons why an OR connection is closed. */
 #define END_OR_CONN_REASON_DONE           1
@@ -628,7 +628,7 @@ typedef enum {
 #define END_STREAM_REASON_CONNRESET 12
 #define END_STREAM_REASON_TORPROTOCOL 13
 #define END_STREAM_REASON_NOTDIRECTORY 14
-#define END_STREAM_REASON_ERZRYPOLICY 15
+#define END_STREAM_REASON_ENTRYPOLICY 15
 
 /* These high-numbered end reasons are not part of the official spec,
  * and are not intended to be put in relay end cells. They are here
@@ -748,7 +748,7 @@ typedef enum {
 
 /** Length of the base32-encoded hash of an introduction point's
  * identity key. */
-#define REND_IRZRO_POINT_ID_LEN_BASE32 32
+#define REND_INTRO_POINT_ID_LEN_BASE32 32
 
 /** Length of the descriptor cookie that is used for client authorization
  * to hidden services. */
@@ -769,7 +769,7 @@ typedef enum {
 
 /** Length of client entry consisting of client identifier and encrypted
  * session key for hidden service authorization type 'basic'. */
-#define REND_BASIC_AUTH_CLIENT_ERZRY_LEN (REND_BASIC_AUTH_CLIENT_ID_LEN \
+#define REND_BASIC_AUTH_CLIENT_ENTRY_LEN (REND_BASIC_AUTH_CLIENT_ID_LEN \
                                           + CIPHER_KEY_LEN)
 
 /** Maximum size of v2 hidden service descriptors. */
@@ -822,7 +822,7 @@ typedef struct rend_data_t {
 } rend_data_t;
 
 /** Time interval for tracking replays of DH public keys received in
- * IRZRODUCE2 cells.  Used only to avoid launching multiple
+ * INTRODUCE2 cells.  Used only to avoid launching multiple
  * simultaneous attempts to connect to the same rendezvous point. */
 #define REND_REPLAY_TIME_INTERVAL (5 * 60)
 
@@ -1115,7 +1115,7 @@ typedef struct ext_or_cmd_t {
 /** A cell as packed for writing to the network. */
 typedef struct packed_cell_t {
   /** Next cell queued on this circuit. */
-  TOR_SIMPLEQ_ERZRY(packed_cell_t) next;
+  TOR_SIMPLEQ_ENTRY(packed_cell_t) next;
   char body[CELL_MAX_NETWORK_SIZE]; /**< Cell as packed for network. */
   uint32_t inserted_time; /**< Time (in milliseconds since epoch, with high
                            * bits truncated) when this cell was inserted. */
@@ -1187,9 +1187,9 @@ typedef struct socks_request_t socks_request_t;
 #define BASE_CONNECTION_MAGIC 0x7C3C304Eu
 #define OR_CONNECTION_MAGIC 0x7D31FF03u
 #define EDGE_CONNECTION_MAGIC 0xF0374013u
-#define ERZRY_CONNECTION_MAGIC 0xbb4a5703
+#define ENTRY_CONNECTION_MAGIC 0xbb4a5703
 #define DIR_CONNECTION_MAGIC 0x9988ffeeu
-#define CORZROL_CONNECTION_MAGIC 0x8abc765du
+#define CONTROL_CONNECTION_MAGIC 0x8abc765du
 #define LISTENER_CONNECTION_MAGIC 0x1a1ac741u
 
 /** Description of a connection to another host or process, and associated
@@ -1805,9 +1805,9 @@ typedef struct control_connection_t {
 #define DOWNCAST(to, ptr) ((to*)SUBTYPE_P(ptr, to, base_))
 
 /** Cast a entry_connection_t subtype pointer to a edge_connection_t **/
-#define ERZRY_TO_EDGE_CONN(c) (&(((c))->edge_))
+#define ENTRY_TO_EDGE_CONN(c) (&(((c))->edge_))
 /** Cast a entry_connection_t subtype pointer to a connection_t **/
-#define ERZRY_TO_CONN(c) (TO_CONN(ERZRY_TO_EDGE_CONN(c)))
+#define ENTRY_TO_CONN(c) (TO_CONN(ENTRY_TO_EDGE_CONN(c)))
 
 /** Convert a connection_t* to an or_connection_t*; assert if the cast is
  * invalid. */
@@ -1820,13 +1820,13 @@ static dir_connection_t *TO_DIR_CONN(connection_t *);
 static edge_connection_t *TO_EDGE_CONN(connection_t *);
 /** Convert a connection_t* to an entry_connection_t*; assert if the cast is
  * invalid. */
-static entry_connection_t *TO_ERZRY_CONN(connection_t *);
+static entry_connection_t *TO_ENTRY_CONN(connection_t *);
 /** Convert a edge_connection_t* to an entry_connection_t*; assert if the cast
  * is invalid. */
-static entry_connection_t *EDGE_TO_ERZRY_CONN(edge_connection_t *);
+static entry_connection_t *EDGE_TO_ENTRY_CONN(edge_connection_t *);
 /** Convert a connection_t* to an control_connection_t*; assert if the cast is
  * invalid. */
-static control_connection_t *TO_CORZROL_CONN(connection_t *);
+static control_connection_t *TO_CONTROL_CONN(connection_t *);
 /** Convert a connection_t* to an listener_connection_t*; assert if the cast is
  * invalid. */
 static listener_connection_t *TO_LISTENER_CONN(connection_t *);
@@ -1844,22 +1844,22 @@ static INLINE dir_connection_t *TO_DIR_CONN(connection_t *c)
 static INLINE edge_connection_t *TO_EDGE_CONN(connection_t *c)
 {
   tor_assert(c->magic == EDGE_CONNECTION_MAGIC ||
-             c->magic == ERZRY_CONNECTION_MAGIC);
+             c->magic == ENTRY_CONNECTION_MAGIC);
   return DOWNCAST(edge_connection_t, c);
 }
-static INLINE entry_connection_t *TO_ERZRY_CONN(connection_t *c)
+static INLINE entry_connection_t *TO_ENTRY_CONN(connection_t *c)
 {
-  tor_assert(c->magic == ERZRY_CONNECTION_MAGIC);
+  tor_assert(c->magic == ENTRY_CONNECTION_MAGIC);
   return (entry_connection_t*) SUBTYPE_P(c, entry_connection_t, edge_.base_);
 }
-static INLINE entry_connection_t *EDGE_TO_ERZRY_CONN(edge_connection_t *c)
+static INLINE entry_connection_t *EDGE_TO_ENTRY_CONN(edge_connection_t *c)
 {
-  tor_assert(c->base_.magic == ERZRY_CONNECTION_MAGIC);
+  tor_assert(c->base_.magic == ENTRY_CONNECTION_MAGIC);
   return (entry_connection_t*) SUBTYPE_P(c, entry_connection_t, edge_);
 }
-static INLINE control_connection_t *TO_CORZROL_CONN(connection_t *c)
+static INLINE control_connection_t *TO_CONTROL_CONN(connection_t *c)
 {
-  tor_assert(c->magic == CORZROL_CONNECTION_MAGIC);
+  tor_assert(c->magic == CONTROL_CONNECTION_MAGIC);
   return DOWNCAST(control_connection_t, c);
 }
 static INLINE listener_connection_t *TO_LISTENER_CONN(connection_t *c)
@@ -2110,7 +2110,7 @@ typedef struct {
 /** Tor should avoid using this router for circuit-building: we got it
  * from a crontroller.  If the controller wants to use it, it'll have to
  * ask for it by identity. */
-#define ROUTER_PURPOSE_CORZROLLER 1
+#define ROUTER_PURPOSE_CONTROLLER 1
 /** Tor should use this router only for bridge positions in circuits: we got
  * it via a directory request from the bridge itself, or a bridge
  * authority. x*/
@@ -2238,7 +2238,7 @@ typedef struct short_policy_t {
  * networkstatus document. */
 typedef struct microdesc_t {
   /** Hashtable node, used to look up the microdesc by its digest. */
-  HT_ERZRY(microdesc_t) node;
+  HT_ENTRY(microdesc_t) node;
 
   /* Cache information */
 
@@ -2309,7 +2309,7 @@ typedef struct node_t {
   /* Indexing information */
 
   /** Used to look up the node_t by its identity digest. */
-  HT_ERZRY(node_t) ht_ent;
+  HT_ENTRY(node_t) ht_ent;
   /** Position of the node within the list of nodes */
   int nodelist_idx;
 
@@ -2903,7 +2903,7 @@ typedef struct circuit_t {
   uint64_t dirreq_id;
 
   /** Next circuit in linked list of all circuits (global_circuitlist). */
-  TOR_LIST_ERZRY(circuit_t) head;
+  TOR_LIST_ENTRY(circuit_t) head;
 
   /** Next circuit in the doubly-linked ring of circuits waiting to add
    * cells to n_conn.  NULL if we have no cells pending, or if we're not
@@ -3096,7 +3096,7 @@ typedef struct origin_circuit_t {
   streamid_t next_stream_id;
 
   /* The intro key replaces the hidden service's public key if purpose is
-   * S_ESTABLISH_IRZRO or S_IRZRO, provided that no unversioned rendezvous
+   * S_ESTABLISH_INTRO or S_INTRO, provided that no unversioned rendezvous
    * descriptor is used. */
   crypto_pk_t *intro_key;
 
@@ -3219,7 +3219,7 @@ typedef struct or_circuit_t {
 #define REND_TOKEN_LEN DIGEST_LEN
 #endif
 
-  /** A hash of location-hidden service's PK if purpose is IRZRO_POINT, or a
+  /** A hash of location-hidden service's PK if purpose is INTRO_POINT, or a
    * rendezvous cookie if purpose is REND_POINT_WAITING. Filled with zeroes
    * otherwise.
    * ???? move to a subtype or adjunct structure? Wastes 20 bytes. -NM
@@ -3276,11 +3276,11 @@ static INLINE origin_circuit_t *TO_ORIGIN_CIRCUIT(circuit_t *x)
 
 /** Bitfield type: things that we're willing to use invalid routers for. */
 typedef enum invalid_router_usage_t {
-  ALLOW_INVALID_ERZRY       =1,
+  ALLOW_INVALID_ENTRY       =1,
   ALLOW_INVALID_EXIT        =2,
   ALLOW_INVALID_MIDDLE      =4,
   ALLOW_INVALID_RENDEZVOUS  =8,
-  ALLOW_INVALID_IRZRODUCTION=16,
+  ALLOW_INVALID_INTRODUCTION=16,
 } invalid_router_usage_t;
 
 /* limits for TCP send and recv buffer size used for constrained sockets */
@@ -3319,7 +3319,7 @@ typedef enum invalid_router_usage_t {
 /** Session group reserved for directory connections */
 #define SESSION_GROUP_DIRCONN -2
 /** Session group reserved for resolve requests launched by a controller */
-#define SESSION_GROUP_CORZROL_RESOLVE -3
+#define SESSION_GROUP_CONTROL_RESOLVE -3
 /** First automatically allocated session group number */
 #define SESSION_GROUP_FIRST_AUTO -4
 
@@ -3612,7 +3612,7 @@ typedef struct {
 
   /** Close hidden service client circuits immediately when they reach
    * the normal circuit-build timeout, even if they have already sent
-   * an IRZRODUCE1 cell on its way to the service. */
+   * an INTRODUCE1 cell on its way to the service. */
   int CloseHSClientCircuitsImmediatelyOnTimeout;
 
   /** Close hidden-service-side rendezvous circuits immediately when
@@ -4509,7 +4509,7 @@ typedef enum setopt_err_t {
 /** Enumerates possible origins of a client-side address mapping. */
 typedef enum {
   /** We're remapping this address because the controller told us to. */
-  ADDRMAPSRC_CORZROLLER,
+  ADDRMAPSRC_CONTROLLER,
   /** We're remapping this address because of an AutomapHostsOnResolve
    * configuration. */
   ADDRMAPSRC_AUTOMAP,
@@ -4591,7 +4591,7 @@ typedef enum buildtimeout_set_event_t {
   STMT_BEGIN                                                            \
     int _log_conn_is_control;                                           \
     tor_assert(conn);                                                   \
-    _log_conn_is_control = (conn->type == CONN_TYPE_CORZROL);           \
+    _log_conn_is_control = (conn->type == CONN_TYPE_CONTROL);           \
     if (_log_conn_is_control)                                           \
       disable_control_logging();                                        \
   STMT_BEGIN stmt; STMT_END;                                            \
@@ -4639,7 +4639,7 @@ typedef enum {
   /** For use in a vote networkstatus document */
   NS_V3_VOTE,
   /** For passing to the controlport in response to a GETINFO request */
-  NS_CORZROL_PORT,
+  NS_CONTROL_PORT,
   /** For use in a consensus networkstatus document (microdesc flavor) */
   NS_V3_CONSENSUS_MICRODESC
 } routerstatus_format_type_t;
@@ -4796,27 +4796,27 @@ typedef struct rend_encoded_v2_service_descriptor_t {
 /** The maximum number of non-circuit-build-timeout failures a hidden
  * service client will tolerate while trying to build a circuit to an
  * introduction point.  See also rend_intro_point_t.unreachable_count. */
-#define MAX_IRZRO_POINT_REACHABILITY_FAILURES 5
+#define MAX_INTRO_POINT_REACHABILITY_FAILURES 5
 
-/** The maximum number of distinct IRZRODUCE2 cells which a hidden
+/** The maximum number of distinct INTRODUCE2 cells which a hidden
  * service's introduction point will receive before it begins to
  * expire.
  *
  * XXX023 Is this number at all sane? */
-#define IRZRO_POINT_LIFETIME_IRZRODUCTIONS 16384
+#define INTRO_POINT_LIFETIME_INTRODUCTIONS 16384
 
 /** The minimum number of seconds that an introduction point will last
  * before expiring due to old age.  (If it receives
- * IRZRO_POINT_LIFETIME_IRZRODUCTIONS IRZRODUCE2 cells, it may expire
+ * INTRO_POINT_LIFETIME_INTRODUCTIONS INTRODUCE2 cells, it may expire
  * sooner.)
  *
  * XXX023 Should this be configurable? */
-#define IRZRO_POINT_LIFETIME_MIN_SECONDS (18*60*60)
+#define INTRO_POINT_LIFETIME_MIN_SECONDS (18*60*60)
 /** The maximum number of seconds that an introduction point will last
  * before expiring due to old age.
  *
  * XXX023 Should this be configurable? */
-#define IRZRO_POINT_LIFETIME_MAX_SECONDS (24*60*60)
+#define INTRO_POINT_LIFETIME_MAX_SECONDS (24*60*60)
 
 /** Introduction point information.  Used both in rend_service_t (on
  * the service side) and in rend_service_descriptor_t (on both the
@@ -4827,7 +4827,7 @@ typedef struct rend_intro_point_t {
                                * key, if this descriptor is V2. */
 
   /** (Client side only) Flag indicating that a timeout has occurred
-   * after sending an IRZRODUCE cell to this intro point.  After a
+   * after sending an INTRODUCE cell to this intro point.  After a
    * timeout, an intro point should not be tried again during the same
    * hidden service connection attempt, but it may be tried again
    * during a future connection attempt. */
@@ -4835,7 +4835,7 @@ typedef struct rend_intro_point_t {
 
   /** (Client side only) The number of times we have failed to build a
    * circuit to this intro point for some reason other than our
-   * circuit-build timeout.  See also MAX_IRZRO_POINT_REACHABILITY_FAILURES. */
+   * circuit-build timeout.  See also MAX_INTRO_POINT_REACHABILITY_FAILURES. */
   unsigned int unreachable_count : 3;
 
   /** (Service side only) Flag indicating that this intro point was
@@ -4848,11 +4848,11 @@ typedef struct rend_intro_point_t {
   unsigned int rend_service_note_removing_intro_point_called : 1;
 
   /** (Service side only) A replay cache recording the RSA-encrypted parts
-   * of IRZRODUCE2 cells this intro point's circuit has received.  This is
+   * of INTRODUCE2 cells this intro point's circuit has received.  This is
    * used to prevent replay attacks. */
   replaycache_t *accepted_intro_rsa_parts;
 
-  /** (Service side only) Count of IRZRODUCE2 cells accepted from this
+  /** (Service side only) Count of INTRODUCE2 cells accepted from this
    * intro point.
    */
   int accepted_introduce2_count;

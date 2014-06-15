@@ -9,8 +9,8 @@
  * \brief Header file for control.c.
  **/
 
-#ifndef TOR_CORZROL_H
-#define TOR_CORZROL_H
+#ifndef TOR_CONTROL_H
+#define TOR_CONTROL_H
 
 void control_update_global_event_mask(void);
 void control_adjust_event_log_severity(void);
@@ -114,7 +114,7 @@ void control_event_hs_descriptor_failed(const rend_data_t *rend_query,
 
 void control_free_all(void);
 
-#ifdef CORZROL_PRIVATE
+#ifdef CONTROL_PRIVATE
 /* Recognized asynchronous event types.  It's okay to expand this list
  * because it is used both as a list of v0 event types, and as indices
  * into the bitfield to determine which controllers want which events.

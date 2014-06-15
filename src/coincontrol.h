@@ -1,5 +1,5 @@
-#ifndef COINCORZROL_H
-#define COINCORZROL_H
+#ifndef COINCONTROL_H
+#define COINCONTROL_H
 
 /** Coin Control Features. */
 class CCoinControl
@@ -54,4 +54,4 @@ private:
 
 };
 
-#endif // COINCORZROL_H
+#endif // COINCONTROL_H

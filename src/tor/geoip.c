@@ -278,7 +278,7 @@ init_geoip_countries(void)
  * Recognized line formats for IPv4 are:
  *   INTIPLOW,INTIPHIGH,CC
  * and
- *   "INTIPLOW","INTIPHIGH","CC","CC3","COURZRY NAME"
+ *   "INTIPLOW","INTIPHIGH","CC","CC3","COUNTRY NAME"
  * where INTIPLOW and INTIPHIGH are IPv4 addresses encoded as 4-byte unsigned
  * integers, and CC is a country code.
  *
@@ -459,7 +459,7 @@ geoip_db_digest(sa_family_t family)
  * connection from that IP address. Used by bridges only, to track which
  * countries have them blocked. */
 typedef struct clientmap_entry_t {
-  HT_ERZRY(clientmap_entry_t) node;
+  HT_ENTRY(clientmap_entry_t) node;
   tor_addr_t addr;
  /* Name of pluggable transport used by this client. NULL if no
     pluggable transport was used. */
@@ -638,7 +638,7 @@ geoip_note_ns_response(geoip_ns_response_t response)
 /** Do not mention any country from which fewer than this number of IPs have
  * connected.  This conceivably avoids reporting information that could
  * deanonymize users, though analysis is lacking. */
-#define MIN_IPS_TO_NOTE_COURZRY 1
+#define MIN_IPS_TO_NOTE_COUNTRY 1
 /** Do not report any geoip data at all if we have fewer than this number of
  * IPs to report about. */
 #define MIN_IPS_TO_NOTE_ANYTHING 1
@@ -678,7 +678,7 @@ c_hist_compare_(const void **_a, const void **_b)
  * measure download times of requests to derive average client
  * bandwidths. */
 typedef struct dirreq_map_entry_t {
-  HT_ERZRY(dirreq_map_entry_t) node;
+  HT_ENTRY(dirreq_map_entry_t) node;
   /** Unique identifier for this network status request; this is either the
    * chan->global_identifier of the dir channel (direct request) or a new
    * locally unique identifier of a circuit (tunneled request). This ID is
@@ -1076,7 +1076,7 @@ geoip_get_client_history(geoip_client_action_t action,
     const char *countrycode;
     c_hist_t *ent;
     /* Only report a country if it has a minimum number of IPs. */
-    if (c >= MIN_IPS_TO_NOTE_COURZRY) {
+    if (c >= MIN_IPS_TO_NOTE_COUNTRY) {
       c = round_to_next_multiple_of(c, granularity);
       countrycode = geoip_get_country_name(i);
       ent = tor_malloc(sizeof(c_hist_t));

@@ -17,14 +17,14 @@
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CORZRIBUTORS ``AS IS'' AND
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CORZRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CORZRACT, STRICT
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
@@ -99,7 +99,7 @@ struct name {								\
 #define	TOR_SLIST_HEAD_INITIALIZER(head)					\
 	{ NULL }
  
-#define TOR_SLIST_ERZRY(type)						\
+#define TOR_SLIST_ENTRY(type)						\
 struct {								\
 	struct type *sle_next;	/* next element */			\
 }
@@ -172,7 +172,7 @@ struct name {								\
 #define TOR_LIST_HEAD_INITIALIZER(head)					\
 	{ NULL }
 
-#define TOR_LIST_ERZRY(type)						\
+#define TOR_LIST_ENTRY(type)						\
 struct {								\
 	struct type *le_next;	/* next element */			\
 	struct type **le_prev;	/* address of previous next element */	\
@@ -256,7 +256,7 @@ struct name {								\
 #define TOR_SIMPLEQ_HEAD_INITIALIZER(head)					\
 	{ NULL, &(head).sqh_first }
 
-#define TOR_SIMPLEQ_ERZRY(type)						\
+#define TOR_SIMPLEQ_ENTRY(type)						\
 struct {								\
 	struct type *sqe_next;	/* next element */			\
 }
@@ -328,7 +328,7 @@ struct name {								\
 #define TOR_TAILQ_HEAD_INITIALIZER(head)					\
 	{ NULL, &(head).tqh_first }
 
-#define TOR_TAILQ_ERZRY(type)						\
+#define TOR_TAILQ_ENTRY(type)						\
 struct {								\
 	struct type *tqe_next;	/* next element */			\
 	struct type **tqe_prev;	/* address of previous next element */	\
@@ -448,7 +448,7 @@ struct name {								\
 #define TOR_CIRCLEQ_HEAD_INITIALIZER(head)					\
 	{ TOR_CIRCLEQ_END(&head), TOR_CIRCLEQ_END(&head) }
 
-#define TOR_CIRCLEQ_ERZRY(type)						\
+#define TOR_CIRCLEQ_ENTRY(type)						\
 struct {								\
 	struct type *cqe_next;		/* next element */		\
 	struct type *cqe_prev;		/* previous element */		\

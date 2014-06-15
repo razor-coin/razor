@@ -2244,8 +2244,8 @@ Address: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 8777 or testnet: 18777)</source>
-        <translation>在通訊埠 &lt;port&gt; 聽候連線 (預設: 8777, 或若為測試網路: 18777)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 7272 or testnet: 17272)</source>
+        <translation>在通訊埠 &lt;port&gt; 聽候連線 (預設: 7272, 或若為測試網路: 17272)</translation>
     </message>
     <message>
         <location line="+5"/>

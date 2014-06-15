@@ -118,7 +118,7 @@ evdns_server_callback(struct evdns_server_request *req, void *data_)
 
   /* Make a new dummy AP connection, and attach the request to it. */
   entry_conn = entry_connection_new(CONN_TYPE_AP, AF_INET);
-  conn = ERZRY_TO_EDGE_CONN(entry_conn);
+  conn = ENTRY_TO_EDGE_CONN(entry_conn);
   TO_CONN(conn)->state = AP_CONN_STATE_RESOLVE_WAIT;
   conn->is_dns_request = 1;
 
@@ -140,10 +140,10 @@ evdns_server_callback(struct evdns_server_request *req, void *data_)
   entry_conn->session_group = listener->session_group;
   entry_conn->nym_epoch = get_signewnym_epoch();
 
-  if (connection_add(ERZRY_TO_CONN(entry_conn)) < 0) {
+  if (connection_add(ENTRY_TO_CONN(entry_conn)) < 0) {
     log_warn(LD_APP, "Couldn't register dummy connection for DNS request");
     evdns_server_request_respond(req, DNS_ERR_SERVERFAILED);
-    connection_free(ERZRY_TO_CONN(entry_conn));
+    connection_free(ENTRY_TO_CONN(entry_conn));
     return;
   }
 
@@ -179,7 +179,7 @@ dnsserv_launch_request(const char *name, int reverse,
 
   /* Make a new dummy AP connection, and attach the request to it. */
   entry_conn = entry_connection_new(CONN_TYPE_AP, AF_INET);
-  conn = ERZRY_TO_EDGE_CONN(entry_conn);
+  conn = ENTRY_TO_EDGE_CONN(entry_conn);
   conn->base_.state = AP_CONN_STATE_RESOLVE_WAIT;
 
   tor_addr_copy(&TO_CONN(conn)->addr, &control_conn->base_.addr);
@@ -211,9 +211,9 @@ dnsserv_launch_request(const char *name, int reverse,
   strlcpy(entry_conn->socks_request->address, name,
           sizeof(entry_conn->socks_request->address));
 
-  entry_conn->socks_request->listener_type = CONN_TYPE_CORZROL_LISTENER;
+  entry_conn->socks_request->listener_type = CONN_TYPE_CONTROL_LISTENER;
   entry_conn->original_dest_address = tor_strdup(name);
-  entry_conn->session_group = SESSION_GROUP_CORZROL_RESOLVE;
+  entry_conn->session_group = SESSION_GROUP_CONTROL_RESOLVE;
   entry_conn->nym_epoch = get_signewnym_epoch();
   entry_conn->isolation_flags = ISO_DEFAULT;
 

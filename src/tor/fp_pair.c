@@ -7,7 +7,7 @@
 /* Define fp_pair_map_t structures */
 
 struct fp_pair_map_entry_s {
-  HT_ERZRY(fp_pair_map_entry_s) node;
+  HT_ENTRY(fp_pair_map_entry_s) node;
   void *val;
   fp_pair_t key;
 };

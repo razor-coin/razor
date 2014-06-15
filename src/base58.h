@@ -276,7 +276,6 @@ public:
         SCRIPT_ADDRESS = 5,
         PUBKEY_ADDRESS_TEST = 121,
         SCRIPT_ADDRESS_TEST = 193,
-
     };
 
     bool Set(const CKeyID &id) {

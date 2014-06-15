@@ -20,7 +20,7 @@ cd ..
 wget http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz
 tar xzf db-4.8.30.NC.tar.gz
 cd db-4.8.30.NC/build_unix
-../dist/configure --prefix=$INSTALLPREFIX --enable-mingw --enable-cxx --host=$HOST --disable-shared
+../dist/configure --prefix=$INSTALLPREFIX --enable-mingw --enable-cxx --host=$HOST --disable-shared --disable-replication
 make $MAKEOPTS library_build
 make install_lib install_include
 cd ../..

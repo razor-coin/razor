@@ -7,7 +7,7 @@ SetCompressor /SOLID lzma
 !define REGKEY "SOFTWARE\$(^Name)"
 !define VERSION 0.1.3.1
 !define COMPANY "Razor Foundation"
-!define URL http://www.razor.org/
+!define URL http://www.razorco.in/
 
 # MUI Symbol Definitions
 !define MUI_ICON "../share/pixmaps/bitcoin.ico"

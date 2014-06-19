@@ -12,7 +12,7 @@ What is Razor?
 
 Razor is a version of Litecoin that provides extra privacy features.
  - 75 second block targets
- - 4 million coins, 100 coin reward, halving every 10,000 blocks
+ - 2 million coins, 100 coin reward, halving every 10,000 blocks
  - Kimoto's Gravity Well
 
 For more information, see http://www.razorco.in.

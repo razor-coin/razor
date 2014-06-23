@@ -789,14 +789,14 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
     } else {
         string automatic_onion;
-        filesystem::path const hostname_path = GetDefaultDataDir(
+        filesystem::path const hostname_path = GetDataDir(
         ) / "onion" / "hostname";
         if (
             !filesystem::exists(
                 hostname_path
             )
         ) {
-            return InitError(_("No external address found."));
+            return InitError(strprintf(_("No external address found. %s"), hostname_path.string().c_str()));
         }
         ifstream file(
             hostname_path.string(

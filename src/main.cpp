@@ -1067,6 +1067,8 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     int64 nSubsidyHalvingInterval = 10000;
 
     int halvings = nHeight / nSubsidyHalvingInterval;
+	if (halvings >= 64)
+		return nFees;
     nSubsidy >>= halvings;
 
     return nSubsidy + nFees;

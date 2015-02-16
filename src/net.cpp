@@ -1196,51 +1196,22 @@ void MapPort(bool)
 }
 #endif
 
-
-
-
 // hidden service seeds
 static const char *strMainNetOnionSeed[][1] = {
-    {"f7gczaz6zoqyuna7.onion"},
-    {"oav6jgr3vdbyicw2.onion"},
-    {"7kz7nqlk6huigxwh.onion"},
-    {"epu3xlejdxp3szln.onion"},
-    {"mp75zslar3v24ikq.onion"},
+    {"g5hkopzn72jnskrl.onion"},
+    {"i6yaiplgckrogwuf.onion"},
+    {"mu3rvkrnvp7d6gjy.onion"},
+    {"bx4anqtovl24tchc.onion"},
+    {"k4pswzubeeogmzu3.onion"},
+    {"d2w35dbpdv67nwhp.onion"},
+    {"verqcewi73cx6ho3.onion"},
    {NULL}
 };
 
 static const char *strTestNetOnionSeed[][1] = {
-    {"f7gczaz6zoqyuna7.onion"},
-    {"oav6jgr3vdbyicw2.onion"},
-    {"7kz7nqlk6huigxwh.onion"},
-    {"epu3xlejdxp3szln.onion"},
-    {"mp75zslar3v24ikq.onion"},
     {NULL}
 };
 
-
-
-
-/*
-// hidden service seeds
-static const char *strMainNetOnionSeed[][1] = {
-    {"ip2hmlyxtsqsogjz.onion"},
-    {"mphzihjmldmnshnv.onion"},
-    {"gsblxj3nuuvjvrm4.onion"},
-    {"oiqkwjtb4mzmotnz.onion"},
-    {"wza27vftw2wsb44y.onion"},
-    {NULL}
-};
-
-static const char *strTestNetOnionSeed[][1] = {
-    {"ip2hmlyxtsqsogjz.onion"},
-    {"mphzihjmldmnshnv.onion"},
-    {"gsblxj3nuuvjvrm4.onion"},
-    {"oiqkwjtb4mzmotnz.onion"},
-    {"wza27vftw2wsb44y.onion"},
-    {NULL}
-};
-*/
 void ThreadOnionSeed()
 {
     static const char *(*strOnionSeed)[1] = fTestNet ? strTestNetOnionSeed : strMainNetOnionSeed;
